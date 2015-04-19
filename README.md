@@ -1,9 +1,12 @@
 ## Angular 2.0 component syntax using Angular 1.x and Babel with Meteor
 
-This is only a "technology preview" and very much a work in progress. I was really curious if I could use the Angular 2 `@` Component syntax in Angular 1, by using Babel. Guess what, it's pretty amazing what can be achieved and not too difficult. Ok, so it's not Angular 2, but I like the syntax and the ability to create new components by extend existing components. Anyway, have a look, play around with it, and if you feel like it then let me know what you think. 
+This is very much a work in progress. I was really curious if I could use the Angular 2 @ Component syntax in Angular 1, by using Babel. Apparently I can, and it is not too difficult either. Ok, so it's not Angular 2, but it looks like it. Anyway, have a look, play around with it and let me know what you think.
 
 You are also welcome to contribute to this project.
-  
+
+### Can I use this outside of Meteor?
+Sure. This example is coded for Meteor, however, you can just as easily use this library in any other workflow that can run Babel. All the work is done by the ES6 decorator functions in angular2-now.js. Just include that library in your code and expose/import them where you want to use them as decorators.
+
 ### Installation
 
     meteor add pbastowski:angular2-now
@@ -23,11 +26,11 @@ The following decorators have been implemented to partially support the Angular 
 - `@Service` ({ (opt) module: 'angular1ModuleName' })
 - `@Filter` ({ (opt) module: 'angular1ModuleName' })
 
-This is not part of Angular 2 spec. I just wanted to see how to implement it. My advice: don't use it.
-- `@Controller`
-
-This is not implemented for the moment.
+This is not implemented for the moment. Use ng-app or manually bootstrap the app.
 - `@Bootstrap`
+
+This is not part of Angular 2 spec. I just wanted to see how to implement it. My advice: don't use it, because it won't exist in the future.
+- `@Controller`
 
 ### SetModuleName
 
@@ -55,7 +58,7 @@ This package exports angular2, from which you can import the decorators that you
 var {Component, Template, Service, Filter, Inject, SetModuleName} = angular2;
 ```
 
-or like so:
+or like this:
 
 ```javascript
 // You can also do it like this
@@ -64,12 +67,33 @@ or like so:
  ...
 ```
 
-I like the first syntax, because it looks a bit like the import syntax. 
+I like the first syntax, because it looks a bit like the ES6 module import syntax. 
+
+### What environment is required?
+- Angular 1.3+
+- Babel 5.1.10+ (lower versions process decorators in the wrong order)
+- Meteor 1.1.0.2
+
+#### Browsers
+- IE9+
+- Chrome
+- FireFox
 
 ### Examples
 
 ```javascript
 var {Component, Template, Service, Filter, Inject, SetModuleName} = angular2;
+
+// This assumes angular-meteor is used and that your components will be in 
+// and Angular 1.x module called "my-components" 
+// In your HTML add an ng-app on a div within the body.
+angular.module('app', [
+    'angular-meteor',
+    'my-components'
+]);
+
+// If we don't call SetModuleName then "app" will be assumed by default.
+SetModuleName('my-components');
 
 // The filter name is the same as the class name.
 @Filter()
