@@ -1,5 +1,5 @@
 Package.describe({
-  name: 'angular2-now',
+  name: 'pbastowski:angular2-now',
   version: '0.0.1',
   // Brief, one-line summary of the package.
   summary: 'Use Angular2 @Component syntax with Angular 1.x and Babel',
@@ -18,6 +18,6 @@ Package.onUse(function(api) {
 
 Package.onTest(function(api) {
   api.use('tinytest');
-  api.use('angular2-now');
+  api.use('pbastowski:angular2-now');
   api.addFiles('angular2-now-tests.js');
 });
