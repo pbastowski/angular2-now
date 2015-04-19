@@ -1,6 +1,6 @@
 ## Angular 2.0 component syntax using Angular 1.x and Babel with Meteor
 
-This is very much a work in progress. I was really curious if I could use the Angular 2 @ Component syntax in Angular 1, by using Babel. Apparently I can, and it is not too difficult either. Ok, so it's not Angular 2, but it looks like it. Anyway, have a look, play around with it and let me know what you think.
+I was really curious if I could use the Angular 2 @ Component syntax in Angular 1, by using Babel. Apparently I can, and it is not too difficult either. Ok, so it's not Angular 2, but it looks like it. Anyway, it's a work in progress. So, have a look, play around with it and let me know what you think.
 
 You are also welcome to contribute to this project.
 
