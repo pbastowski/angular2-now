@@ -1,6 +1,6 @@
 ## Angular 2.0 component syntax using Angular 1.x and Babel with Meteor
 
-This is only a "technology preview" and very much a work in progress. I was really curious if I could use the Angular 2 @Component syntax in Angular 1, by using Babel. Guess what, it's pretty amazing what can be achieved and not too difficult. Ok, so it's not Angular 2, but I like the syntax and the ability to create new components by extend existing components. Anyway, have a look, play around with it, and if you feel like it then let me know what you think. 
+This is only a "technology preview" and very much a work in progress. I was really curious if I could use the Angular 2 \@Component syntax in Angular 1, by using Babel. Guess what, it's pretty amazing what can be achieved and not too difficult. Ok, so it's not Angular 2, but I like the syntax and the ability to create new components by extend existing components. Anyway, have a look, play around with it, and if you feel like it then let me know what you think. 
 
 You are also welcome to contribute to this project.
   
@@ -17,17 +17,17 @@ You will also need the packages below:
 
 The following decorators have been implemented to partially support the Angular 2.0 directive syntax.
 
-- @Component ({ selector: 'tag-name', bind: { a: '=', etc: '@' }, services: ['$http', myServiceClass], (opt)module: 'angularModuleName' })
-- @Template ({ inline: '<div>Inline template</div>', url: 'pth/to/template.html'})
-- @Inject (['$http', myServiceClass, '$q'])
-- @Service ({ (opt) module: 'angular1ModuleName' })
-- @Filter ({ (opt) module: 'angular1ModuleName' })
+- \@Component ({ selector: 'tag-name', bind: { a: '=', etc: '@' }, services: ['$http', myServiceClass], (opt)module: 'angularModuleName' })
+- \@Template ({ inline: '<div>Inline template</div>', url: 'pth/to/template.html'})
+- \@Inject (['$http', myServiceClass, '$q'])
+- \@Service ({ (opt) module: 'angular1ModuleName' })
+- \@Filter ({ (opt) module: 'angular1ModuleName' })
 
 This is not part of Angular 2 spec. I just wanted to see how to implement it. My advice: don't use it.
-- @Controller
+- \@Controller
 
 This is not implemented for the moment.
-- @Bootstrap
+- \@Bootstrap
 
 ### SetModuleName
 
@@ -40,12 +40,12 @@ The module does not have to exist already. If it does not exist then it will be 
 ### ControllerAs
 The created components use ControllerAs syntax. So, when referring to properties or functions on the controller's "scope", make sure to prefix them with this in the controller and with the className, or the camel-cased selector name if different from the className, in the HTML templates.
   
-### Transclude and <content></content>
-@Template will automatically add "ng-transclude" the the <component> tag, if it finds one in your inline template. Also, the directive's transclude flag is set to true for all cases, whether or not they have a transcluded element or not. It does not seem to hurt anything and makes the code a bit simpler.
+### Transclude and `<content></content>`
+\@Template will automatically add "ng-transclude" the the <component> tag, if it finds one in your inline template. Also, the directive's transclude flag is set to true for all cases, whether or not they have a transcluded element or not. It does not seem to hurt anything and makes the code a bit simpler.
 
 Templates specified using the url property aren't currently checked and thus do not have "ng-transclude" added to them. You will have to manually add ng-transclude to the element you want to transclude in your template.
 
-### Importing the required @decorators from the package
+### Importing the required "@" decorators from the package
 
 This package exports angular2, from which you can import the decorators that you need, like so:
 
