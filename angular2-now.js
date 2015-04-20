@@ -40,25 +40,29 @@ function Component(options) {
 
         // selector is optional, if not specified then the className is used
         options.selector = camelCase(options.selector||'') || target.name+'';
+        if (options.selector[0] === '.') {
+            var isClass = true;
+            options.selector = options.selector.slice(1);
+        }
 
         // The template can be passed in from the @Template decorator
         options.template = target.template || options.template || undefined;
         options.templateUrl = target.templateUrl || options.templateUrl || undefined;
-
+console.log('restrict: ', options.selector, (options.template+options.templateUrl) ? 'EA' : isClass ? 'C' : 'A');
         // Create the angular directive
         // todo: use module and name-spaced directive naming, perhaps from a config file like Greg suggested
         angular.module(options.module)
             .directive(options.selector, function () {
             return {
-                restrict:         (options.template+options.templateUrl) ? 'EA' : 'A',
+                restrict:         (options.template+options.templateUrl) ? 'EA' : isClass ? 'C' : 'A',
                 controllerAs:     options.selector,
                 scope:            options['bind'] || {},
                 bindToController: true,
                 template:         options.template,
                 templateUrl:      options.templateUrl,
                 controller:       target,
-                //transclude:       /ng-transclude/i.test(options.template) || target.transclude,
-                transclude:       true
+                transclude:       /ng-transclude/i.test(options.template) || target.transclude,
+                //transclude:       true
             };
         });
     }
