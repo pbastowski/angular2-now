@@ -48,7 +48,7 @@ function Component(options) {
         // The template can be passed in from the @Template decorator
         options.template = target.template || options.template || undefined;
         options.templateUrl = target.templateUrl || options.templateUrl || undefined;
-console.log('restrict: ', options.selector, (options.template+options.templateUrl) ? 'EA' : isClass ? 'C' : 'A');
+
         // Create the angular directive
         // todo: use module and name-spaced directive naming, perhaps from a config file like Greg suggested
         angular.module(options.module)
