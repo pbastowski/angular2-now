@@ -71,7 +71,7 @@ This package exports angular2, from which you can import the decorators that you
 ```javascript
 // Import the Angular2 decorators using ES6 destructuring assignment
 // Look up ES6 destructuring here: https://babeljs.io/docs/learn-es6/ 
-var {Component, Template, Service, Filter, Inject, SetModuleName} = angular2;
+var {Component, Template, Service, Filter, Inject, SetModuleName, bootstrap} = angular2;
 ```
 
 or like this:
