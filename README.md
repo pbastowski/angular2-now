@@ -60,9 +60,9 @@ bootstrap(app);
 The created components use ControllerAs syntax. So, when referring to properties or functions on the controller's "scope", make sure to prefix them with this in the controller and with the className, or the camel-cased selector name if different from the className, in the HTML templates.
   
 ### Transclude and `<content></content>`
-`@Template` will automatically add "ng-transclude" to the `<content>` tag in your inline template. Also, the directive's transclude flag is set to true for all cases, whether or not they have a transcluded element or not. It does not seem to hurt anything and makes the code a bit simpler. Please correct me if I'm wrong.
+If your inline template includes a `<content>` tag then `@Template` will automatically add "ng-transclude" to it and the directive's transclude flag will be set to true.
 
-Templates specified using the url property aren't currently checked and thus do not get "ng-transclude" added to them by `@Template`. You will have to manually add ng-transclude to the element you want to transclude in your non-inline templates.
+Templates specified using the url property aren't currently checked and thus do not get `ng-transclude` added to them by `@Template`. You will have to manually add ng-transclude to the element you want to transclude in your non-inline templates.
 
 ### Importing the required "@" decorators from the package
 
