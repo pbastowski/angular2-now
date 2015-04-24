@@ -41,7 +41,7 @@ This allows you to bootstrap your Angular 1 app using the Angular 2 component bo
 
 Somewhere in your HTML add this:
 ```html
-<my-app>Some text inside my app</myapp>
+<my-app>Some text inside my app</my-app>
 ```
 And in your JavaScript add the code below. Note that your app-class-name must be the same as the app name you used with SetModuleName. Thus, `SetModuleName('app')` must have a corresponding `class app {}` and `bootstrap(app)`.  
 
