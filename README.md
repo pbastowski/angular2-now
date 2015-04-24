@@ -46,11 +46,13 @@ Somewhere in your HTML add this:
 And in your JavaScript add the code below. Note that your app-class-name must be the same as the app name you used with SetModuleName. Thus, `SetModuleName('app')` must have a corresponding `class app {}` and `bootstrap(app)`.  
 
 ```javascript
-SetModuleName('app')
+SetModuleName('app');
+
 @Component({selector: 'my-app'})
 @Template({inline: `<content></content>`})
 class app { 
 }
+
 bootstrap(app);
 ```
 
