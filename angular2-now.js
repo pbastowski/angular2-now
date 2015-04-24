@@ -1,30 +1,29 @@
-'use strict'
+'use strict';
 
 angular2 = {
         Component:     Component,
         Template:      Template,
         Inject:        Inject,
         Controller:    Controller,
-        Bootstrap:     Bootstrap,
         Service:       Service,
+        bootstrap:     bootstrap,
         'Filter':      Filter,
         SetModuleName: SetModuleName
 };
 
-//if (module)
-//    module.exports = {angular2: angular2};
-
 var currentModule = 'app';
 
-function SetModuleName (module) {
+function SetModuleName(module, dependsOn) {
     module = module || 'app';
     currentModule = module;
+
+    if (!dependsOn) dependsOn = [];
 
     // Check that the module exists and if not then create it now
     try {
         angular.module(module)
     } catch (er) {
-        angular.module(module, []);
+        angular.module(module, dependsOn);
     }
 }
 
@@ -45,31 +44,46 @@ function Component(options) {
             options.selector = options.selector.slice(1);
         }
 
+        // Save the unCamelCased selector name, so that bootstrap() can use it
+        target.selector = unCamelCase(options.selector);
+
         // The template can be passed in from the @Template decorator
         options.template = target.template || options.template || undefined;
         options.templateUrl = target.templateUrl || options.templateUrl || undefined;
 
         // Create the angular directive
         // todo: use module and name-spaced directive naming, perhaps from a config file like Greg suggested
-        angular.module(options.module)
-            .directive(options.selector, function () {
-            return {
-                restrict:         (options.template+options.templateUrl) ? 'EA' : isClass ? 'C' : 'A',
-                controllerAs:     options.selector,
-                scope:            options['bind'] || {},
-                bindToController: true,
-                template:         options.template,
-                templateUrl:      options.templateUrl,
-                controller:       target,
-                transclude:       /ng-transclude/i.test(options.template) || target.transclude,
-                //transclude:       true
-            };
-        });
-    }
+        try {
+            angular.module(options.module)
+                .directive(options.selector, function () {
+                return {
+                    restrict:         (options.template+options.templateUrl) ? 'EA' : isClass ? 'C' : 'A',
+                    controllerAs:     options.selector,
+                    scope:            options['bind'] || {},
+                    bindToController: true,
+                    template:         options.template,
+                    templateUrl:      options.templateUrl,
+                    controller:       target,
+                    replace:          false,
+                    transclude:       /ng-transclude/i.test(options.template) || target.transclude
+                };
+            });
+        } catch (er) {
+            throw new Error('Does module "' + options.module + '" exist? You may need to use SetModuleName("youModuleName").');
+        }
+    };
 
     function camelCase(s) {
         return s.replace(/-(.)/g, function(a,b) { return b.toUpperCase() })
     }
+
+    function unCamelCase(c) {
+        var s = c.replace(/([A-Z])/g, function(a,b) { return '-'+b.toLowerCase() });
+        if (s[0] === '-') s = s.slice(1);
+        return s;
+    }
+
+
 }
 
 function Inject(deps) {
@@ -78,15 +92,12 @@ function Inject(deps) {
         if (!target.$inject)
             target.$inject = [];
 
-        angular.forEach(deps, function(v,i) {
+        angular.forEach(deps, function(v) {
             if (v instanceof Object) v = v.name;
             if (target.$inject.indexOf(v) === -1)
                 target.$inject.push(v);
         });
 
-        //console.log('@ Inject: deps: ', target.$inject);
-
-        //target.$inject = deps;
         return target
     }
 }
@@ -101,13 +112,15 @@ function Template(options) {
         target.template = options.inline;
         target.templateUrl = options.url;
 
-        // If template contains the new <content> tag then add ng-transclude to it
-        // This will be picked up in @Component, where ddo.transclude will be set to true
+        // If template contains the new <content> tag then add ng-transclude to it.
+        // This will be picked up in @Component, where ddo.transclude will be set to true.
         // Note: If using options.url, you will have to add ng-transclude yourself to the element you wish to transclude
         // todo: access $templateCache looking for <content> and then add ng-transclude to it, as for an inline template
-        if (/\<content\>/i.test(options.inline))
-            target.template = target.template.replace(/\<content\>/i, '<content ng-transclude>');
-
+        var s = (options.inline ||'').match(/\<content[ >]([^\>]+)/i);
+        if (s) {
+            if (s[1].toLowerCase().indexOf('ng-transclude') === -1)
+                target.template = target.template.replace(/\<content/i, '<content ng-transclude');
+        }
         return target;
     }
 }
@@ -133,7 +146,8 @@ function Service(options) {
 
     return function(target) {
         angular.module(options.module)
-            .factory(target.name, function() { return new target } )
+            .service(target.name, target);
+            //.factory(target.name, function () { return new target })
     }
 }
 
@@ -143,21 +157,24 @@ function Filter(options) {
 
     return function(target) {
 
-        //console.log('@ Filter: ', target);
-
         angular.module(options.module)
             .filter(target.name, function () { return new target } );
     }
 }
 
-function Bootstrap (object) {
-    if (!object) {
+function bootstrap(target) {
+    if (!target) {
         throw new Error("Can't bootstrap Angular without an object");
-        return;
     }
-    angular.element(document).ready(function() {
-        angular.bootstrap()
 
+    SetModuleName(target.name);
+
+    angular.element(document).ready(function() {
+
+        // Find the component's element
+        var el = document.querySelector(target.selector);
+
+        angular.bootstrap(el, [target.name]);
     })
 }
 
