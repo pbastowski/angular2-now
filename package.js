@@ -1,6 +1,6 @@
 Package.describe({
   name: 'pbastowski:angular2-now',
-  version: '0.0.1',
+  version: '0.0.2',
   // Brief, one-line summary of the package.
   summary: 'Use Angular2 @Component syntax with Angular 1.x and Babel',
   // URL to the Git repository containing the source code for this package.
