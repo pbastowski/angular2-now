@@ -20,25 +20,39 @@ You will also need the packages below:
 
 The following decorators have been implemented to partially support the Angular 2.0 directive syntax.
 
-- `@Component` ({ selector: 'tag-name', bind: { a: '=', etc: '@' }, services: ['$http', myServiceClass], (opt)module: 'angularModuleName' })
-- `@Template` ({ inline: '`<div>Inline template</div>', url: 'pth/to/template.html`'})
-- `@Inject` (['$http', myServiceClass, '$q'])
-- `@Service` ({ (opt) module: 'angular1ModuleName' })
-- `@Filter` ({ (opt) module: 'angular1ModuleName' })
-
-This is not implemented for the moment. Use ng-app or manually bootstrap the app.
-- `@Bootstrap`
-
-This is not part of Angular 2 spec. I just wanted to see how to implement it. My advice: don't use it, because it won't exist in the future.
-- `@Controller`
+- `@Component ({ selector: 'tag-name', bind: { a: '=', etc: '@' }, services: ['$http', myServiceClass], (opt)module: 'angularModuleName' })`
+- `@Template ({ inline: '<div>Inline template</div>', url: 'pth/to/template.html'})`
+- `@Inject (['$http', myServiceClass, '$q'])`
+- `@Service ({ (opt) module: 'angular1ModuleName' })`
+- `@Filter ({ (opt) module: 'angular1ModuleName' })`
 
 ### SetModuleName
 
-Here is a helper function that allows us to set the Angular 1 module name in which to create the directives. Why is it necessary? Because I decided that the default module name for all directives is "app" ... so I can easily play with the code. So, to allow me to use other module names, I can set the module name with:
+- `SetModuleName ( 'app', ['angular-meteor', 'my-other-module'])`
 
-- `SetModuleName` ( 'angular1ModuleName' )
+This function allows us to set the Angular 1 module name in which the directives, services and filters will be created by the decorator functions. The optional second parameter can be used to specify which other modules this module depends on. It is equivalent to `angular.module( 'app', ['angular-meteor', 'my-other-module'] )`.   
 
-The module does not have to exist already. If it does not exist then it will be created. After this function call, all decorators will use this module name as the Angular 1.x module to create components in. 
+The module does not have to exist already. If it does not exist then it will be created. After this function call, all decorators will use this module name as the Angular 1.x module to create components, services and filters in. 
+
+### Bootstrapping the app
+- `bootstrap (app)` 
+
+This allows you to bootstrap your Angular 1 app using the Angular 2 component bootstrap syntax. So, there is no need to use `ng-app`. Using `bootstrap` is the equivalend of the Angular 1 manual bootstrapping method: `angular.bootstrap(DOMelement, ['app'])`. 
+
+Somewhere in your HTML add this:
+```html
+<my-app>Some text inside my app</myapp>
+```
+And in your JavaScript add the code below. Note that your app-class-name must be the same as the app name you used with SetModuleName. Thus, `SetModuleName('app')` must have a corresponding `class app {}` and `bootstrap(app)`.  
+
+```javascript
+SetModuleName('app')
+@Component({selector: 'my-app'})
+@Template({inline: `<content></content>`})
+class app { 
+}
+bootstrap(app);
+```
 
 ### ControllerAs
 The created components use ControllerAs syntax. So, when referring to properties or functions on the controller's "scope", make sure to prefix them with this in the controller and with the className, or the camel-cased selector name if different from the className, in the HTML templates.
