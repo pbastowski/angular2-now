@@ -19,5 +19,6 @@ Package.onUse(function(api) {
 Package.onTest(function(api) {
   api.use('tinytest');
   api.use('pbastowski:angular2-now');
+  api.use('angularjs:angular@1.3.15', 'client');
   api.addFiles('angular2-now-tests.js');
 });
