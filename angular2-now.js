@@ -20,11 +20,14 @@ function SetModuleName(module, dependsOn) {
     if (!dependsOn) dependsOn = [];
 
     // Check that the module exists and if not then create it now
+    var ngModule;
     try {
-        angular.module(module)
+        ngModule = angular.module(module)
     } catch (er) {
-        angular.module(module, dependsOn);
+        ngModule = angular.module(module, dependsOn);
     }
+
+    return ngModule;
 }
 
 function Component(options) {
@@ -111,6 +114,9 @@ function Template(options) {
     return function (target) {
         target.template = options.inline;
         target.templateUrl = options.url;
+
+            // When a template url is specified in options, then transclude can also be specified
+            target.transclude = options.transclude;
 
         // If template contains the new <content> tag then add ng-transclude to it.
         // This will be picked up in @Component, where ddo.transclude will be set to true.
