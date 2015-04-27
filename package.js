@@ -1,6 +1,6 @@
 Package.describe({
   name: 'pbastowski:angular2-now',
-  version: '0.0.2',
+  version: '0.0.3',
   // Brief, one-line summary of the package.
   summary: 'Use Angular2 @Component syntax with Angular 1.x and Babel',
   // URL to the Git repository containing the source code for this package.
@@ -18,7 +18,7 @@ Package.onUse(function(api) {
 
 Package.onTest(function(api) {
   api.use('tinytest');
-  api.use('pbastowski:angular2-now');
   api.use('angularjs:angular@1.3.15', 'client');
+  api.use('pbastowski:angular2-now');
   api.addFiles('angular2-now-tests.js');
 });
