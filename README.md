@@ -20,8 +20,8 @@ You will also need the packages below:
 
 The following decorators have been implemented to partially support the Angular 2.0 directive syntax.
 
-- `@Component ({ selector: 'tag-name', bind: { a: '=', etc: '@' }, services: ['$http', myServiceClass], (opt)module: 'angularModuleName' })`
-- `@Template ({ inline: '<div>Inline template</div>', url: 'pth/to/template.html'})`
+- `@Component ({ selector: 'tag-name', bind: { a: '=', etc: '@' }, injectables: ['$http', myServiceClass], (opt)module: 'angularModuleName' })`
+- `@View ({ template: '<div>Inline template</div>', templateUrl: 'pth/to/template.html'})`
 - `@Inject (['$http', myServiceClass, '$q'])`
 - `@Service ({ (opt) module: 'angular1ModuleName' })`
 - `@Filter ({ (opt) module: 'angular1ModuleName' })`
@@ -49,7 +49,7 @@ And in your JavaScript add the code below. Note that your app-class-name must be
 SetModuleName('app');
 
 @Component({selector: 'my-app'})
-@Template({inline: `<content></content>`})
+@View({template: `<content></content>`})
 class app { 
 }
 
@@ -60,9 +60,9 @@ bootstrap(app);
 The created components use ControllerAs syntax. So, when referring to properties or functions on the controller's "scope", make sure to prefix them with this in the controller and with the className, or the camel-cased selector name if different from the className, in the HTML templates.
   
 ### Transclude and `<content></content>`
-If your inline template includes a `<content>` tag then `@Template` will automatically add `ng-transclude` to it and the directive's transclude flag will be set to true.
+If your inline template includes a `<content>` tag then `@View` will automatically add `ng-transclude` to it and the directive's transclude flag will be set to true.
 
-Templates specified using the url property aren't currently checked and thus do not get `ng-transclude` added to them by `@Template`. You will have to manually add ng-transclude to the element you want to transclude in your non-inline templates.
+Templates specified using the url property aren't currently checked and thus do not get `ng-transclude` added to them by `@View`. You will have to manually add ng-transclude to the element you want to transclude in your non-inline templates.
 
 ### Importing the required "@" decorators from the package
 
@@ -217,7 +217,7 @@ class fileChange {
 
 // selector is assumed to be "upload-images"
 @Component()
-@Template({ inline:'<p><b>Uploaded Images</b></p>'})
+@View({ template:'<p><b>Uploaded Images</b></p>'})
 class uploadedImages {
 
     constructor ($scope, $element) {
@@ -238,10 +238,10 @@ class uploadedImages {
         a3: '&'
     }
 })
-@Template({
+@View({
     // Using a url to specify the template location. This is the equivalent of
     // templateUrl in Angular 1.x.
-    url: 'client/booger.html'
+    templateUrl: 'client/booger.html'
 })
 @Inject(['$element'])
 class booger {
@@ -261,13 +261,13 @@ class booger {
     selector: 'another-booger',
     bind: { abc: '=' }
 })
-@Template({
-    inline:`
+@View({
+    template:`
         <h2>Another Booger</h2>
         <p>@template takes precedence over @Component: {{ anotherBooger.abc }}</p>
         <content></content>
     `,
-    url: undefined
+    templateUrl: undefined
 })
 @Inject(['$element'])
 class bigBooger extends booger {
@@ -284,8 +284,8 @@ class bigBooger extends booger {
     selector: 'my-special',
     bind: { xxx: '=' }
 })
-@Template({
-    inline: `
+@View({
+    template: `
         <h2>my-special</h2>
         <pre>Name is {{paulSpecial.xxx}}</pre>
         <content></content>
@@ -307,10 +307,10 @@ class proto {
 @Component({
     selector: 'my-special2',
     bind: { yyy: '@' },
-    services: [ 'service1', service2 ]
+    injectables: [ 'service1', service2 ]
 })
-@Template({
-    inline: `
+@View({
+    template: `
         <h2>my-special 2</h2>
         <pre>Name is {{paulSpecial2.yyy}}</pre>
         <content></content>

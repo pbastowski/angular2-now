@@ -1,14 +1,15 @@
 'use strict';
 
 angular2 = {
-        Component:     Component,
-        Template:      Template,
-        Inject:        Inject,
-        Controller:    Controller,
-        Service:       Service,
-        bootstrap:     bootstrap,
-        'Filter':      Filter,
-        SetModuleName: SetModuleName
+    Component:     Component,
+    Template:      Template,
+    View:          View,
+    Inject:        Inject,
+    Controller:    Controller,
+    Service:       Service,
+    bootstrap:     bootstrap,
+    'Filter':      Filter,
+    SetModuleName: SetModuleName
 };
 
 var currentModule = 'app';
@@ -37,11 +38,11 @@ function Component(options) {
     return function (target) {
 
         // service injections
-        if (options.services && options.services instanceof Array)
-            target = Inject(options.services)(target);
+        if (options.injectables && options.injectables instanceof Array)
+            target = Inject(options.injectables)(target);
 
         // selector is optional, if not specified then the className is used
-        options.selector = camelCase(options.selector||'') || target.name+'';
+        options.selector = camelCase(options.selector || '') || target.name + '';
         if (options.selector[0] === '.') {
             var isClass = true;
             options.selector = options.selector.slice(1);
@@ -56,32 +57,37 @@ function Component(options) {
 
         // Create the angular directive
         // todo: use module and name-spaced directive naming, perhaps from a config file like Greg suggested
+        var ddo = {
+            restrict:         (options.template + options.templateUrl) ? 'EA' : isClass ? 'C' : 'A',
+            controllerAs:     options.selector,
+            scope:            options['bind'] || {},
+            bindToController: true,
+            template:         options.template,
+            templateUrl:      options.templateUrl,
+            controller:       target,
+            replace:          false,
+            transclude:       /ng-transclude/i.test(options.template) || target.transclude
+        }
+
         try {
             angular.module(options.module)
-                .directive(options.selector, function () {
-                return {
-                    restrict:         (options.template+options.templateUrl) ? 'EA' : isClass ? 'C' : 'A',
-                    controllerAs:     options.selector,
-                    scope:            options['bind'] || {},
-                    bindToController: true,
-                    template:         options.template,
-                    templateUrl:      options.templateUrl,
-                    controller:       target,
-                    replace:          false,
-                    transclude:       /ng-transclude/i.test(options.template) || target.transclude
-                };
-            });
+                .directive(options.selector, function () { return ddo; });
         } catch (er) {
             throw new Error('Does module "' + options.module + '" exist? You may need to use SetModuleName("youModuleName").');
         }
     };
 
+
     function camelCase(s) {
-        return s.replace(/-(.)/g, function(a,b) { return b.toUpperCase() })
+        return s.replace(/-(.)/g, function (a, b) {
+            return b.toUpperCase()
+        })
     }
 
     function unCamelCase(c) {
-        var s = c.replace(/([A-Z])/g, function(a,b) { return '-'+b.toLowerCase() });
+        var s = c.replace(/([A-Z])/g, function (a, b) {
+            return '-' + b.toLowerCase()
+        });
         if (s[0] === '-') s = s.slice(1);
         return s;
     }
@@ -91,11 +97,11 @@ function Component(options) {
 
 function Inject(deps) {
     deps = deps || [];
-    return function(target) {
+    return function (target) {
         if (!target.$inject)
             target.$inject = [];
 
-        angular.forEach(deps, function(v) {
+        angular.forEach(deps, function (v) {
             if (v instanceof Object) v = v.name;
             if (target.$inject.indexOf(v) === -1)
                 target.$inject.push(v);
@@ -106,7 +112,6 @@ function Inject(deps) {
 }
 
 
-
 function Template(options) {
     options = options || {};
     if (!options.inline) options.inline = undefined;
@@ -115,14 +120,14 @@ function Template(options) {
         target.template = options.inline;
         target.templateUrl = options.url;
 
-            // When a template url is specified in options, then transclude can also be specified
-            target.transclude = options.transclude;
+        // When a template url is specified in options, then transclude can also be specified
+        target.transclude = options.transclude;
 
         // If template contains the new <content> tag then add ng-transclude to it.
         // This will be picked up in @Component, where ddo.transclude will be set to true.
         // Note: If using options.url, you will have to add ng-transclude yourself to the element you wish to transclude
         // todo: access $templateCache looking for <content> and then add ng-transclude to it, as for an inline template
-        var s = (options.inline ||'').match(/\<content[ >]([^\>]+)/i);
+        var s = (options.inline || '').match(/\<content[ >]([^\>]+)/i);
         if (s) {
             if (s[1].toLowerCase().indexOf('ng-transclude') === -1)
                 target.template = target.template.replace(/\<content/i, '<content ng-transclude');
@@ -131,18 +136,41 @@ function Template(options) {
     }
 }
 
-function Controller(module) {
-    module = module || currentModule || 'app';
-    return function (target) {
-        target.controllerAs = target.name || '';
-        target.bindToController = true;
+function View(options) {
+    options = options || {};
+    if (!options.template) options.template = undefined;
 
-                //module+target.name.slice(0,1).toUpperCase()+target.name.slice(1),
-        angular.module(module)
-            .controller(
-                module+'.'+target.name,
-                target
-            );
+    return function (target) {
+        target.template = options.template;
+        target.templateUrl = options.templateUrl;
+
+        // When a templateUrl is specified in options, then transclude can also be specified
+        target.transclude = options.transclude;
+
+        // directives is an array of child directive controllers (Classes)
+        target.directives = options.directives;
+
+        // If template contains the new <content> tag then add ng-transclude to it.
+        // This will be picked up in @Component, where ddo.transclude will be set to true.
+        // Note: If using options.url, you will have to add ng-transclude yourself to the element you wish to transclude
+        // todo: access $templateCache looking for <content> and then add ng-transclude to it, as for an inline template
+        var s = (options.template || '').match(/\<content[ >]([^\>]+)/i);
+        if (s) {
+            if (s[1].toLowerCase().indexOf('ng-transclude') === -1)
+                target.template = target.template.replace(/\<content/i, '<content ng-transclude');
+        }
+        return target;
+    }
+}
+
+function Controller(option) {
+    options = options || {};
+    if (!options.module) options.module = currentModule || 'app';
+
+    return function (target) {
+        //module+target.name.slice(0,1).toUpperCase()+target.name.slice(1),
+        angular.module(options.module)
+            .controller(options.module + '.' + target.name, target);
     }
 }
 
@@ -150,10 +178,10 @@ function Service(options) {
     options = options || {};
     if (!options.module) options.module = currentModule || 'app';
 
-    return function(target) {
+    return function (target) {
         angular.module(options.module)
             .service(target.name, target);
-            //.factory(target.name, function () { return new target })
+        //.factory(target.name, function () { return new target })
     }
 }
 
@@ -161,10 +189,12 @@ function Filter(options) {
     options = options || {};
     if (!options.module) options.module = currentModule || 'app';
 
-    return function(target) {
+    return function (target) {
 
         angular.module(options.module)
-            .filter(target.name, function () { return new target } );
+            .filter(target.name, function () {
+                return new target
+            });
     }
 }
 
@@ -175,7 +205,7 @@ function bootstrap(target) {
 
     SetModuleName(target.name);
 
-    angular.element(document).ready(function() {
+    angular.element(document).ready(function () {
 
         // Find the component's element
         var el = document.querySelector(target.selector);
