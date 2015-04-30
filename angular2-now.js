@@ -205,12 +205,15 @@ function bootstrap(target) {
 
     SetModuleName(target.name);
 
-    angular.element(document).ready(function () {
+    if (Meteor.isCordova)
+        angular.element(document).on("deviceready", onReady);
+    else
+        angular.element(document).ready(onReady);
 
+    function onReady() {
         // Find the component's element
         var el = document.querySelector(target.selector);
 
         angular.bootstrap(el, [target.name]);
-    })
+    }
 }
-
