@@ -37,11 +37,11 @@ The module does not have to exist already. If it does not exist then it will be 
 ### Bootstrapping the app
 - `bootstrap (app)` 
 
-This allows you to bootstrap your Angular 1 app using the Angular 2 component bootstrap syntax. So, there is no need to use `ng-app`. Using `bootstrap` is the equivalend of the Angular 1 manual bootstrapping method: `angular.bootstrap(DOMelement, ['app'])`. 
+This allows you to bootstrap your Angular 1 app using the Angular 2 component bootstrap syntax. So, there is no need to use `ng-app`. Using `bootstrap` is the equivalend of the Angular 1 manual bootstrapping method: `angular.bootstrap(DOMelement, ['app'])`. The bootstrap function also knows how to handle Meteor.isCordova apps. 
 
 Somewhere in your HTML add this:
 ```html
-<my-app>Some text inside my app</my-app>
+<my-app>Optional content inside my app that can be transcluded</my-app>
 ```
 And in your JavaScript add the code below. Note that your app-class-name must be the same as the app name you used with SetModuleName. Thus, `SetModuleName('app')` must have a corresponding `class app {}` and `bootstrap(app)`.  
 
