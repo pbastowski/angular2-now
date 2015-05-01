@@ -205,7 +205,7 @@ function bootstrap(target) {
 
     SetModuleName(target.name);
 
-    if (Meteor.isCordova)
+    if (Meteor && Meteor.isCordova)
         angular.element(document).on("deviceready", onReady);
     else
         angular.element(document).ready(onReady);
