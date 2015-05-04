@@ -198,12 +198,15 @@ function Filter(options) {
     }
 }
 
-function bootstrap(target) {
+function bootstrap(target, config) {
     if (!target) {
         throw new Error("Can't bootstrap Angular without an object");
     }
 
     SetModuleName(target.name);
+
+    if (!config) config = { strictDi: false };
+
 
     if (Meteor && Meteor.isCordova)
         angular.element(document).on("deviceready", onReady);
@@ -214,6 +217,6 @@ function bootstrap(target) {
         // Find the component's element
         var el = document.querySelector(target.selector);
 
-        angular.bootstrap(el, [target.name]);
+        angular.bootstrap(el, [target.name], config);
     }
 }
