@@ -191,7 +191,8 @@ function bootstrap(target, config) {
     throw new Error("Can't bootstrap Angular without an object");
   }
 
-  var bootModule = target.moduleName || camelCase(target.selector) || currentModule;
+  //var bootModule = target.moduleName || camelCase(target.selector) || currentModule;
+  var bootModule = target.moduleName || target.selector || currentModule;
 
   if (bootModule !== currentModule)
     SetModuleName(bootModule);

@@ -56,7 +56,7 @@ Somewhere in your HTML add this:
 ```html
 <my-app>Optional content inside my app that can be transcluded</my-app>
 ```
-And in your JavaScript add the code below. Note that your app-class-name must be the same as the app name you used with SetModuleName. Thus, `SetModuleName('app')` must have a corresponding `class app {}` and `bootstrap(app)`.  
+And in your JavaScript add the code below.  
 
 ```javascript
 angular.module('app', []);
@@ -69,11 +69,14 @@ class app {
 bootstrap(app);
 ```
 
-A bootstrap component can optionally specify the component name, which is the module name that will be used to bootstrap that Angular app. So, if the bootstrap module name is 'socially', then the example above would look like this:
+A bootstrap component can optionally specify the component name, which is the module name that will be used to bootstrap that Angular app. So, if the bootstrap module name was 'socially', then the example above would look like this:
 
     @Component({ selector: 'my-app', name: 'socially' })
-    
-If you don't specify a component name then bootstrap will use the current module name, as set with `SetModuleName()`.
+
+And you would also need to create the module named "socially".
+
+If you don't specify a module "name" in the @Component annotation, then bootstrap() will use the selector name as the name for your bootstrap module. 
+
 
 ### ControllerAs
 The created components use ControllerAs syntax. So, when referring to properties or functions on the controller's "scope", make sure to prefix them with this in the controller and with the className, or the camel-cased selector name if different from the className, in the HTML templates.
@@ -90,7 +93,7 @@ This package exports angular2, from which you can import the decorators that you
 ```javascript
 // Import the Angular2 decorators using ES6 destructuring assignment
 // Look up ES6 destructuring here: https://babeljs.io/docs/learn-es6/ 
-var {Component, Template, Service, Filter, Inject, SetModuleName, bootstrap} = angular2;
+var {Component, Template, Service, Filter, Inject, bootstrap} = angular2;
 ```
 
 or like this:
