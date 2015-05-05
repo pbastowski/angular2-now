@@ -5,7 +5,7 @@ I was really curious if I could use the Angular 2 @ Component syntax in Angular 
 You are also welcome to contribute to this project.
 
 ### Can I use this outside of Meteor?
-Sure. This example is coded for Meteor, however, you can just as easily use this library in any other workflow that can run Babel. All the work is done by the ES6 decorator functions in angular2-now.js. Just include that library in your code and expose/import them where you want to use them as decorators.
+Sure. This example is coded for Meteor, however, you can just as easily use this library in any other workflow that can run Babel. All the work is done by the ES6 decorator functions in angular2-now.es6.js. Just include that library in your code and expose/import them where you want to use them as decorators.
 
 ### Installation
 
@@ -20,11 +20,11 @@ You will also need the packages below:
 
 The following decorators have been implemented to partially support the Angular 2.0 directive syntax.
 
-- `@Component ({ selector: 'tag-name', bind: { a: '=', etc: '@' }, injectables: ['$http', myServiceClass], (opt)module: 'angularModuleName' })`
+- `@Component ({ selector: 'tag-name', bind: { a: '=', etc: '@' }, injectables: ['$http', myServiceClass], ?module: 'angularModuleName', ?name: 'bootstrapComponentName' })`
 - `@View ({ template: '<div>Inline template</div>', templateUrl: 'pth/to/template.html'})`
 - `@Inject (['$http', myServiceClass, '$q'])`
-- `@Service ({ (opt) module: 'angular1ModuleName' })`
-- `@Filter ({ (opt) module: 'angular1ModuleName' })`
+- `@Service ({ name: 'serviceName', ?module: 'angularModuleName' })`
+- `@Filter ({ name: 'filterName', ?module: 'angularModuleName' })`
 
 ### SetModuleName
 
@@ -56,6 +56,12 @@ class app {
 
 bootstrap(app);
 ```
+
+A bootstrap component can optionally specify the component name, which is the module name that will be used to bootstrap that Angular app. So, if the bootstrap module name is 'socially', then the example above would look like this:
+
+    @Component({ selector: 'my-app', name: 'socially' })
+    
+If you don't specify a component name then bootstrap will use the current module name, as set with `SetModuleName()`.
 
 ### ControllerAs
 The created components use ControllerAs syntax. So, when referring to properties or functions on the controller's "scope", make sure to prefix them with this in the controller and with the className, or the camel-cased selector name if different from the className, in the HTML templates.
