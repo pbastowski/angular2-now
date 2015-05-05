@@ -59,9 +59,9 @@ Somewhere in your HTML add this:
 And in your JavaScript add the code below. Note that your app-class-name must be the same as the app name you used with SetModuleName. Thus, `SetModuleName('app')` must have a corresponding `class app {}` and `bootstrap(app)`.  
 
 ```javascript
-SetModuleName('app');
+angular.module('app', []);
 
-@Component({selector: 'my-app'})
+@Component({selector: 'my-app', name: 'app' })
 @View({template: `<content></content>`})
 class app { 
 }
