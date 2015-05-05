@@ -29,6 +29,7 @@ The following decorators have been implemented to support the Angular 2.0 compon
 - **@Component** `({ selector: 'tag-name', bind: { a: '=', etc: '@' }, injectables: ['$http', myServiceClass], ?module: 'angularModuleName', ?name: 'bootstrapComponentName' })`
 - **@View** `({ template: '<div>Inline template</div>', templateUrl: 'pth/to/template.html'})`
 - **@Inject** `(['$http', myServiceClass, '$q'])`
+- **bootstrap** `(app [, config ])` 
 
 The decorators below are not Angular 2, as I haven't seen what Angular 2 services will actually look like yet. But, they are nice. 
 
