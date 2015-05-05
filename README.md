@@ -35,6 +35,7 @@ The decorators below are not Angular 2, as I haven't seen what Angular 2 service
 
 - **@Service** `({ name: 'serviceName', ?module: 'angularModuleName' })`
 - **@Filter** `({ name: 'filterName', ?module: 'angularModuleName' })`
+- **@State** `({name: 'stateName', ?url: '/stateurl', ?defaultRoute: true/false, ?resolve: {...}, ?controller: controllerFunction }))`
 
 ### SetModuleName *(deprecated in 0.1.0)*
 
@@ -45,6 +46,32 @@ Just use `angular.module('app', ...)` instead. I have monkey patched angular.mod
 This function allows us to set the Angular 1 module name in which the directives, services and filters will be created by the decorator functions. The optional second parameter can be used to specify which other modules this module depends on. It is equivalent to `angular.module( 'app', ['angular-meteor', 'my-other-module'] )`.   
 
 The module does not have to exist already. If it does not exist then it will be created. After this function call, all decorators will use this module name as the Angular 1.x module to create components, services and filters in. 
+
+### ui-router support through @State
+
+This is completely not Angular 2, but I love how easy it makes my routing.
+
+You'll have to include ui-router in your app
+
+    meteor add urigo:angular-ui-router
+
+And then add the `ui.router` dependency to your bootstrap module, like this
+  
+    angular.module('myApp', ['angular-meteor', 'ui.router']);
+
+Then, you can simply annotate your component with the route/state info, like so 
+
+```javascript
+@State({name: 'defect', url: '/defect', defaultRoute: true})
+@Component({selector: 'defect'})
+@View({templateUrl: 'client/defect/defect.html'})
+@Inject(['lookupTables'])
+class defect { 
+}
+```
+
+Resolves, and a controller to receive the resolved values, are supported through the the resolve and controller options. Examples of this will come at a later stage. 
+
 
 ### Bootstrapping the app
 - `bootstrap (app [, config ])` 
