@@ -1,11 +1,17 @@
-## Angular 2.0 component syntax using Angular 1.x and Babel with Meteor
+## Angular 2.0 component syntax using Angular 1.x and Babel
 
-I was really curious if I could use the Angular 2 @ Component syntax in Angular 1, by using Babel. Apparently I can, and it is not too difficult either. Ok, so it's not Angular 2, but it looks like it. Anyway, it's a work in progress. So, have a look, play around with it and let me know what you think.
+This library and Meteor package will allow you to continue using Angular 1.3 or higher, while giving you the opportunity to start coding your directives (components) using Angular 2 @Component syntax. You get to keep your investment in Angular 1.x while preparing for Angular 2.  
 
-You are also welcome to contribute to this project.
+If either of the statements below applies to you, then you need angular2-now:
+
+- You are about to start a new development in Angular 1.x and are thinking about migrating to Angular 2, when if finally arrives.
+
+- You just like the Angular 2 component annotations for creating directives, but don't care much for the rest of Angular 2 at this stage.
+
+You are welcome to contribute to this project.
 
 ### Can I use this outside of Meteor?
-Sure. This example is coded for Meteor, however, you can just as easily use this library in any other workflow that can run Babel. All the work is done by the ES6 decorator functions in angular2-now.es6.js. Just include that library in your code and expose/import them where you want to use them as decorators.
+Sure. The example code is for Meteor, however, you can just as easily use this library in any other workflow that can run Babel. All the work is done by the ES6 decorator functions in angular2-now.es6.js. Just include that library in your code and expose/import them where you want to use the @ decorators.
 
 ### Installation
 
@@ -18,17 +24,22 @@ You will also need the packages below:
     
 ### What's implemented?
 
-The following decorators have been implemented to partially support the Angular 2.0 directive syntax.
+The following decorators have been implemented to support the Angular 2.0 component syntax, as far as possible.
 
-- `@Component ({ selector: 'tag-name', bind: { a: '=', etc: '@' }, injectables: ['$http', myServiceClass], ?module: 'angularModuleName', ?name: 'bootstrapComponentName' })`
-- `@View ({ template: '<div>Inline template</div>', templateUrl: 'pth/to/template.html'})`
-- `@Inject (['$http', myServiceClass, '$q'])`
-- `@Service ({ name: 'serviceName', ?module: 'angularModuleName' })`
-- `@Filter ({ name: 'filterName', ?module: 'angularModuleName' })`
+- **@Component** `({ selector: 'tag-name', bind: { a: '=', etc: '@' }, injectables: ['$http', myServiceClass], ?module: 'angularModuleName', ?name: 'bootstrapComponentName' })`
+- **@View** `({ template: '<div>Inline template</div>', templateUrl: 'pth/to/template.html'})`
+- **@Inject** `(['$http', myServiceClass, '$q'])`
 
-### SetModuleName
+The decorators below are not Angular 2, as I haven't seen what Angular 2 services will actually look like yet. But, they are nice. 
 
-- `SetModuleName ( 'app', ['angular-meteor', 'my-other-module'])`
+- **@Service** `({ name: 'serviceName', ?module: 'angularModuleName' })`
+- **@Filter** `({ name: 'filterName', ?module: 'angularModuleName' })`
+
+### SetModuleName *(deprecated in 0.1.0)*
+
+Just use `angular.module('app', ...)` instead. I have monkey patched angular.module, so, SetModuleName is no longer required. This also resolves an issue with ng-annotate. For the rest of this section, assume that `angular.module` can be used in place of `SetModuleName`.
+
+- **SetModuleName** `( 'app', ['angular-meteor', 'my-other-module'])`
 
 This function allows us to set the Angular 1 module name in which the directives, services and filters will be created by the decorator functions. The optional second parameter can be used to specify which other modules this module depends on. It is equivalent to `angular.module( 'app', ['angular-meteor', 'my-other-module'] )`.   
 
@@ -105,57 +116,35 @@ I like the first syntax, because it looks a bit like the ES6 module import synta
 ### Examples
 
 ```javascript
-var {Component, Template, Service, Filter, Inject, SetModuleName} = angular2;
 
-// This assumes angular-meteor is used and that your components will be in 
-// and Angular 1.x module called "my-components" 
-// In your HTML add an ng-app on a div within the body.
-angular.module('app', [
-    'angular-meteor',
-    'my-components'
-]);
+// "Import" the angular2-now decorators and functions into local scope
+var {Component, Template, Service, Filter, Inject, bootstrap} = angular2;
 
-// If we don't call SetModuleName then "app" will be assumed by default.
-SetModuleName('my-components');
+// Use angular.module() to create the 'my-components' module for our components/directives.
+// All components created with @Component, @Filter and @Service will automatically
+// go into this module.
+angular.module('my-components', []);
 
-// The filter name is the same as the class name.
-@Filter()
-class keys {
-    constructor ($log) {
-        return ((input, logIt) => { logIt && $log.debug(input); return Object.keys(input);})
-    }
-}
-
-@Filter()
-class fil1 {
-    prefix = 'filter '
+// The filter name is 'ucase'. You can use this like so: "'string' | ucase"
+@Filter({ name: 'ucase' })
+class filter1 {
     constructor (prefix) {
-        if (prefix) this.prefix = prefix;
-        else prefix = this.prefix;
-
         return function(input) {
-            return prefix + (input + '').toUpperCase();
+            return (input + '').toUpperCase();
         }
     }
 }
 
-@Filter()
-class fil2 extends fil1 {
-    constructor () {
-        return super('other ');
-    }
-}
-
-// service name is the same as the classname, in this case "service1"
-@Service()
-class service1 {
+// The name of the service that you can inject is 'service1'
+@Service({ name: 'service1' })
+class myService {
     // this service has no methods
     hello = 'this is'
     world = 'a test'
 }
 
-@Service()
-class service2 {
+@Service({ name: 'service2' })
+class otherService {
     hello = 'hello'
     world = 'world'
     test() {
@@ -164,45 +153,16 @@ class service2 {
     }
 }
 
-// Well, this is not Angular2, but it is fun to use classes, is it not?
-@Controller()
-@Inject(['$scope', '$log', 'FileUpload'])
-class appController {
-    constructor($scope, $log, FileUpload) {
-
-        $scope.upload = FileUpload.uploadImg;
-        $scope.url = FileUpload.url;
-        $scope.images = FileUpload.images;
-        this.test = 'testing 123...';
-
-        $scope.takePhoto = takePhoto;
-
-        function takePhoto() {
-            MeteorCamera.getPicture(callback);
-
-            function callback(error, data) {
-                if (error)
-                    return $log.error('camera returned an error: ', error);
-
-                FileUpload.uploadImg(data);
-            }
-        }
-
-    }
-}
-
-
-
 /**
  * file-change (directive) - attribute only
  *
- * The ng-change directive in conjunction with ng-model does not support input[type=file]. file-change does.
+ * The ng-change directive in conjunction with ng-model does not support input[type=file]. 
+ * file-change does.
  *
  * Usage: <input type="file" file-change="upload($event)">
  */
 @Component({
-    // The name of the directive is a camelCased selector name
-    // If a selector is not supplied then directive name will be the same className.
+    // The name of the directive will be the camelCased version of the selector name.
     selector: 'file-change',
     
     // bind is the same as scope was in Angular 1.x
@@ -211,6 +171,8 @@ class appController {
 })
 class fileChange {
     constructor ($element, $scope) {
+        // Arrow functions, you either love them or hate them.
+        // I'm still deciding, cause, they're so ugly.
         $element.on('change', (evt) => {
             if (this.fileChange && this.fileChange !== '') {
                 $scope.$apply(() => {
@@ -222,9 +184,12 @@ class fileChange {
 }
 
 
-// selector is assumed to be "upload-images"
-@Component()
-@View({ template:'<p><b>Uploaded Images</b></p>'})
+// Here is a component with a template. All this one does is display some text.
+// Clicking on the text toggles its color to yellow and back.
+// Do note the use of @Inject().
+@Component({ selector: 'upload-images' })
+@View({ template: '<p><b>Uploaded Images</b></p>' })
+@Inject(['$scope', '$element'])
 class uploadedImages {
 
     constructor ($scope, $element) {
@@ -238,7 +203,12 @@ class uploadedImages {
     }
 }
 
+
+// Here we use bind to expose attributes a1 (two-way), a2 (value only) and a3 (function) on
+// our private scope. 
+// Note, also, the use of templateUrl to define the template.
 @Component({
+    selector: 'booger',
     bind : {
         a1: '=',
         a2: '@',
@@ -246,12 +216,12 @@ class uploadedImages {
     }
 })
 @View({
-    // Using a url to specify the template location. This is the equivalent of
-    // templateUrl in Angular 1.x.
+    // templateUrl works the same as in Angular 1.x directives.
     templateUrl: 'client/booger.html'
 })
 @Inject(['$element'])
 class booger {
+    // constructor() is the controller. There is no link function at all. At least not at this moment. 
     constructor($element) {
         $element.css({'cursor': 'pointer', '-webkit-user-select': 'none'});
         $element.on('click', function () {
@@ -263,7 +233,10 @@ class booger {
     }
 }
 
-
+// Let's extend the above class and make a new component. We also use <content> to denote
+// where our transcluded content will go. 
+// Do note that scope = this. Whatever you put on this in your constructor will appear in the scope.
+// To access the scope you must prefix it with the controller name (anotherBooger), because controllerAs was used when defining the directive.
 @Component({
     selector: 'another-booger',
     bind: { abc: '=' }
@@ -271,64 +244,51 @@ class booger {
 @View({
     template:`
         <h2>Another Booger</h2>
-        <p>@template takes precedence over @Component: {{ anotherBooger.abc }}</p>
+        <p>anotherBooger.abc = {{ anotherBooger.abc }}</p>
         <content></content>
-    `,
-    templateUrl: undefined
+    `
 })
 @Inject(['$element'])
 class bigBooger extends booger {
     constructor ($element) {
+        // This executes the parent class constructor passing $element to it
         super($element);
+        
+        // Some local scope variables
         this.a = 1;
         this.b = 2;
-        console.log('- controller 321');
     }
 }
 
 
-@Component({
-    selector: 'my-special',
-    bind: { xxx: '=' }
-})
-@View({
-    template: `
-        <h2>my-special</h2>
-        <pre>Name is {{paulSpecial.xxx}}</pre>
-        <content></content>
-    `
-})
-@Inject(['$element'])
-class proto {
-    constructor ($element) {
-        this.xxx = 'Hello World 2';
+// Finally, we get ready to bootstrap the app.
 
-        if ($element) {
-            $element.css({cursor: 'pointer', 'user-select': 'none'});
-            $element.on('click', () => { console.log('click!' + $element[0].tagName) });
-        }
-    }
+// This assumes that the angular-meteor package is used and that your components will be 
+// created in an Angular 1.x module called "my-components". 
+angular.module('myApp', [
+    'angular-meteor',
+    'my-components'
+]);
+
+
+// The component "name", below, is optional. If you don't supply a component name
+// then the camelCased selector name will be used. If the selector name is not supplied then
+// the current module name, as specified with angular.module(), will be used
+// to bootstrap the app.
+// In your HTML add "<my-app></my-app>" within the body, where you want your app to exist.
+// The '<content></content>' template ensures that any content is transcluded.
+// *Please note that without a template the constructor will not execute.* 
+
+@Component({ selector: 'my-app', name: 'myApp' })
+@View({ template: `<content></content>` })
+class myApp {
+  constructor() {
+    console.log('! myApp constructor');
+  }
 }
 
 
-@Component({
-    selector: 'my-special2',
-    bind: { yyy: '@' },
-    injectables: [ 'service1', service2 ]
-})
-@View({
-    template: `
-        <h2>my-special 2</h2>
-        <pre>Name is {{paulSpecial2.yyy}}</pre>
-        <content></content>
-    `
-})
-class fancyProto extends proto {
-    constructor ($element, service1, service2) {
-        // The super() call below will inherit the click event handler from the parent
-        super($element);
-        console.log('fancyProto: services: ', service1, service2, service2.test());
-    }
-}
+// Bootstrap the app
+bootstrap(myApp);
 
 ```

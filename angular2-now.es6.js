@@ -13,6 +13,15 @@ angular2 = {
 
 var currentModule = 'app';
 
+var angularModule = angular.module;
+
+// Monkey patch angular.module
+angular.module = function () {
+    currentModule = arguments[0];
+
+    return angularModule.apply(angular, arguments);
+}
+
 function SetModuleName(module, dependsOn) {
   module = module || 'app';
   currentModule = module;
@@ -54,8 +63,8 @@ function Component(options) {
     target.selector = unCamelCase(options.selector);
 
     // The template can be passed in from the @Template decorator
-    options.template = target.template || options.template || undefined;
-    options.templateUrl = target.templateUrl || options.templateUrl || undefined;
+    options.template = target.template || /*options.template ||*/ undefined;
+    options.templateUrl = target.templateUrl || /*options.templateUrl ||*/ undefined;
 
     // Create the angular directive
     // todo: use module and name-spaced directive naming, perhaps from a config file like Greg suggested
@@ -77,7 +86,7 @@ function Component(options) {
           return ddo;
         });
     } catch (er) {
-      throw new Error('Does module "' + options.module + '" exist? You may need to use SetModuleName("youModuleName").');
+      throw new Error('Does module "' + options.module + '" exist? You may need to use angular.module("youModuleName").');
     }
   };
 
