@@ -113,7 +113,10 @@ The created components use ControllerAs syntax. So, when referring to properties
 ### Transclude and `<content></content>`
 If your inline template includes a `<content>` tag then `@View` will automatically add `ng-transclude` to it and the directive's transclude flag will be set to true.
 
-Templates specified using the url property aren't currently checked and thus do not get `ng-transclude` added to them by `@View`. You will have to manually add ng-transclude to the element you want to transclude in your non-inline templates.
+Templates specified using the templateUrl property aren't currently checked and thus do not get `ng-transclude` added to them by `@View`. You will have to manually add ng-transclude to the element you want to transclude in your non-inline templates and also add `transclude: true` to the @View annotation's options, as shown below:
+
+    @View({ templateUrl: '/client/mytemplate.html', transclude: true })
+
 
 ### Importing the required "@" decorators from the package
 
