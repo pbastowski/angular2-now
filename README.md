@@ -37,15 +37,17 @@ The decorators below are not Angular 2, as I haven't seen what Angular 2 service
 - **@Filter** `({ name: 'filterName', ?module: 'angularModuleName' })`
 - **@State** `({name: 'stateName', ?url: '/stateurl', ?defaultRoute: true/false, ?resolve: {...}, ?controller: controllerFunction }))`
 
-### SetModuleName *(deprecated in 0.1.0)*
+### Using angular.module 
 
-Just use `angular.module('app', ...)` instead. I have monkey patched angular.module, so, SetModuleName is no longer required. This also resolves an issue with ng-annotate. For the rest of this section, assume that `angular.module` can be used in place of `SetModuleName`.
+- **angular.module** `( 'app', ['angular-meteor', 'my-other-module'] )`
 
-- **SetModuleName** `( 'app', ['angular-meteor', 'my-other-module'])`
+This allows us to set the Angular 1 module name in which Components, Services, Filters and State configuration will be created by the @decorator functions. The syntax is identical to Angular's own `angular.module`, see: https://docs.angularjs.org/api/ng/function/angular.module.
+ 
+#### How does it work? 
+I have "monkey patched" angular.module() to remember the module name and then call the original angular.module function (and return its return value). 
 
-This function allows us to set the Angular 1 module name in which the directives, services and filters will be created by the decorator functions. The optional second parameter can be used to specify which other modules this module depends on. It is equivalent to `angular.module( 'app', ['angular-meteor', 'my-other-module'] )`.   
+> Previously, we used SetModuleName *(deprecated in 0.1.0)* to do the same job
 
-The module does not have to exist already. If it does not exist then it will be created. After this function call, all decorators will use this module name as the Angular 1.x module to create components, services and filters in. 
 
 ### ui-router support through @State
 
@@ -115,24 +117,53 @@ Templates specified using the url property aren't currently checked and thus do 
 
 ### Importing the required "@" decorators from the package
 
-This package exports angular2, from which you can import the decorators that you need, like so:
+This package exports the object `angular2now` (angular2 deprecated since 0.1.2), from which you can import the decorators that you need, like so:
 
 ```javascript
-// Import the Angular2 decorators using ES6 destructuring assignment
+// Import the Angular2now decorators using ES6 destructuring assignment
 // Look up ES6 destructuring here: https://babeljs.io/docs/learn-es6/ 
-var {Component, Template, Service, Filter, Inject, bootstrap} = angular2;
+var {Component, Template, Service, Filter, Inject, bootstrap} = angular2now;
 ```
 
 or like this:
 
 ```javascript
 // You can also do it like this
- var Component = angular2.Component;
- var Template = angular2.Template;
+ var Component = angular2now.Component;
+ var Template = angular2now.Template;
  ...
 ```
 
 I like the first syntax, because it looks a bit like the ES6 module import syntax. 
+
+### How do I access ngModel of my directive/component?
+
+This is a little bit tricky, because a component's constructor is actually it's controller. The controller does not get access to ngModel, but the link function does. We don't have a link function, so, how do we get access to ngModel?
+ 
+Like this:
+
+```javascript
+@Component({ selector: 'my-validator' })
+@Inject(['$scope', '$q'])
+class myValidator {
+    constructor($scope, $q) {
+        $scope.ngModel = $q.defer();
+        $scope.ngModel.promise.then(function (ngModel) {
+            // This is where you do stuff with ngModel, such as 
+            // ngModel.$parsers.unshift(function (value) { ... });
+            //        or
+            // ngModel.$formatters.unshift(function (value) { ... });
+        });
+    }
+}
+```
+
+Yes, I know, we don't want to use `$scope`. But, for the moment I haven't figured out how to do this another, simpler, way. What I would like to do is to automatically add ngModel onto the controller's `this` scope. Perhaps you can help me work out how to do that?
+
+#### How does this magic work?
+
+I always create a link function for each component and require `"^?ngModel"`. The link function receives ngModel as it's fourth parameter and then checks for ngModel on it's scope. The same ngModel that was earlier created by the constructor function and assigned a `$q.defered()`. If present, scope.ngModel is resolved with the link function's ngModel. The rest you can see in the example above. 
+ 
 
 ### What environment is required?
 - Angular 1.3+
@@ -149,7 +180,7 @@ I like the first syntax, because it looks a bit like the ES6 module import synta
 ```javascript
 
 // "Import" the angular2-now decorators and functions into local scope
-var {Component, Template, Service, Filter, Inject, bootstrap} = angular2;
+var {Component, Template, Service, Filter, Inject, bootstrap} = angular2now;
 
 // Use angular.module() to create the 'my-components' module for our components/directives.
 // All components created with @Component, @Filter and @Service will automatically

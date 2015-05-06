@@ -1,6 +1,6 @@
 'use strict';
 
-angular2 = {
+angular2now = angular2 = {
     Component:     Component,
     View:          View,
     Inject:        Inject,
@@ -78,7 +78,9 @@ function Component(options) {
             templateUrl:      options.templateUrl,
             controller:       target,
             replace:          false,
-            transclude:       /ng-transclude/i.test(options.template) || target.transclude
+            transclude:       /ng-transclude/i.test(options.template) || target.transclude,
+            link:             link,
+            require:          '^?ngModel'
         }
 
         try {
@@ -88,6 +90,21 @@ function Component(options) {
                 });
         } catch (er) {
             throw new Error('Does module "' + options.module + '" exist? You may need to use angular.module("youModuleName").');
+        }
+
+        function link(scope, el, attr, models) {
+            // Make the ngModel available to the directive controller(constructor)
+            // The controller runs first and the link after.
+            // In the controller we define ngModel on $scope, as a $q.defered(),
+            // which is detected below and resolved with the actual ngModel.
+            // todo: investigate other, easier, ways of doing this.
+            if (scope.ngModel) {
+                try {
+                    scope.ngModel.resolve(models);
+                } catch (er) {
+                    throw new Error("@Component: If you're trying access your component's ngModel, then in your constructor() add $scope.ngModel = $q.defered(). Remember to @Inject(['$scope', '$q']).");
+                }
+            }
         }
     };
 
