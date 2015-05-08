@@ -348,7 +348,7 @@ angular.module('myApp', [
 @View({ template: `<content></content>` })
 class myApp {
   constructor() {
-    console.log('! myApp constructor');
+    consoleLog('! myApp constructor');
   }
 }
 

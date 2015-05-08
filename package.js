@@ -12,6 +12,7 @@ Package.describe({
 
 Package.onUse(function(api) {
   api.versionsFrom('1.1.0.2');
+  //api.use('angular:angular@1.3.15_1', 'client')
   api.addFiles('angular2-now.es6.js', ['client']);
   api.export(['angular2', 'angular2now']);
 });
