@@ -79,8 +79,8 @@ function Component(options) {
             controller:       target,
             replace:          false,
             transclude:       /ng-transclude/i.test(options.template) || target.transclude,
-            link:             link,
-            require:          '^?ngModel'
+            require:          '^?ngModel',
+            link:             link
         }
 
         try {
@@ -126,7 +126,12 @@ function unCamelCase(c) {
 }
 
 function Inject(deps) {
+    if (typeof deps !== 'undefined' && !(deps instanceof Array)) {
+        throw new Error('@Inject: dependencies must be passed as an array.')
+    }
+
     deps = deps || [];
+
     return function (target) {
         if (!target.$inject)
             target.$inject = [];
@@ -205,11 +210,10 @@ function Filter(options) {
 }
 
 function bootstrap(target, config) {
-    if (!target) {
-        throw new Error("Can't bootstrap Angular without an object");
+    if (!target || !(target instanceof Object)) {
+        throw new Error("bootstrap: Can't bootstrap Angular without an object");
     }
 
-    //var bootModule = target.moduleName || camelCase(target.selector) || currentModule;
     var bootModule = target.moduleName || target.selector || currentModule;
 
     if (bootModule !== currentModule)
@@ -234,10 +238,25 @@ function bootstrap(target, config) {
 
 function State (options) {
 
-    if (!options)
-        throw new Error('@Route error: Valid options are: state, url, defaultRoute.');
+    if (!options || !(options instanceof Object) || options.name === undefined)
+        throw new Error('@State: Valid options are: name, url, defaultRoute, template, resolve, abstract.');
 
     return function (target) {
+
+        var deps;
+        var resolved = { };
+        var resolvedServiceName = camelCase(target.selector);
+        var doResolve;
+
+        // Is there a resolve block?
+        if ( options.resolve && options.resolve instanceof Object && (deps = Object.keys(options.resolve)).length )
+            doResolve = true;
+
+        // Create an injectable value service to share the resolved values with the controller
+        if (doResolve) {
+            angular.module(currentModule).value(resolvedServiceName, resolved);
+        }
+
         angular.module(currentModule)
             .config(['$urlRouterProvider', '$stateProvider',
             function ($urlRouterProvider, $stateProvider) {
@@ -247,10 +266,40 @@ function State (options) {
 
                 $stateProvider.state(options.name, {
                     url:        options.url,
-                    template:   options.template || '<' + target.selector + '></' + target.selector + '>',
+                    abstract:   options.abstract,
+
+                    // If this is an abstract state then we just provide a <div ui-view> for the children
+                    template:   options.template || (options.abstract ? '<div ui-view=""></div>' : '<' + target.selector + '></' + target.selector + '>'),
+
+                    // Do we need to resolve stuff? If so, then we provide a controller to catch the resolved data
                     resolve:    options.resolve,
-                    controller: options.controller
+                    controller: (doResolve ? controller : undefined)
                 });
+
+                // Publish the resolved values to an injectable service:
+                // - "{selectorName}" => stores only local resolved values
+                // This service can be injected into a component's constructor, for example.
+                //
+                if (doResolve) {
+                    deps.unshift(resolvedServiceName);
+
+                    controller.$inject = deps;
+                }
+
+                // Populate the published service with the resolved values
+                function controller() {
+                    var args = Array.prototype.slice.call(arguments);
+
+                    var localScope = args[0];
+
+                    args = args.slice(1);
+                    deps = deps.slice(1);
+
+                    deps.forEach(function(v, i) {
+                        localScope[v] = args[i];
+                    });
+                }
+
             }]);
 
     }
