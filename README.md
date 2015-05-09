@@ -56,7 +56,7 @@ The decorators below are not Angular 2, as such, but for me they make coding in 
 
 To use the library, include it in your Angular 1.3, or higher, project. window.angular2now gives you access to all the decorator functions. You can import the functions you need into each module that needs them like this:
 
-Babel
+Babel/ES6
 
     var {Component, View, Inject} = angular2now;
 
