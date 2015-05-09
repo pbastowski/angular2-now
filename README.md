@@ -12,13 +12,21 @@ You are welcome to contribute to this project.
 
 ### Can I use this outside of Meteor?
 
-Sure you can! As an added bonus, you can use angular2-now with both plain ES5 and fancy ES6/ES7 (through the use of Babel).
+Sure you can! As an added bonus, you can use angular2-now with both plain ES5 and fancy ES6/ES7 decorators (through the use of Babel).
 
-Curious? Have a look at the ES5 example below.
+Curious? Have a look at the ES5 examples below.
  
 angular2-now using ES5: [Plunker](http://plnkr.co/edit/uxV781?p=preview)
 
-To use the pretty @ notation that Angular 2 uses, such as `@Component` or `@View`, you will need to have a build workflow that uses Babel to transpile your ES6 code to plain ES5 code that your browser can understand.
+angular2-now-js library: [Github](https://github.com/pbastowski/angular2-now-js)
+
+#### Bower
+
+angular2-now is also available on bower. To install go to your project folder and type the line shown below at your command prompt:
+
+    bower install angular2-now
+
+Please note that to use the pretty `@` notation that Angular 2 uses and as shown in the examples below, such as `@Component` or `@View`, you will need to have a build workflow that uses Babel to transpile your ES6 code to plain ES5 JavaScript that your browser can understand.
 
 In any either case, the same angular2-now.js library will work with both ES5 and ES6. 
 
