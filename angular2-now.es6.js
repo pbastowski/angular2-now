@@ -92,6 +92,8 @@ function Component(options) {
             throw new Error('Does module "' + options.module + '" exist? You may need to use angular.module("youModuleName").');
         }
 
+        return target;
+
         function link(scope, el, attr, models) {
             // Make the ngModel available to the directive controller(constructor)
             // The controller runs first and the link after.
@@ -182,6 +184,7 @@ function Controller(options) {
         //module+options.name.slice(0,1).toUpperCase()+options.name.slice(1),
         angular.module(options.module)
             .controller(options.module + '.' + options.name, target);
+        return target;
     }
 }
 
@@ -193,6 +196,7 @@ function Service(options) {
         angular.module(options.module)
             .service(options.name, target);
         //.factory(options.name, function () { return new target })
+        return target;
     }
 }
 
@@ -206,6 +210,8 @@ function Filter(options) {
             .filter(options.name, function () {
                 return new target
             });
+
+        return target;
     }
 }
 
@@ -273,7 +279,7 @@ function State (options) {
 
                     // Do we need to resolve stuff? If so, then we provide a controller to catch the resolved data
                     resolve:    options.resolve,
-                    controller: (doResolve ? controller : undefined)
+                    controller: options.controller || (doResolve ? controller : undefined)
                 });
 
                 // Publish the resolved values to an injectable service:
@@ -302,5 +308,6 @@ function State (options) {
 
             }]);
 
+        return target;
     }
 }
