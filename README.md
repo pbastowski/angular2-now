@@ -18,7 +18,7 @@ Curious?
 
 - ES5 example: [Plunker](http://plnkr.co/edit/uxV781?p=preview)
 
-- Plain JavaScript (non-Meteor) angular2-now library: [Github](https://github.com/pbastowski/angular2-now-js)
+- Plain JavaScript (non-Meteor) angular2-now.js library: [Github](https://github.com/pbastowski/angular2-now-js)
 
 #### Bower
 
