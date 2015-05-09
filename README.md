@@ -20,7 +20,7 @@ Curious?
 
 - Plain JavaScript (non-Meteor) angular2-now.js library: [Github](https://github.com/pbastowski/angular2-now-js)
 
-#### Bower
+##### Bower
 
 angular2-now is also available on bower. To install go to your project folder and type the line shown below at your command prompt:
 
