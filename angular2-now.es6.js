@@ -21,7 +21,7 @@ angular.module = function () {
     currentModule = arguments[0];
 
     return angularModule.apply(angular, arguments);
-}
+};
 
 function SetModuleName(module, dependsOn) {
     module = module || 'app';
@@ -32,7 +32,7 @@ function SetModuleName(module, dependsOn) {
     // Check that the module exists and if not then create it now
     var ngModule;
     try {
-        ngModule = angular.module(module)
+        ngModule = angular.module(module);
     } catch (er) {
         ngModule = angular.module(module, dependsOn);
     }
@@ -81,7 +81,7 @@ function Component(options) {
             transclude:       /ng-transclude/i.test(options.template) || target.transclude,
             require:          '^?ngModel',
             link:             link
-        }
+        };
 
         try {
             angular.module(options.module)
@@ -115,13 +115,13 @@ function Component(options) {
 
 function camelCase(s) {
     return s.replace(/-(.)/g, function (a, b) {
-        return b.toUpperCase()
-    })
+        return b.toUpperCase();
+    });
 }
 
 function unCamelCase(c) {
     var s = c.replace(/([A-Z])/g, function (a, b) {
-        return '-' + b.toLowerCase()
+        return '-' + b.toLowerCase();
     });
     if (s[0] === '-') s = s.slice(1);
     return s;
@@ -129,7 +129,7 @@ function unCamelCase(c) {
 
 function Inject(deps) {
     if (typeof deps !== 'undefined' && !(deps instanceof Array)) {
-        throw new Error('@Inject: dependencies must be passed as an array.')
+        throw new Error('@Inject: dependencies must be passed as an array.');
     }
 
     deps = deps || [];
@@ -144,8 +144,8 @@ function Inject(deps) {
                 target.$inject.push(v);
         });
 
-        return target
-    }
+        return target;
+    };
 }
 
 
@@ -173,7 +173,7 @@ function View(options) {
                 target.template = target.template.replace(/\<content/i, '<content ng-transclude');
         }
         return target;
-    }
+    };
 }
 
 function Controller(options) {
@@ -185,7 +185,7 @@ function Controller(options) {
         angular.module(options.module)
             .controller(options.module + '.' + options.name, target);
         return target;
-    }
+    };
 }
 
 function Service(options) {
@@ -197,7 +197,7 @@ function Service(options) {
             .service(options.name, target);
         //.factory(options.name, function () { return new target })
         return target;
-    }
+    };
 }
 
 function Filter(options) {
@@ -208,11 +208,11 @@ function Filter(options) {
 
         angular.module(options.module)
             .filter(options.name, function () {
-                return new target
+                return new target;
             });
 
         return target;
-    }
+    };
 }
 
 function bootstrap(target, config) {
@@ -228,7 +228,8 @@ function bootstrap(target, config) {
     if (!config)
         config = {strictDi: false};
 
-    if (Meteor && Meteor.isCordova)
+    if (!Meteor) var Meteor = {};
+    if (Meteor.isCordova)
         angular.element(document).on("deviceready", onReady);
     else
         angular.element(document).ready(onReady);
@@ -270,7 +271,7 @@ function State (options) {
                 if (options.defaultRoute)
                     $urlRouterProvider.otherwise(options.url);
 
-                $stateProvider.state(options.name, {
+                     var sdo = {
                     url:        options.url,
                     abstract:   options.abstract,
 
@@ -280,7 +281,9 @@ function State (options) {
                     // Do we need to resolve stuff? If so, then we provide a controller to catch the resolved data
                     resolve:    options.resolve,
                     controller: options.controller || (doResolve ? controller : undefined)
-                });
+                     };
+
+                     $stateProvider.state(options.name, sdo);
 
                 // Publish the resolved values to an injectable service:
                 // - "{selectorName}" => stores only local resolved values
@@ -309,5 +312,5 @@ function State (options) {
             }]);
 
         return target;
-    }
+    };
 }
