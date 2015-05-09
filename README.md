@@ -12,13 +12,13 @@ You are welcome to contribute to this project.
 
 ### Can I use this outside of Meteor?
 
-Sure you can! As an added bonus, you can use angular2-now with both plain ES5 and fancy ES6/ES7 decorators (through the use of Babel).
+Sure you can. angular2-now works with both plain ES5 and fancy ES6/ES7 decorators (through the use of Babel).
 
-Curious? Have a look at the ES5 examples below.
- 
-angular2-now using ES5: [Plunker](http://plnkr.co/edit/uxV781?p=preview)
+Curious? 
 
-angular2-now-js library: [Github](https://github.com/pbastowski/angular2-now-js)
+- ES5 example: [Plunker](http://plnkr.co/edit/uxV781?p=preview)
+
+- Plain JavaScript (non-Meteor) angular2-now library: [Github](https://github.com/pbastowski/angular2-now-js)
 
 #### Bower
 
