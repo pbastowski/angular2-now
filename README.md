@@ -11,7 +11,17 @@ If either of the statements below applies to you, then you need angular2-now:
 You are welcome to contribute to this project.
 
 ### Can I use this outside of Meteor?
-Sure. The example code is for Meteor, however, you can just as easily use this library in any other workflow that can run Babel. All the work is done by the ES6 decorator functions in angular2-now.es6.js. Just include that library in your code and expose/import them where you want to use the @ decorators.
+
+Sure you can! As an added bonus, you can use angular2-now with both plain ES5 and fancy ES6/ES7 (through the use of Babel).
+
+Curious? Have a look at the ES5 example below.
+ 
+angular2-now using ES5: [Plunker](http://plnkr.co/edit/uxV781?p=preview)
+
+To use the pretty @ notation that Angular 2 uses, such as `@Component` or `@View`, you will need to have a build workflow that uses Babel to transpile your ES6 code to plain ES5 code that your browser can understand.
+
+In any either case, the same angular2-now.js library will work with both ES5 and ES6. 
+
 
 ### Installation
 
