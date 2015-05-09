@@ -28,7 +28,7 @@ angular2-now is also available on bower. To install go to your project folder an
 
 Please note that to use the pretty `@` notation that Angular 2 uses and as shown in the examples below, such as `@Component` or `@View`, you will need to have a build workflow that uses Babel to transpile your ES6 code to plain ES5 JavaScript that your browser can understand.
 
-In any either case, the same angular2-now.js library will work with both ES5 and ES6. 
+In either case, the same angular2-now.js library will work with both ES5 and ES6. 
 
 
 ### Installation
@@ -50,6 +50,26 @@ The decorators below are not Angular 2, as such, but for me they make coding in 
 - **@Service** `({ name: 'serviceName', ?module: 'angularModuleName' })`
 - **@Filter** `({ name: 'filterName', ?module: 'angularModuleName' })`
 - **@State** `({name: 'stateName', ?url: '/stateurl', ?defaultRoute: true/false, ?resolve: {...}, ?controller: controllerFunction, ?template: { } }))`
+
+
+### How to use the library
+
+To use the library, include it in your Angular 1.3, or higher, project. window.angular2now gives you access to all the decorator functions. You can import the functions you need into each module that needs them like this:
+
+Babel
+
+    var {Component, View, Inject} = angular2now;
+
+ES5
+
+    var Component = angular2now.Component;
+    var View = angular2now.View;
+    var Inject = angular2now.Inject;
+
+Or, if you want all the angular2-now decorator functions available for use anywhere in your application without explicitly importing them, then you could try this
+
+    angular.extend(window, angular2now)
+
 
 ### Using angular.module 
 
