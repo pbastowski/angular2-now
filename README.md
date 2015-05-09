@@ -4,9 +4,9 @@ This library and Meteor package will allow you to continue using Angular 1.3 or 
 
 If either of the statements below applies to you, then you need angular2-now:
 
-- You are about to start a new development in Angular 1.x and are thinking about migrating to Angular 2, when if finally arrives.
+- You are about to start a new development in Angular 1.x and are thinking about migrating to Angular 2, when it finally arrives.
 
-- You just like the Angular 2 component annotations for creating directives, but don't care much for the rest of Angular 2 at this stage.
+- You just like the clean syntax of Angular 2 component annotations for creating directives/components and services, but don't care much for the rest of Angular 2 at this stage.
 
 You are welcome to contribute to this project.
 
@@ -35,10 +35,6 @@ In any either case, the same angular2-now.js library will work with both ES5 and
 
     meteor add pbastowski:angular2-now
     
-You will also need the packages below:
-
-    meteor add pbastowski:angular-babel
-    meteor add urigo:angular
     
 ### What's implemented?
 
@@ -49,11 +45,11 @@ The following decorators have been implemented to support the Angular 2.0 compon
 - **@Inject** `(['$http', myServiceClass, '$q'])`
 - **bootstrap** `(app [, config ])` 
 
-The decorators below are not Angular 2, as I haven't seen what Angular 2 services will actually look like yet. But, they are nice. 
+The decorators below are not Angular 2, as such, but for me they make coding in Angular a bit nicer. 
 
 - **@Service** `({ name: 'serviceName', ?module: 'angularModuleName' })`
 - **@Filter** `({ name: 'filterName', ?module: 'angularModuleName' })`
-- **@State** `({name: 'stateName', ?url: '/stateurl', ?defaultRoute: true/false, ?resolve: {...}, ?controller: controllerFunction }))`
+- **@State** `({name: 'stateName', ?url: '/stateurl', ?defaultRoute: true/false, ?resolve: {...}, ?controller: controllerFunction, ?template: { } }))`
 
 ### Using angular.module 
 
