@@ -12,8 +12,8 @@ Package.describe({
 
 Package.onUse(function(api) {
   api.versionsFrom('1.1.0.2');
-  api.use('urigo:angular', 'client');
-  api.use('pbastowski:angular-babel', 'client');
+  api.use('urigo:angular@0.8.8', 'client');
+  api.use('pbastowski:angular-babel@0.1.3', 'client');
   api.addFiles('angular2-now.es6.js', ['client']);
   api.export(['angular2', 'angular2now']);
 });
