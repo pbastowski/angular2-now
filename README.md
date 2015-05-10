@@ -67,8 +67,6 @@ This allows us to set the Angular 1 module name in which Components, Services, F
 #### How does it work? 
 I have "monkey patched" angular.module() to remember the module name and then call the original angular.module function (and return its return value). 
 
-> Previously, we used SetModuleName *(deprecated in 0.1.0)* to do the same job
-
 
 ### ui-router support through @State
 
