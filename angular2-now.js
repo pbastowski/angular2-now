@@ -10,7 +10,6 @@ this.angular2now = angular2now = angular2 = function () {
         Service:       Service,
         bootstrap:     bootstrap,
         'Filter':      Filter,
-        SetModuleName: SetModuleName,
         State:         State
     };
 
@@ -18,29 +17,12 @@ this.angular2now = angular2now = angular2 = function () {
 
     var angularModule = angular.module;
 
-// Monkey patch angular.module
+    // Monkey patch angular.module
     angular.module = function () {
         currentModule = arguments[0];
 
         return angularModule.apply(angular, arguments);
     };
-
-    function SetModuleName(module, dependsOn) {
-        module = module || 'app';
-        currentModule = module;
-
-        if (!dependsOn) dependsOn = [];
-
-        // Check that the module exists and if not then create it now
-        var ngModule;
-        try {
-            ngModule = angular.module(module);
-        } catch (er) {
-            ngModule = angular.module(module, dependsOn);
-        }
-
-        return ngModule;
-    }
 
     function Component(options) {
         options = options || {};
@@ -81,8 +63,8 @@ this.angular2now = angular2now = angular2 = function () {
                 controller:       target,
                 replace:          false,
                 transclude:       /ng-transclude/i.test(options.template) || target.transclude,
-                require:          '^?ngModel',
-                link:             link
+                require:          options.require || [options.selector, '^?ngModel'],
+                link:             options.link || link
             };
 
             try {
@@ -96,15 +78,16 @@ this.angular2now = angular2now = angular2 = function () {
 
             return target;
 
-            function link(scope, el, attr, models) {
+            function link(scope, el, attr, controllers) {
                 // Make the ngModel available to the directive controller(constructor)
                 // The controller runs first and the link after.
                 // In the controller we define ngModel on $scope, as a $q.defered(),
                 // which is detected below and resolved with the actual ngModel.
                 // todo: investigate other, easier, ways of doing this.
-                if (scope.ngModel) {
+                if (controllers[0].ngModel && typeof controllers[0].ngModel === 'function') {
                     try {
-                        scope.ngModel.resolve(models);
+                        controllers[0].ngModel(controllers[1]);
+                        //scope.ngModel.resolve(controllers);
                     } catch (er) {
                         throw new Error("@Component: If you're trying access your component's ngModel, then in your constructor() add $scope.ngModel = $q.defered(). Remember to @Inject(['$scope', '$q']).");
                     }
@@ -227,7 +210,7 @@ this.angular2now = angular2now = angular2 = function () {
         var bootModule = target.moduleName || target.selector || currentModule;
 
         if (bootModule !== currentModule)
-            SetModuleName(bootModule);
+            angular.module(bootModule);
 
         if (!config)
             config = {strictDi: false};
@@ -246,7 +229,17 @@ this.angular2now = angular2now = angular2 = function () {
         }
     }
 
-
+    //
+    // @State can be used to annotate either a Component or a class.
+    //
+    // If class is annotated then it is assumed to be the controller and
+    // the state name will be used as the name of the injectable service
+    // if any resolves are requested.
+    //
+    // When a component is annotated and resolves requested, then the component's
+    // selector name is used as the name of the injectable service that holds
+    // their values.
+    //
     function State(options) {
 
         if (!options || !(options instanceof Object) || options.name === undefined)
@@ -256,65 +249,89 @@ this.angular2now = angular2now = angular2 = function () {
 
             var deps;
             var resolved = {};
-            var resolvedServiceName = camelCase(target.selector);
+            var resolvedServiceName = camelCase(target.selector || target.name);
+
+            // Indicates if there is anything to resolve
             var doResolve;
 
+            // Values to resolve can either be supplied in options.resolve or as a static method on the
+            // component's class
+            var resolves = options.resolve || target.resolve;
+
             // Is there a resolve block?
-            if (options.resolve && options.resolve instanceof Object && (deps = Object.keys(options.resolve)).length)
+            if (resolves && resolves instanceof Object && (deps = Object.keys(resolves)).length)
                 doResolve = true;
 
             // Create an injectable value service to share the resolved values with the controller
+            // The service bears the same name as the component's camelCased selector name.
             if (doResolve) {
                 angular.module(currentModule).value(resolvedServiceName, resolved);
             }
 
+            // Configure the state
             angular.module(currentModule)
                 .config(['$urlRouterProvider', '$stateProvider',
-                         function ($urlRouterProvider, $stateProvider) {
+                    function ($urlRouterProvider, $stateProvider) {
 
-                             if (options.defaultRoute)
-                                 $urlRouterProvider.otherwise(options.url);
+                        // Activate this state, if options.defaultRoute = true.
+                        // If you don't want this then don't set options.defaultRoute to true
+                        // and, instead, use $state.go inside the constructor to active a state.
+                        // You can also pass a string to defaultRoute, which will become the default route.
+                        if (options.defaultRoute)
+                            $urlRouterProvider.otherwise((typeof options.defaultRoute === 'string') ? options.defaultRoute : options.url);
 
-                             var sdo = {
-                                 url:      options.url,
-                                 abstract: options.abstract,
+                        // This is the state definition object
+                        var sdo = {
+                            url:      options.url,
 
-                                 // If this is an abstract state then we just provide a <div ui-view> for the children
-                                 template: options.template || (options.abstract ? '<div ui-view=""></div>' : '<' + target.selector + '></' + target.selector + '>'),
-                                 //template: options.template || '<' + target.selector + '></' + target.selector + '>',
+                            // Default values for URL parameters can be configured here.
+                            // ALso, parameters that do not appear in the URL can be configured here.
+                            params:   options.params,
 
-                                 // Do we need to resolve stuff? If so, then we provide a controller to catch the resolved data
-                                 resolve:    options.resolve,
-                                 controller: options.controller || (doResolve ? controller : undefined)
-                             };
+                            // The bootstrap component should always be abstract, otherwise weird stuff happens.
 
-                             $stateProvider.state(options.name, sdo);
+                            abstract: options.abstract,
 
-                             // Publish the resolved values to an injectable service:
-                             // - "{selectorName}" => stores only local resolved values
-                             // This service can be injected into a component's constructor, for example.
-                             //
-                             if (doResolve) {
-                                 deps.unshift(resolvedServiceName);
+                            templateUrl: options.templateUrl,
 
-                                 controller.$inject = deps;
-                             }
+                            // If this is an abstract state then we just provide a <div ui-view> for the children
+                            template: options.templateUrl ? undefined : options.template || (options.abstract ? '<div ui-view=""></div>' : '<' + target.selector + '></' + target.selector + '>'),
 
-                             // Populate the published service with the resolved values
-                             function controller() {
-                                 var args = Array.prototype.slice.call(arguments);
-                                 //console.log('@State: controller: ', deps, args);
-                                 var localScope = args[0];
+                            // Do we need to resolve stuff? If so, then we provide a controller to catch the resolved data
+                            resolve:    resolves,
+                            controller: options.controller || (!target.selector ? target : undefined) ||(doResolve ? controller : undefined)
+                        };
 
-                                 args = args.slice(1);
-                                 deps = deps.slice(1);
+                        //console.log('@State: target.template: ', target.template || target.templateUrl);
+                        //console.log('@State:    sdo.template: ', sdo.template);
 
-                                 deps.forEach(function (v, i) {
-                                     localScope[v] = args[i];
-                                 });
-                             }
+                        $stateProvider.state(options.name, sdo);
 
-                         }]);
+                        // Publish the resolved values to an injectable service:
+                        // - "{selectorName}" => stores only local resolved values
+                        // This service can be injected into a component's constructor, for example.
+                        //
+                        if (doResolve) {
+                            deps.unshift(resolvedServiceName);
+
+                            controller.$inject = deps;
+                        }
+
+                        // Populate the published service with the resolved values
+                        function controller() {
+                            var args = Array.prototype.slice.call(arguments);
+                            //console.log('@State: controller: ', deps, args);
+                            var localScope = args[0];
+
+                            args = args.slice(1);
+                            deps = deps.slice(1);
+
+                            deps.forEach(function (v, i) {
+                                localScope[v] = args[i];
+                            });
+                        }
+
+                    }]);
 
             return target;
         };
