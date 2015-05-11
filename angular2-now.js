@@ -277,7 +277,7 @@ this.angular2now = angular2now = angular2 = function () {
 
             var deps;
             var resolved = {};
-            var resolvedServiceName = camelCase(target.selector || target.name);
+            var resolvedServiceName = camelCase(target.selector || options.name);
 
             // Indicates if there is anything to resolve
             var doResolve;
@@ -324,7 +324,7 @@ this.angular2now = angular2now = angular2 = function () {
                             templateUrl: options.templateUrl,
 
                             // If this is an abstract state then we just provide a <div ui-view> for the children
-                            template: options.templateUrl ? undefined : options.template || (options.abstract ? '<div ui-view=""></div>' : '<' + target.selector + '></' + target.selector + '>'),
+                            template: options.templateUrl ? undefined : options.template || (options.abstract ? '<div ui-view=""></div>' : target.selector ? '<' + target.selector + '></' + target.selector + '>' : ''),
 
                             // Do we need to resolve stuff? If so, then we provide a controller to catch the resolved data
                             resolve:    resolves,
@@ -333,6 +333,7 @@ this.angular2now = angular2now = angular2 = function () {
 
                         //console.log('@State: target.template: ', target.template || target.templateUrl);
                         //console.log('@State:    sdo.template: ', sdo.template);
+                        //console.log('@State:    sdo: ', resolvedServiceName, sdo);
 
                         $stateProvider.state(options.name, sdo);
 

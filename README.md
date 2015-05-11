@@ -97,7 +97,62 @@ class defect {
 }
 ```
 
-Resolves, and a controller to receive the resolved values, are supported through the the resolve and controller options. Examples of this will come at a later stage. 
+#### Resolving and injecting ui-router dependencies 
+
+To add a `ui-router` resolve block, add in to the @State annotation as shown below.
+
+```javascript
+@State({
+    name: 'defect', 
+    url: '/defect', 
+    defaultRoute: true,
+    resolve: {
+        user: function() { return 'paul'; },
+        role: function() { return 'admin'; }
+    }
+})
+```
+
+A resolve block can also be added as a `static` property on the class itself, like shown below. Either way produces the same results.
+
+```javascript
+@State({ name: 'root', url: '' })
+@Inject(['defect'])
+class defect {
+    constructor(defect) { 
+        // defect.name == 'paul'
+        // defect.role == 'admin'
+    }
+    static resolve = {
+        user: function() { return 'paul'; },
+        role: function() { return 'admin'; }
+    }
+}
+```
+
+The resolved values are made available for injection into a component's constructor, as shown above. The injected parameter `defect` is the name of the service created for you that holds the resolved return values. The name of this service is always the camelCased version of your component's selector. So, if the selector == 'my-app', then the name of the injectable service will be 'myApp'. 
+
+#### States without a component
+    
+It is also possible to define a state without a component, as in
+
+```javascript
+@State({ 
+    name: 'test', 
+    url: '/test', 
+    resolve: { 
+        user: function() { return 'paul'; },
+        role: function() { return 'admin'; } 
+    } 
+})
+class myApp {
+    constructor(user, role) {
+        console.log('myApp resolved: ', user, role);
+    }
+}
+```
+
+In this case, the class itself is the controller for the route and receives the injected properties directly.  
 
 
 ### Bootstrapping the app
