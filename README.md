@@ -1,12 +1,12 @@
 ## Angular 2.0 component syntax using Angular 1.x and Babel
 
-This library and Meteor package will allow you to continue using Angular 1.3 or higher, while giving you the opportunity to start coding your directives (components) using Angular 2 @Component syntax. You get to keep your investment in Angular 1.x while preparing for Angular 2.  
+This library allows you to continue using Angular 1.3 or higher, while giving you the opportunity to start coding your Angular 1.x applicantions in Angular 2 syntax. You get to keep your investment in Angular 1.x while preparing for Angular 2.  
 
 If either of the statements below applies to you, then you need angular2-now:
 
 - You are about to start a new development in Angular 1.x and are thinking about migrating to Angular 2, when it finally arrives.
 
-- You just like the clean syntax of Angular 2 component annotations for creating directives/components and services, but don't care much for the rest of Angular 2 at this stage.
+- You just like the clean syntax of Angular 2, but don't care much for the rest of Angular 2 at this stage.
 
 You are welcome to contribute to this project.
 
@@ -74,7 +74,13 @@ This is completely not Angular 2, but I love how easy it makes my routing.
 
 You'll have to include ui-router in your app
 
-    meteor add urigo:angular-ui-router
+Meteor:
+
+    meteor add angularui:angular-ui-router
+    
+Bower:
+
+    bower install angular-ui-router
 
 And then add the `ui.router` dependency to your bootstrap module, like this
   
