@@ -97,7 +97,7 @@ class defect {
 }
 ```
 
-#### Resolving and injecting ui-router dependencies 
+#### Resolving and injecting dependencies 
 
 To add a `ui-router` resolve block, add in to the @State annotation as shown below.
 
@@ -130,7 +130,7 @@ class defect {
 }
 ```
 
-The resolved values are made available for injection into a component's constructor, as shown above. The injected parameter `defect` is the name of the service created for you that holds the resolved return values. The name of this service is always the camelCased version of your component's selector. So, if the selector == 'my-app', then the name of the injectable service will be 'myApp'. 
+The resolved values are made available for injection into a component's constructor, as shown above. The injected parameter `defect` is the name of a service created for you that holds the resolved return values. The name of this service is always the camelCased version of your component's selector. So, if the selector == 'my-app', then the name of the injectable service will be 'myApp'. 
 
 #### States without a component
     
