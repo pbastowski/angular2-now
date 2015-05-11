@@ -33,6 +33,7 @@
     ".versions",
     "package.js",
     "package.json",
-    "versions.json"
+    "versions.json",
+    ".idea"
   ]
 }

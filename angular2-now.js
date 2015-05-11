@@ -26,7 +26,6 @@ this.angular2now = angular2now = angular2 = function () {
 
     function Component(options) {
         options = options || {};
-        if (!options.module) options.module = currentModule || 'app';
 
         return function (target) {
 
@@ -63,17 +62,17 @@ this.angular2now = angular2now = angular2 = function () {
                 controller:       target,
                 replace:          false,
                 transclude:       /ng-transclude/i.test(options.template) || target.transclude,
-                require:          options.require || [options.selector, '^?ngModel'],
-                link:             options.link || link
+                require:          options.require || target.require || [options.selector, '^?ngModel'],
+                link:             options.link || target.link || link
             };
 
             try {
-                angular.module(options.module)
+                angular.module(currentModule)
                     .directive(options.selector, function () {
                         return ddo;
                     });
             } catch (er) {
-                throw new Error('Does module "' + options.module + '" exist? You may need to use angular.module("youModuleName").');
+                throw new Error('Does module "' + currentModule + '" exist? You may need to use angular.module("youModuleName").');
             }
 
             return target;
@@ -81,13 +80,12 @@ this.angular2now = angular2now = angular2 = function () {
             function link(scope, el, attr, controllers) {
                 // Make the ngModel available to the directive controller(constructor)
                 // The controller runs first and the link after.
-                // In the controller we define ngModel on $scope, as a $q.defered(),
-                // which is detected below and resolved with the actual ngModel.
+                // In the controller we define this.ngModel as a callback function.
+                // Link looks for ngModel and if present calls it, passing the ngModel controller.
                 // todo: investigate other, easier, ways of doing this.
                 if (controllers[0].ngModel && typeof controllers[0].ngModel === 'function') {
                     try {
                         controllers[0].ngModel(controllers[1]);
-                        //scope.ngModel.resolve(controllers);
                     } catch (er) {
                         throw new Error("@Component: If you're trying access your component's ngModel, then in your constructor() add $scope.ngModel = $q.defered(). Remember to @Inject(['$scope', '$q']).");
                     }
@@ -96,6 +94,22 @@ this.angular2now = angular2now = angular2 = function () {
         };
 
 
+    }
+
+    // Does a provider with a specific name exist in the current module
+    function serviceExists(serviceName) {
+        return !!getService(serviceName);
+    }
+
+    function getService(serviceName, moduleName) {
+        if (!moduleName)
+            moduleName = currentModule;
+
+        return angular.module(moduleName)
+                ._invokeQueue
+                .find(function(v,i) {
+                    return v[0]==='$provide' && v[2][0] === serviceName
+                });
     }
 
     function camelCase(s) {
@@ -148,27 +162,43 @@ this.angular2now = angular2now = angular2 = function () {
             // directives is an array of child directive controllers (Classes)
             target.directives = options.directives;
 
-            // If template contains the new <content> tag then add ng-transclude to it.
-            // This will be picked up in @Component, where ddo.transclude will be set to true.
-            // Note: If using options.url, you will have to add ng-transclude yourself to the element you wish to transclude
-            // todo: access $templateCache looking for <content> and then add ng-transclude to it, as for an inline template
-            var s = (options.template || '').match(/\<content[ >]([^\>]+)/i);
-            if (s) {
-                if (s[1].toLowerCase().indexOf('ng-transclude') === -1)
-                    target.template = target.template.replace(/\<content/i, '<content ng-transclude');
-            }
+            // Check for the new <content> tag and add ng-transclude to it, if not there.
+            if (target.template)
+                target.template = transcludeContent(target.template);
+
+            //if (target.templateUrl && !_templateCacheTranscluded[target.templateUrl]) {
+            //    var template = _templateCache.get(target.templateUrl);
+            //    if (template) {
+            //        _templateCache.put(templateUrl, transcludeContent(template));
+            //
+            //        // Remember that we have already transcluded this template and don't do it again
+            //        _templateCacheTranscluded[templateUrl] = true;
+            //    }
+            //    //else
+            //    //    throw new Error('@View: Invalid templateUrl: "' + target.templateUrl + '".');
+            //}
+
             return target;
         };
+
+        // If template contains the new <content> tag then add ng-transclude to it.
+        // This will be picked up in @Component, where ddo.transclude will be set to true.
+        function transcludeContent(template) {
+            var s = (template || '').match(/\<content[ >]([^\>]+)/i);
+            if (s) {
+                if (s[1].toLowerCase().indexOf('ng-transclude') === -1)
+                    template = template.replace(/\<content/i, '<content ng-transclude');
+            }
+            return template;
+        }
     }
 
     function Controller(options) {
         options = options || {};
-        if (!options.module) options.module = currentModule || 'app';
 
         return function (target) {
-            //module+options.name.slice(0,1).toUpperCase()+options.name.slice(1),
-            angular.module(options.module)
-                .controller(options.module + '.' + options.name, target);
+            angular.module(currentModule)
+                .controller(options.name, target);
 
             return target;
         };
@@ -176,10 +206,9 @@ this.angular2now = angular2now = angular2 = function () {
 
     function Service(options) {
         options = options || {};
-        if (!options.module) options.module = currentModule || 'app';
 
         return function (target) {
-            angular.module(options.module)
+            angular.module(currentModule)
                 .service(options.name, target);
             //.factory(options.name, function () { return new target })
 
@@ -189,11 +218,10 @@ this.angular2now = angular2now = angular2 = function () {
 
     function Filter(options) {
         options = options || {};
-        if (!options.module) options.module = currentModule || 'app';
 
         return function (target) {
 
-            angular.module(options.module)
+            angular.module(currentModule)
                 .filter(options.name, function () {
                     return new target;
                 });
@@ -265,7 +293,8 @@ this.angular2now = angular2now = angular2 = function () {
             // Create an injectable value service to share the resolved values with the controller
             // The service bears the same name as the component's camelCased selector name.
             if (doResolve) {
-                angular.module(currentModule).value(resolvedServiceName, resolved);
+                if (!serviceExists(resolvedServiceName))
+                    angular.module(currentModule).value(resolvedServiceName, resolved);
             }
 
             // Configure the state
