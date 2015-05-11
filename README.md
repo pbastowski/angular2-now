@@ -219,29 +219,32 @@ or like this:
 
 I like the first syntax, because it looks a bit like the ES6 module import syntax. 
 
-### How do I access ngModel of my directive/component?
+### How do I access ngModel in my directive/component?
 
-This is a little bit tricky, because a component's constructor is actually it's controller. The controller does not get access to ngModel, but the link function does. We don't have a link function, so, how do we get access to ngModel?
+Normally you'd do it in the `link` function, but, we don't have a link function. We have a controller/constructor, which does not have access to ngModel. So, how do we get access to ngModel? 
  
-Like this:
+> Warning: Breaking change in 0.1.6. `$q` and `$scope` are no longer required to access ngModel, please see below.
+
+You get access to ngModel like this:
 
 ```javascript
 @Component({ selector: 'my-validator' })
-@Inject(['$scope', '$q'])
 class myValidator {
-    constructor($scope, $q) {
-        $scope.ngModel = $q.defer();
-        $scope.ngModel.promise.then(function (ngModel) {
+    constructor() {
+        this.ngModel = function (ngModel) {
             // This is where you do stuff with ngModel, such as 
             // ngModel.$parsers.unshift(function (value) { ... });
             //        or
             // ngModel.$formatters.unshift(function (value) { ... });
-        });
+        };
     }
 }
 ```
 
-Yes, I know, we don't want to use `$scope`. But, for the moment I haven't figured out how to do this another, simpler, way. What I would like to do is to automatically add ngModel onto the controller's `this` scope. Perhaps you can help me work out how to do that?
+In the above example we create a this.ngModel and assign a callback function to it, which receives the ngModel controller when the (hidden) link function actually executes.
+
+Angular 2 is a bit different in this aspect. It allows you to inject dependent controllers directly into your constructor, which is very nice. It's not easy to implement in Angular 1, but we're trying.
+
 
 #### How does this magic work?
 
