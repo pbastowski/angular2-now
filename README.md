@@ -241,9 +241,9 @@ class myValidator {
 }
 ```
 
-In the above example we create a this.ngModel and assign a callback function to it, which receives the ngModel controller when the (hidden) link function actually executes.
+In the above example, we create `this.ngModel` in the `constructor` and assign a callback function to it, which receives the `ngModel` controller when the (hidden) link function actually executes. That's how Angular 1 works.
 
-Angular 2 is a bit different in this aspect. It allows you to inject dependent controllers directly into your constructor, which is very nice. It's not easy to implement in Angular 1, but we're trying.
+Angular 2 is a bit different in this aspect. It allows you to inject dependent controllers directly into your constructor, which is very nice. However, it's not easy to implement the same behaviour in Angular 1, but we're trying.
 
 
 #### How does this magic work?
