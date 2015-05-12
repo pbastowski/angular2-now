@@ -1,17 +1,13 @@
 {
   "name": "angular2-now",
   "version": "0.1.5",
+  "homepage": "https://github.com/pbastowski/angular2-now",
+  "description": "Use Angular2 @Component syntax with Angular 1.x and TypeScript or Babel",
+  "keywords": [ "AngularJS", "Angular2", "angular2-now", "TypeScript", "babel" ],
   "authors": [
     "pbastowski@gmail.com"
   ],
-  "description": "Use Angular2 @Component syntax with Angular 1.x and Babel",
   "main": "angular2-now.js",
-  "keywords": [
-    "AngularJS",
-    "angular2-now",
-    "Angular2",
-    "babel"
-  ],
   "license": "MIT",
   "homepage": "https://github.com/pbastowski/angular2-now",
   "ignore": [
@@ -19,8 +15,6 @@
     "node_modules",
     "bower_components",
     "test",
-    "tests",
-    "angular2-now-tests.js",
     ".coverage",
     ".docs",
     ".meteor",
