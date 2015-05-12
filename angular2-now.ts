@@ -1,19 +1,6 @@
 'use strict';
-var angular;
-var Meteor;
-
-//export var angular2now = {
-//  Component: Component,
-//  View: View,
-//  Inject: Inject,
-//  Controller: Controller,
-//  Service: Service,
-//  bootstrap: bootstrap,
-//  'Filter': Filter,
-//  SetModuleName: SetModuleName,
-//  State: State
-//};
-//export var angular2 = angular2now;
+declare var angular;
+var Meteor = Meteor;
 
 var currentModule = 'app';
 
@@ -224,7 +211,7 @@ export function bootstrap(target, config?) {
   if (!config)
     config = {strictDi: false};
 
-  if (Meteor && Meteor.isCordova)
+  if (Meteor !== undefined && Meteor.isCordova)
     angular.element(document).on("deviceready", onReady);
   else
     angular.element(document).ready(onReady);

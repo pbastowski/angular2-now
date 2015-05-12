@@ -2,7 +2,8 @@
 
 // Include Gulp & tools we'll use
 var gulp = require('gulp'),
-    ts = require('gulp-typescript');
+    ts = require('gulp-typescript'),
+    merge = require('merge2');
 
 var tsProject = {
     typescript: require('typescript'),
@@ -24,6 +25,8 @@ gulp.task('default', function () {
     var tsResult = gulp.src('angular2-now.ts')
         .pipe(ts(tsProject, {}, ts.reporter.longReporter()));
 
-    return tsResult.js
-        .pipe(gulp.dest('.'));
+    return merge(
+        tsResult.js.pipe(gulp.dest('.')),
+        tsResult.dts.pipe(gulp.dest('.'))
+    );
 });
