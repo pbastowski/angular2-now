@@ -1,0 +1,36 @@
+{
+  "name": "angular2-now",
+  "authors": [
+    "pbastowski@gmail.com"
+  ],
+  "description": "Use Angular2 @Component syntax with Angular 1.x and Babel",
+  "main": "angular2-now.js",
+  "keywords": [
+    "angular2",
+    "angular 2",
+    "now",
+    "migration",
+    "angular1",
+    "angular 1",
+    "babel"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/pbastowski/angular2-now",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "_release": "9133d274d6",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "9133d274d67436e739fc82e86b8dc0b7eaf2890e"
+  },
+  "_source": "git://github.com/pbastowski/angular2-now-js.git",
+  "_target": "*",
+  "_originalSource": "angular2-now",
+  "_direct": true
+}

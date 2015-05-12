@@ -1,27 +1,47 @@
 ## Angular 2.0 component syntax using Angular 1.x and Babel
 
-This library and Meteor package will allow you to continue using Angular 1.3 or higher, while giving you the opportunity to start coding your directives (components) using Angular 2 @Component syntax. You get to keep your investment in Angular 1.x while preparing for Angular 2.  
+This library allows you to continue using Angular 1.3 or higher, while giving you the opportunity to start coding your Angular 1.x applicantions in Angular 2 syntax. You get to keep your investment in Angular 1.x while preparing for Angular 2.  
 
 If either of the statements below applies to you, then you need angular2-now:
 
-- You are about to start a new development in Angular 1.x and are thinking about migrating to Angular 2, when if finally arrives.
+- You are about to start a new development in Angular 1.x and are thinking about migrating to Angular 2, when it finally arrives.
 
-- You just like the Angular 2 component annotations for creating directives, but don't care much for the rest of Angular 2 at this stage.
+- You just like the clean syntax of Angular 2, but don't care much for the rest of Angular 2 at this stage.
 
 You are welcome to contribute to this project.
 
 ### Can I use this outside of Meteor?
-Sure. The example code is for Meteor, however, you can just as easily use this library in any other workflow that can run Babel. All the work is done by the ES6 decorator functions in angular2-now.es6.js. Just include that library in your code and expose/import them where you want to use the @ decorators.
 
-### Installation
+Yes, you can. The angular2-now.js library works with both ES6 (Babel) and plain ES5. ES6 examples are in this README and for an ES5 usage demo see [Plunker](http://plnkr.co/edit/uxV781?p=preview).
+
+Install it like this
+
+    bower install angular2-now
+
+To use this library, include it in your Angular 1.3 (or higher) project, ensuring that it loads before it's functions are used. `window.angular2now` gives you access to all the decorator functions. You can import the functions you need into each module that requires them, like this:
+
+Babel/ES6
+
+    var {Component, View, Inject} = angular2now;
+
+ES5
+
+    var Component = angular2now.Component;
+    var View = angular2now.View;
+    var Inject = angular2now.Inject;
+
+Or, if you want all the angular2-now decorator functions available for use anywhere in your application without explicitly importing them, then you could try this
+
+    angular.extend(window, angular2now)
+
+Please note that to use the Angular 2 `@` notation, as shown in the examples below, such as `@Component` or `@View`, you will need to have a build workflow that uses Babel to transpile your ES6 code to plain ES5 JavaScript that your browser can understand.
+
+
+### Meteor Installation
 
     meteor add pbastowski:angular2-now
     
-You will also need the packages below:
 
-    meteor add pbastowski:angular-babel
-    meteor add urigo:angular
-    
 ### What's implemented?
 
 The following decorators have been implemented to support the Angular 2.0 component syntax, as far as possible.
@@ -31,11 +51,12 @@ The following decorators have been implemented to support the Angular 2.0 compon
 - **@Inject** `(['$http', myServiceClass, '$q'])`
 - **bootstrap** `(app [, config ])` 
 
-The decorators below are not Angular 2, as I haven't seen what Angular 2 services will actually look like yet. But, they are nice. 
+The decorators below are not Angular 2, as such, but for me they make coding in Angular a bit nicer. 
 
 - **@Service** `({ name: 'serviceName', ?module: 'angularModuleName' })`
 - **@Filter** `({ name: 'filterName', ?module: 'angularModuleName' })`
-- **@State** `({name: 'stateName', ?url: '/stateurl', ?defaultRoute: true/false, ?resolve: {...}, ?controller: controllerFunction }))`
+- **@State** `({name: 'stateName', ?url: '/stateurl', ?defaultRoute: true/false, ?resolve: {...}, ?controller: controllerFunction, ?template: { } }))`
+
 
 ### Using angular.module 
 
@@ -46,8 +67,6 @@ This allows us to set the Angular 1 module name in which Components, Services, F
 #### How does it work? 
 I have "monkey patched" angular.module() to remember the module name and then call the original angular.module function (and return its return value). 
 
-> Previously, we used SetModuleName *(deprecated in 0.1.0)* to do the same job
-
 
 ### ui-router support through @State
 
@@ -55,7 +74,13 @@ This is completely not Angular 2, but I love how easy it makes my routing.
 
 You'll have to include ui-router in your app
 
-    meteor add urigo:angular-ui-router
+Meteor:
+
+    meteor add angularui:angular-ui-router
+    
+Bower:
+
+    bower install angular-ui-router
 
 And then add the `ui.router` dependency to your bootstrap module, like this
   
@@ -72,7 +97,62 @@ class defect {
 }
 ```
 
-Resolves, and a controller to receive the resolved values, are supported through the the resolve and controller options. Examples of this will come at a later stage. 
+#### Resolving and injecting dependencies 
+
+To add a `ui-router` resolve block, add in to the @State annotation as shown below.
+
+```javascript
+@State({
+    name: 'defect', 
+    url: '/defect', 
+    defaultRoute: true,
+    resolve: {
+        user: function() { return 'paul'; },
+        role: function() { return 'admin'; }
+    }
+})
+```
+
+A resolve block can also be added as a `static` property on the class itself, like shown below. Either way produces the same results.
+
+```javascript
+@State({ name: 'root', url: '' })
+@Inject(['defect'])
+class defect {
+    constructor(defect) { 
+        // defect.name == 'paul'
+        // defect.role == 'admin'
+    }
+    static resolve = {
+        user: function() { return 'paul'; },
+        role: function() { return 'admin'; }
+    }
+}
+```
+
+The resolved values are made available for injection into a component's constructor, as shown above. The injected parameter `defect` is the name of a service created for you that holds the resolved return values. The name of this service is always the camelCased version of your component's selector. So, if the selector == 'my-app', then the name of the injectable service will be 'myApp'. 
+
+#### States without a component
+    
+It is also possible to define a state without a component, as in
+
+```javascript
+@State({ 
+    name: 'test', 
+    url: '/test', 
+    resolve: { 
+        user: function() { return 'paul'; },
+        role: function() { return 'admin'; } 
+    } 
+})
+class myApp {
+    constructor(user, role) {
+        console.log('myApp resolved: ', user, role);
+    }
+}
+```
+
+In this case, the class itself is the controller for the route and receives the injected properties directly.  
 
 
 ### Bootstrapping the app
@@ -139,29 +219,32 @@ or like this:
 
 I like the first syntax, because it looks a bit like the ES6 module import syntax. 
 
-### How do I access ngModel of my directive/component?
+### How do I access ngModel in my directive/component?
 
-This is a little bit tricky, because a component's constructor is actually it's controller. The controller does not get access to ngModel, but the link function does. We don't have a link function, so, how do we get access to ngModel?
+Normally you'd do it in the `link` function, but, we don't have a link function. We have a controller/constructor, which does not have access to ngModel. So, how do we get access to ngModel? 
  
-Like this:
+> Warning: Breaking change in 0.1.6. `$q` and `$scope` are no longer required to access ngModel, please see below.
+
+You get access to ngModel like this:
 
 ```javascript
 @Component({ selector: 'my-validator' })
-@Inject(['$scope', '$q'])
 class myValidator {
-    constructor($scope, $q) {
-        $scope.ngModel = $q.defer();
-        $scope.ngModel.promise.then(function (ngModel) {
+    constructor() {
+        this.ngModel = function (ngModel) {
             // This is where you do stuff with ngModel, such as 
             // ngModel.$parsers.unshift(function (value) { ... });
             //        or
             // ngModel.$formatters.unshift(function (value) { ... });
-        });
+        };
     }
 }
 ```
 
-Yes, I know, we don't want to use `$scope`. But, for the moment I haven't figured out how to do this another, simpler, way. What I would like to do is to automatically add ngModel onto the controller's `this` scope. Perhaps you can help me work out how to do that?
+In the above example, we create `this.ngModel` in the `constructor` and assign a callback function to it, which receives the `ngModel` controller when the (hidden) link function actually executes. That's how Angular 1 works.
+
+Angular 2 is a bit different in this aspect. It allows you to inject dependent controllers directly into your constructor, which is very nice. However, it's not easy to implement the same behaviour in Angular 1, but we're trying.
+
 
 #### How does this magic work?
 

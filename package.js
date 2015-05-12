@@ -1,6 +1,6 @@
 Package.describe({
   name: 'pbastowski:angular2-now',
-  version: '0.1.3',
+  version: '0.1.6',
   // Brief, one-line summary of the package.
   summary: 'Use Angular2 @Component syntax with Angular 1.x and Babel',
   // URL to the Git repository containing the source code for this package.
@@ -13,7 +13,8 @@ Package.describe({
 Package.onUse(function(api) {
   api.versionsFrom('1.1.0.2');
   api.use('urigo:angular@0.8.8', 'client');
-  api.addFiles('angular2-now.es6.js', ['client']);
+  api.use('pbastowski:angular-babel@0.1.3', 'client');
+  api.addFiles('angular2-now.js', ['client']);
   api.export(['angular2', 'angular2now']);
 });
 
