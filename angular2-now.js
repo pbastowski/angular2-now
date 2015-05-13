@@ -4,6 +4,7 @@ this.angular2now = angular2now = angular2 = function () {
 
     var angular2now = {
         Component:     Component,
+        Directive:     Component,
         View:          View,
         Inject:        Inject,
         Controller:    Controller,
@@ -54,12 +55,12 @@ this.angular2now = angular2now = angular2 = function () {
             // todo: use module and name-spaced directive naming, perhaps from a config file like Greg suggested
             var ddo = {
                 restrict:         (options.template + options.templateUrl) ? 'EA' : isClass ? 'C' : 'A',
-                controllerAs:     options.selector,
-                scope:            options['bind'] || {},
-                bindToController: true,
+                controllerAs:     target.controllerAs || options.selector,
+                scope:            target.scope || options['bind'] || {},
+                bindToController: target.bindToController || true,
                 template:         options.template,
                 templateUrl:      options.templateUrl,
-                controller:       target,
+                controller:       target.controller || target,
                 replace:          false,
                 transclude:       /ng-transclude/i.test(options.template) || target.transclude,
                 require:          options.require || target.require || [options.selector, '^?ngModel'],
