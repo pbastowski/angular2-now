@@ -81,8 +81,8 @@ this.angular2now = angular2now = angular2 = function () {
             options.template = target.template || /*options.template ||*/ undefined;
             options.templateUrl = target.templateUrl || /*options.templateUrl ||*/ undefined;
 
-            //controller.$inject = target.$inject || [];
-            //controller.$inject.push('$q');  // we'll need $q to instantiate this controller after link finishes
+            controller.$inject = target.$inject || [];
+            controller.$inject.push('$q');  // we'll need $q to instantiate this controller after link finishes
 
             // Create the angular directive
             // todo: use module and name-spaced directive naming, perhaps from a config file like Greg suggested
@@ -93,8 +93,8 @@ this.angular2now = angular2now = angular2 = function () {
                 bindToController: target.bindToController || true,
                 template:         options.template,
                 templateUrl:      options.templateUrl,
-                controller:       target.controller || target,
-                //controller:       controller,
+                //controller:       target.controller || target,
+                controller:       controller,
                 replace:          false,
                 transclude:       /ng-transclude/i.test(options.template) || target.transclude,
                 require:          options.require || target.require || [options.selector, '^?ngModel'],
@@ -113,32 +113,34 @@ this.angular2now = angular2now = angular2 = function () {
 
             return target;
 
-            //function controller() {
-            //    var that = this;
-            //
-            //    var args = Array.prototype.slice.call(arguments);
-            //    var $q = arguments[arguments.length-1];
-            //
-            //    var ctl = makeFunction(target);
-            //
-            //    this.___$$cb = $q.defer();
-            //
-            //    this.___$$cb.promise.then(function(controllers) {
-            //
-            //        ctl.apply(that, args);
-            //
-            //    });
-            //}
+            function controller() {
+                var that = this;
+
+                var args = Array.prototype.slice.call(arguments);
+                var $q = arguments[arguments.length-1];
+
+                var ctl = makeFunction(target);
+
+                this.___$$cb = $q.defer();
+
+                this.___$$cb.promise.then(function(controllers) {
+
+                    console.log('CCC controller');
+                    ctl.apply(that, args);
+
+                });
+            }
 
             function link(scope, el, attr, controllers) {
+                console.log('LLL link');
                 // Make the ngModel available to the directive controller(constructor)
                 // The controller runs first and the link after.
                 // In the controller we define this.ngModel as a callback function.
                 // Link looks for ngModel and if present calls it, passing the ngModel controller.
 
                 // todo: investigate other, easier, ways of doing this.
-                //if (controllers[0].___$$cb)
-                //    controllers[0].___$$cb.resolve(controllers.slice(1));
+                if (controllers[0].___$$cb)
+                    controllers[0].___$$cb.resolve(controllers.slice(1));
 
                 if (controllers[0].ngModel && typeof controllers[0].ngModel === 'function') {
                     try {
@@ -159,16 +161,15 @@ this.angular2now = angular2now = angular2 = function () {
     window.makeFunction = makeFunction;
     function makeFunction(target) {
         // convert to string and remove final "}"
-        //var fnBody = target.toString().slice(0, -1).split('{');
         var fnBody = target.toString().slice(0, -1);
         var i = fnBody.indexOf('{');
         fnBody = [fnBody.slice(0,i-1), fnBody.slice(i+1)];
 
-        console.log('! makeFunction1: ', fnBody);
+        //console.log('! makeFunction1: ', fnBody);
 
         // extract function argument names
         var fnArgs = fnBody[0].split('function ')[1].split(/[()]/).slice(1,-1)[0].split(', ');
-        console.log('! makeFunction2: ', fnArgs, fnBody[1]);
+        //console.log('! makeFunction2: ', fnArgs, fnBody[1]);
 
         // remove the Babel classCheck... call
         fnBody[1] = fnBody[1].slice(fnBody[1].indexOf(';')+1);
@@ -176,7 +177,7 @@ this.angular2now = angular2now = angular2 = function () {
         // append function body as last arg in fnArgs
         fnArgs.push(fnBody[1]);
 
-        console.log('! makeFunction3: ', fnArgs);
+        //console.log('! makeFunction3: ', fnArgs);
 
         var f = Function.apply(null, fnArgs);
 
@@ -438,6 +439,7 @@ this.angular2now = angular2now = angular2 = function () {
 
                         // Populate the published service with the resolved values
                         function controller() {
+                            console.log('SSS state controller: ', target.selector);
 
                             var args = Array.prototype.slice.call(arguments);
 
