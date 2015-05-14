@@ -9,21 +9,51 @@ this.angular2now = angular2now = angular2 = function () {
         Inject:        Inject,
         Controller:    Controller,
         Service:       Service,
-        bootstrap:     bootstrap,
         'Filter':      Filter,
+        Injectable:    Service,
+        bootstrap:     bootstrap,
         State:         State
     };
 
-    var currentModule = 'app';
+    var currentModule;
+    var currentNameSpace;
 
     var angularModule = angular.module;
 
     // Monkey patch angular.module
     angular.module = function () {
-        currentModule = arguments[0];
+        // A namespace may be specified like this:
+        //     angular.module('ftdesiree:helpers')
+        //
+        currentModule = arguments[0].split(':');
+
+        if (currentModule.length === 1) {
+            // no namespace, just the module name
+            currentModule = currentModule[0];
+        } else {
+            // split off the name-space and module name
+            currentNameSpace = currentModule[0];
+            currentModule = currentModule[1];
+
+            // reassign arguments[0] without the namespace
+            arguments[0] = currentModule;
+            //console.log('@angular.module: ns: ', currentNameSpace, arguments[0]);
+        }
 
         return angularModule.apply(angular, arguments);
     };
+
+
+    function nameSpace(name) {
+        var nsName = name;
+
+        if (currentNameSpace) {
+            //nsName = camelCase(currentModule) + '.' + name;
+            nsName = currentNameSpace + '.' + name;
+        }
+
+        return nsName;
+    }
 
     function Component(options) {
         options = options || {};
@@ -51,6 +81,9 @@ this.angular2now = angular2now = angular2 = function () {
             options.template = target.template || /*options.template ||*/ undefined;
             options.templateUrl = target.templateUrl || /*options.templateUrl ||*/ undefined;
 
+            //controller.$inject = target.$inject || [];
+            //controller.$inject.push('$q');  // we'll need $q to instantiate this controller after link finishes
+
             // Create the angular directive
             // todo: use module and name-spaced directive naming, perhaps from a config file like Greg suggested
             var ddo = {
@@ -61,6 +94,7 @@ this.angular2now = angular2now = angular2 = function () {
                 template:         options.template,
                 templateUrl:      options.templateUrl,
                 controller:       target.controller || target,
+                //controller:       controller,
                 replace:          false,
                 transclude:       /ng-transclude/i.test(options.template) || target.transclude,
                 require:          options.require || target.require || [options.selector, '^?ngModel'],
@@ -69,6 +103,7 @@ this.angular2now = angular2now = angular2 = function () {
 
             try {
                 angular.module(currentModule)
+                    .controller(nameSpace(options.selector), target.controller || target)
                     .directive(options.selector, function () {
                         return ddo;
                     });
@@ -78,12 +113,33 @@ this.angular2now = angular2now = angular2 = function () {
 
             return target;
 
+            //function controller() {
+            //    var that = this;
+            //
+            //    var args = Array.prototype.slice.call(arguments);
+            //    var $q = arguments[arguments.length-1];
+            //
+            //    var ctl = makeFunction(target);
+            //
+            //    this.___$$cb = $q.defer();
+            //
+            //    this.___$$cb.promise.then(function(controllers) {
+            //
+            //        ctl.apply(that, args);
+            //
+            //    });
+            //}
+
             function link(scope, el, attr, controllers) {
                 // Make the ngModel available to the directive controller(constructor)
                 // The controller runs first and the link after.
                 // In the controller we define this.ngModel as a callback function.
                 // Link looks for ngModel and if present calls it, passing the ngModel controller.
+
                 // todo: investigate other, easier, ways of doing this.
+                //if (controllers[0].___$$cb)
+                //    controllers[0].___$$cb.resolve(controllers.slice(1));
+
                 if (controllers[0].ngModel && typeof controllers[0].ngModel === 'function') {
                     try {
                         controllers[0].ngModel(controllers[1]);
@@ -95,6 +151,36 @@ this.angular2now = angular2now = angular2 = function () {
         };
 
 
+    }
+
+    // Takes a class and remakes it using Function, so that it's this can be reassigned
+    // and so it can be called and arguments passed to it.
+    // Classes can not be called directly due to Babel restrictions.
+    window.makeFunction = makeFunction;
+    function makeFunction(target) {
+        // convert to string and remove final "}"
+        //var fnBody = target.toString().slice(0, -1).split('{');
+        var fnBody = target.toString().slice(0, -1);
+        var i = fnBody.indexOf('{');
+        fnBody = [fnBody.slice(0,i-1), fnBody.slice(i+1)];
+
+        console.log('! makeFunction1: ', fnBody);
+
+        // extract function argument names
+        var fnArgs = fnBody[0].split('function ')[1].split(/[()]/).slice(1,-1)[0].split(', ');
+        console.log('! makeFunction2: ', fnArgs, fnBody[1]);
+
+        // remove the Babel classCheck... call
+        fnBody[1] = fnBody[1].slice(fnBody[1].indexOf(';')+1);
+
+        // append function body as last arg in fnArgs
+        fnArgs.push(fnBody[1]);
+
+        console.log('! makeFunction3: ', fnArgs);
+
+        var f = Function.apply(null, fnArgs);
+
+        return f
     }
 
     // Does a provider with a specific name exist in the current module
@@ -138,10 +224,12 @@ this.angular2now = angular2now = angular2 = function () {
             if (!target.$inject)
                 target.$inject = [];
 
-            angular.forEach(deps, function (v) {
-                if (v instanceof Object) v = v.name;
-                if (target.$inject.indexOf(v) === -1)
-                    target.$inject.push(v);
+            angular.forEach(deps, function (dep) {
+                // Namespace any injectables without an existing module prefix and not prefixed with '$'.
+                if (dep[0] !== '$' && dep.indexOf('.') === -1) dep = nameSpace(dep);
+
+                if (target.$inject.indexOf(dep) === -1)
+                    target.$inject.push(dep);
             });
 
             return target;
@@ -199,7 +287,7 @@ this.angular2now = angular2now = angular2 = function () {
 
         return function (target) {
             angular.module(currentModule)
-                .controller(options.name, target);
+                .controller(nameSpace(options.name), target);
 
             return target;
         };
@@ -210,7 +298,7 @@ this.angular2now = angular2now = angular2 = function () {
 
         return function (target) {
             angular.module(currentModule)
-                .service(options.name, target);
+                .service(nameSpace(options.name), target);
             //.factory(options.name, function () { return new target })
 
             return target;
@@ -223,7 +311,7 @@ this.angular2now = angular2now = angular2 = function () {
         return function (target) {
 
             angular.module(currentModule)
-                .filter(options.name, function () {
+                .filter(nameSpace(options.name), function () {
                     return new target;
                 });
 
@@ -258,17 +346,17 @@ this.angular2now = angular2now = angular2 = function () {
         }
     }
 
-    //
-    // @State can be used to annotate either a Component or a class.
-    //
-    // If class is annotated then it is assumed to be the controller and
-    // the state name will be used as the name of the injectable service
-    // if any resolves are requested.
-    //
-    // When a component is annotated and resolves requested, then the component's
-    // selector name is used as the name of the injectable service that holds
-    // their values.
-    //
+    /**
+     * @State can be used to annotate either a Component or a class.
+     *
+     * If a class is annotated then it is assumed to be the controller and
+     * the state name will be used as the name of the injectable service
+     * that will hold any resolves requested.
+     *
+     * When a component is annotated and resolves requested, then the component's
+     * selector name is used as the name of the injectable service that holds
+     * their values.
+     */
     function State(options) {
 
         if (!options || !(options instanceof Object) || options.name === undefined)
@@ -278,7 +366,7 @@ this.angular2now = angular2now = angular2 = function () {
 
             var deps;
             var resolved = {};
-            var resolvedServiceName = camelCase(target.selector || options.name);
+            var resolvedServiceName = nameSpace(camelCase(target.selector || options.name));
 
             // Indicates if there is anything to resolve
             var doResolve;
@@ -350,8 +438,9 @@ this.angular2now = angular2now = angular2 = function () {
 
                         // Populate the published service with the resolved values
                         function controller() {
+
                             var args = Array.prototype.slice.call(arguments);
-                            //console.log('@State: controller: ', deps, args);
+
                             var localScope = args[0];
 
                             args = args.slice(1);
