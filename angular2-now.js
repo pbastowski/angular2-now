@@ -135,7 +135,7 @@ this.angular2now = angular2now = angular2 = function () {
 
                 // Create our controller function from the class.
                 // We have to do this, because Babel disallows calling classes and passing this to them.
-                var ctl = makeFunction(target);
+                //var ctl = makeFunction(target);
 
                 // Create a callback that will be execute in the link function when it executes
                 // where our controller will be actually instantiated.
@@ -154,7 +154,8 @@ this.angular2now = angular2now = angular2 = function () {
                         }
                     }
 
-                    ctl.apply(that, args);
+                    //ctl.apply(that, args);
+                    target.apply(that, args);
                 };
             }
 
