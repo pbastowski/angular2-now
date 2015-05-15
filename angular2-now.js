@@ -78,30 +78,28 @@ this.angular2now = angular2now = angular2 = function () {
             target.selector = unCamelCase(options.selector);
 
             // The template can be passed in from the @Template decorator
-            options.template = target.template || /*options.template ||*/ undefined;
-            options.templateUrl = target.templateUrl || /*options.templateUrl ||*/ undefined;
+            options.template = target.template || undefined;
+            options.templateUrl = target.templateUrl || undefined;
 
+            // Build the require array.
             // Our controller needs the same injections as the component's controller,
-            // but with the "@*" injections renamed to "$scope". The "@*" injections
-            // will be pased directly in the link function.
+            // but with the "@*" injections renamed to "$scope". The link function will pass
+            // the "@*" injections directly to the component controller.
             var requiredControllers = [options.selector];
             controller.$inject = target.$inject || [];
             controller.$inject = controller.$inject.map(function(dep) {
-                var idx = dep.indexOf('.@');
-                if ( idx !== -1) {
-                    requiredControllers.push('^?'+dep.slice(idx+2));
+                if ( dep[0] === '@' ) {
+                    requiredControllers.push('^?'+dep.slice(1));
                     dep = '$scope'
                 }
                 return dep;
             });
-            //console.log('~~~ $inject: ', options.selector, controller.$inject, '\n    requiredControllers: ', requiredControllers);
-            target.requiredControllers = requiredControllers;
 
             // Remember the original $inject, as it will be needed in the link function.
+            // In the link function we will receive any requested component controllers
+            // which we will then inject into the arguments that we will pass to the
+            // actual constructor of our component.
             target.$injectDefer = target.$inject || [];
-
-            // We'll need $q to instantiate this controller after link finishes
-            controller.$inject.push('$q');
 
             // Create the angular directive
             var ddo = {
@@ -111,18 +109,15 @@ this.angular2now = angular2now = angular2 = function () {
                 bindToController: target.bindToController || true,
                 template:         options.template,
                 templateUrl:      options.templateUrl,
-                //controller:       target.controller || target,
-                controller:       controller,
+                controller:       target.controller || controller,
                 replace:          false,
                 transclude:       /ng-transclude/i.test(options.template) || target.transclude,
-                //require:          options.require || target.require || [options.selector, '^?ngModel'],
                 require:          options.require || target.require || requiredControllers,
                 link:             options.link || target.link || link
             };
 
             try {
                 angular.module(currentModule)
-                    //.controller(nameSpace(options.selector), target.controller || target)
                     .directive(options.selector, function () {
                         return ddo;
                     });
@@ -135,10 +130,11 @@ this.angular2now = angular2now = angular2 = function () {
             function controller() {
                 var that = this;
 
+                // Convert arguments to a normal JS array
                 var args = Array.prototype.slice.call(arguments);
 
-                // Create our controller function from the class
-                // We have to do this because Babel disallows calling classes and passing this
+                // Create our controller function from the class.
+                // We have to do this, because Babel disallows calling classes and passing this to them.
                 var ctl = makeFunction(target);
 
                 // Create a callback that will be execute in the link function when it executes
@@ -150,22 +146,19 @@ this.angular2now = angular2now = angular2 = function () {
                     // Find all the "@*" injections and replace them (in the args array) with the
                     // actual controller from the passed in controllers array.
                     var controllerIndex = 0;
-                    for (var i= 0; i < args.length-1; i++) {
+                    for (var i= 0; i < args.length; i++) {
                         var arg = args[i];
-                        if (target.$injectDefer[i].indexOf('.@') !== -1) {
-                            args[i] = controllers[controllerIndex++];
+                        if (target.$injectDefer[i][0] === '@') {
+                            args[i] = controllers[controllerIndex];
+                            controllerIndex++;
                         }
                     }
 
-                    //console.log('~~~ controller: $injectDefer: ', target.selector, target.$injectDefer, args);
-                    //console.log('CCC controller');
                     ctl.apply(that, args);
-
                 };
             }
 
             function link(scope, el, attr, controllers) {
-                //console.log('LLL link');
                 // Execute the callback, passing all but the first argument (our own controller)
                 if (controller.___$$cb) {
                     controller.___$$cb(controllers.slice(1));
@@ -193,10 +186,12 @@ this.angular2now = angular2now = angular2 = function () {
         var fnArgs = fnBody[0].split('function ')[1].split(/[()]/).slice(1,-1)[0].split(', ');
         //console.log('! makeFunction2: ', fnArgs, fnBody[1]);
 
-        // remove the Babel classCheck... call
-        fnBody[1] = fnBody[1].slice(fnBody[1].indexOf(';')+1);
+        // remove the Babel classCheck... call, which will prevent us from calling this
+        if (fnBody[1].indexOf('_classCallCheck') !== -1) {
+            fnBody[1] = fnBody[1].slice(fnBody[1].indexOf(';') + 1);
+        }
 
-        // append function body as last arg in fnArgs
+        // Append function body as last arg in fnArgs
         fnArgs.push(fnBody[1]);
 
         //console.log('! makeFunction3: ', target.selector, fnArgs);
@@ -252,7 +247,7 @@ this.angular2now = angular2now = angular2 = function () {
 
             angular.forEach(deps, function (dep) {
                 // Namespace any injectables without an existing module prefix and not prefixed with '$'.
-                if (dep[0] !== '$' && dep.indexOf('.') === -1) dep = nameSpace(dep);
+                if (dep[0] !== '$' && dep[0] !== '@' && dep.indexOf('.') === -1) dep = nameSpace(dep);
 
                 if (target.$inject.indexOf(dep) === -1)
                     target.$inject.push(dep);
