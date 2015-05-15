@@ -82,10 +82,10 @@ this.angular2now = angular2now = angular2 = function () {
             options.templateUrl = target.templateUrl || /*options.templateUrl ||*/ undefined;
 
             controller.$inject = target.$inject || [];
-            controller.$inject.push('$q');  // we'll need $q to instantiate this controller after link finishes
+            // we'll need $q to instantiate this controller after link finishes
+            controller.$inject.push('$q');
 
             // Create the angular directive
-            // todo: use module and name-spaced directive naming, perhaps from a config file like Greg suggested
             var ddo = {
                 restrict:         (options.template + options.templateUrl) ? 'EA' : isClass ? 'C' : 'A',
                 controllerAs:     target.controllerAs || options.selector,
@@ -103,7 +103,7 @@ this.angular2now = angular2now = angular2 = function () {
 
             try {
                 angular.module(currentModule)
-                    .controller(nameSpace(options.selector), target.controller || target)
+                    //.controller(nameSpace(options.selector), target.controller || target)
                     .directive(options.selector, function () {
                         return ddo;
                     });
@@ -125,14 +125,14 @@ this.angular2now = angular2now = angular2 = function () {
 
                 this.___$$cb.promise.then(function(controllers) {
 
-                    console.log('CCC controller');
+                    //console.log('CCC controller');
                     ctl.apply(that, args);
 
                 });
             }
 
             function link(scope, el, attr, controllers) {
-                console.log('LLL link');
+                //console.log('LLL link');
                 // Make the ngModel available to the directive controller(constructor)
                 // The controller runs first and the link after.
                 // In the controller we define this.ngModel as a callback function.
@@ -185,18 +185,21 @@ this.angular2now = angular2now = angular2 = function () {
     }
 
     // Does a provider with a specific name exist in the current module
-    function serviceExists(serviceName) {
-        return !!getService(serviceName);
+    function serviceExists(serviceName, type) {
+        return !!getService(serviceName, currentModule, type);
     }
 
-    function getService(serviceName, moduleName) {
+    function getService(serviceName, moduleName, type) {
         if (!moduleName)
             moduleName = currentModule;
+
+        if (!type)
+            type = '$provide';
 
         return angular.module(moduleName)
                 ._invokeQueue
                 .find(function(v,i) {
-                    return v[0]==='$provide' && v[2][0] === serviceName
+                    return v[0] === type && v[2][0] === serviceName
                 });
     }
 
@@ -439,7 +442,7 @@ this.angular2now = angular2now = angular2 = function () {
 
                         // Populate the published service with the resolved values
                         function controller() {
-                            console.log('SSS state controller: ', target.selector);
+                            //console.log('SSS state controller: ', target.selector);
 
                             var args = Array.prototype.slice.call(arguments);
 
