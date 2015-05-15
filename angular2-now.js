@@ -81,8 +81,26 @@ this.angular2now = angular2now = angular2 = function () {
             options.template = target.template || /*options.template ||*/ undefined;
             options.templateUrl = target.templateUrl || /*options.templateUrl ||*/ undefined;
 
+            // Our controller needs the same injections as the component's controller,
+            // but with the "@*" injections renamed to "$scope". The "@*" injections
+            // will be pased directly in the link function.
+            var requiredControllers = [options.selector];
             controller.$inject = target.$inject || [];
-            // we'll need $q to instantiate this controller after link finishes
+            controller.$inject = controller.$inject.map(function(dep) {
+                var idx = dep.indexOf('.@');
+                if ( idx !== -1) {
+                    requiredControllers.push('^?'+dep.slice(idx+2));
+                    dep = '$scope'
+                }
+                return dep;
+            });
+            //console.log('~~~ $inject: ', options.selector, controller.$inject, '\n    requiredControllers: ', requiredControllers);
+            target.requiredControllers = requiredControllers;
+
+            // Remember the original $inject, as it will be needed in the link function.
+            target.$injectDefer = target.$inject || [];
+
+            // We'll need $q to instantiate this controller after link finishes
             controller.$inject.push('$q');
 
             // Create the angular directive
@@ -97,7 +115,8 @@ this.angular2now = angular2now = angular2 = function () {
                 controller:       controller,
                 replace:          false,
                 transclude:       /ng-transclude/i.test(options.template) || target.transclude,
-                require:          options.require || target.require || [options.selector, '^?ngModel'],
+                //require:          options.require || target.require || [options.selector, '^?ngModel'],
+                require:          options.require || target.require || requiredControllers,
                 link:             options.link || target.link || link
             };
 
@@ -117,38 +136,42 @@ this.angular2now = angular2now = angular2 = function () {
                 var that = this;
 
                 var args = Array.prototype.slice.call(arguments);
-                var $q = arguments[arguments.length-1];
 
+                // Create our controller function from the class
+                // We have to do this because Babel disallows calling classes and passing this
                 var ctl = makeFunction(target);
 
-                this.___$$cb = $q.defer();
+                // Create a callback that will be execute in the link function when it executes
+                // where our controller will be actually instantiated.
+                // We need to do this because dependencies on other component controllers are only
+                // available in Angular 1 in the link function.
+                controller.___$$cb = function(controllers) {
 
-                this.___$$cb.promise.then(function(controllers) {
+                    // Find all the "@*" injections and replace them (in the args array) with the
+                    // actual controller from the passed in controllers array.
+                    var controllerIndex = 0;
+                    for (var i= 0; i < args.length-1; i++) {
+                        var arg = args[i];
+                        if (target.$injectDefer[i].indexOf('.@') !== -1) {
+                            args[i] = controllers[controllerIndex++];
+                        }
+                    }
 
+                    //console.log('~~~ controller: $injectDefer: ', target.selector, target.$injectDefer, args);
                     //console.log('CCC controller');
                     ctl.apply(that, args);
 
-                });
+                };
             }
 
             function link(scope, el, attr, controllers) {
                 //console.log('LLL link');
-                // Make the ngModel available to the directive controller(constructor)
-                // The controller runs first and the link after.
-                // In the controller we define this.ngModel as a callback function.
-                // Link looks for ngModel and if present calls it, passing the ngModel controller.
-
-                // todo: investigate other, easier, ways of doing this.
-                if (controllers[0].___$$cb)
-                    controllers[0].___$$cb.resolve(controllers.slice(1));
-
-                if (controllers[0].ngModel && typeof controllers[0].ngModel === 'function') {
-                    try {
-                        controllers[0].ngModel(controllers[1]);
-                    } catch (er) {
-                        throw new Error("@Component: If you're trying access your component's ngModel, then in your constructor() add $scope.ngModel = $q.defered(). Remember to @Inject(['$scope', '$q']).");
-                    }
+                // Execute the callback, passing all but the first argument (our own controller)
+                if (controller.___$$cb) {
+                    controller.___$$cb(controllers.slice(1));
+                    delete controller.___$$cb;
                 }
+
             }
         };
 
@@ -158,7 +181,6 @@ this.angular2now = angular2now = angular2 = function () {
     // Takes a class and remakes it using Function, so that it's this can be reassigned
     // and so it can be called and arguments passed to it.
     // Classes can not be called directly due to Babel restrictions.
-    window.makeFunction = makeFunction;
     function makeFunction(target) {
         // convert to string and remove final "}"
         var fnBody = target.toString().slice(0, -1);
@@ -177,7 +199,7 @@ this.angular2now = angular2now = angular2 = function () {
         // append function body as last arg in fnArgs
         fnArgs.push(fnBody[1]);
 
-        //console.log('! makeFunction3: ', fnArgs);
+        //console.log('! makeFunction3: ', target.selector, fnArgs);
 
         var f = Function.apply(null, fnArgs);
 
