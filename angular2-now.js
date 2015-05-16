@@ -12,7 +12,8 @@ this.angular2now = angular2now = angular2 = function () {
         'Filter':      Filter,
         Injectable:    Service,
         bootstrap:     bootstrap,
-        State:         State
+        State:         State,
+        Resolve:       Resolve
     };
 
     var currentModule;
@@ -478,6 +479,10 @@ this.angular2now = angular2now = angular2 = function () {
 
             return target;
         };
+
+    }
+
+    function Resolve () {
 
     }
 
