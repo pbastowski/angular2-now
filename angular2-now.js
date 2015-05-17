@@ -148,10 +148,6 @@ this.angular2now = angular2now = angular2 = function () {
                 // Convert arguments to a normal JS array
                 var args = Array.prototype.slice.call(arguments);
 
-                // Create our controller function from the class.
-                // We have to do this, because Babel disallows calling classes and passing this to them.
-                //var ctl = makeFunction(target);
-
                 // Create a callback that will be execute in the link function when it executes
                 // where our controller will be actually instantiated.
                 // We need to do this because dependencies on other component controllers are only
@@ -170,7 +166,6 @@ this.angular2now = angular2now = angular2 = function () {
                         }
                     }
 
-                    //ctl.apply(that, args);
                     target.apply(that, args);
                 };
             }
