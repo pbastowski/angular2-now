@@ -107,7 +107,6 @@ this.angular2now = angular2now = angular2 = function () {
             });
 
             // Remove all the 'delete-me' entries
-            console.log('$inject: ', target.$inject);
             target.$inject = target.$inject.filter(function(v) { return v !== 'delete-me'; });
 
             // Remember the original $inject, as it will be needed in the link function.
@@ -254,6 +253,9 @@ this.angular2now = angular2now = angular2 = function () {
 
     function View(options) {
         options = options || {};
+        // Allow shorthand notation of just passing the template as a string
+        if (typeof options === 'string')
+            options = { template: options }
         if (!options.template) options.template = undefined;
 
         return function (target) {
