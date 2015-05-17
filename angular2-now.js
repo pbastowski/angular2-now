@@ -346,8 +346,12 @@ this.angular2now = angular2now = angular2 = function () {
     }
 
     function bootstrap(target, config) {
-        if (!target || !(target instanceof Object)) {
+        if (!target) {
             throw new Error("bootstrap: Can't bootstrap Angular without an object");
+        }
+        // Allow string shortcut for target.selector. Can be the name of any HTML tag.
+        if (typeof target === 'string') {
+            target = {selector: target};
         }
 
         var bootModule = target.selector || currentModule;
