@@ -95,19 +95,20 @@ this.angular2now = angular2now = angular2 = function () {
             // but with the "@*" injections renamed to "$scope". The link function will pass
             // the "@*" injections directly to the component controller.
             var requiredControllers = [options.selector];
-            controller.$inject = target.$inject || [];
-            controller.$inject = controller.$inject.map(function(dep) {
-                //if ( dep[0] === '@' || dep[0] === '^' ) {
+            target.$inject = target.$inject || [];
+            target.$inject = target.$inject.map(function(dep) {
                 if ( /^@[^]{0,2}/.test(dep[0]) ) {
                     var searchScope = '?' + (dep[1] === '^' ? '^': '') + (dep[2] === '^' ? '^': '');
 
                     requiredControllers.push(searchScope + dep.slice(1));
-                    dep = '$scope'
+                    dep = 'delete-me'
                 }
                 return dep;
             });
 
-            //controller.$inject = controller.$inject.filter(function(v) { return v !== '$scope'; });
+            // Remove all the 'delete-me' entries
+            console.log('$inject: ', target.$inject);
+            target.$inject = target.$inject.filter(function(v) { return v !== 'delete-me'; });
 
             // Remember the original $inject, as it will be needed in the link function.
             // In the link function we will receive any requested component controllers
@@ -123,7 +124,8 @@ this.angular2now = angular2now = angular2 = function () {
                 bindToController: target.bindToController || true,
                 template:         options.template,
                 templateUrl:      options.templateUrl,
-                controller:       target.controller || controller,
+                //controller:       target.controller || controller,
+                controller:       target,
                 replace:          false,
                 transclude:       /ng-transclude/i.test(options.template) || target.transclude,
                 require:          options.require || target.require || requiredControllers,
@@ -175,16 +177,16 @@ this.angular2now = angular2now = angular2 = function () {
             }
 
             function link(scope, el, attr, controllers) {
-                //// Alternate syntax for the injection of other component's controllers
-                //if (controllers[0].$controllers) {
-                //    controllers[0].$controllers.apply(controllers.slice(1))
-                //}
-
-                // Execute the callback, passing all but the first argument (our own controller)
-                if (controller.___$$cb) {
-                    controller.___$$cb(controllers.slice(1));
-                    delete controller.___$$cb;
+                // Alternate syntax for the injection of other component's controllers
+                if (controllers[0].$dependson) {
+                    controllers[0].$dependson.apply(controllers[0], controllers.slice(1));
                 }
+
+                //// Execute the callback, passing all but the first argument (our own controller)
+                //if (controller.___$$cb) {
+                //    controller.___$$cb(controllers.slice(1));
+                //    delete controller.___$$cb;
+                //}
 
             }
         };

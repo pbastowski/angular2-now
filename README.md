@@ -278,23 +278,28 @@ I like the first syntax, because it looks a bit like the ES6 module import synta
 
 ### How do I access `ngModel` and other component's controllers?
 
-You inject the name of the component whose controller you want, prefixed with `"@"` or `"@^"`.
+You `@Inject` the names of the components whose controller you want, prefixed with `"@"` or `"@^"` (looks for a parent controller). Due to the nature of Angular 1 and Babel, these dependencies can not be directly injected into the constructor. However, they can be accessed within the constructor like this: 
 
 ```javascript
 @Component({ selector: 'my-validator' })
 @Inject(['@ngModel', '@^tabContainer'])
 class myValidator {
-    constructor(ngModel, tabContainer) {
-        ngModel.$parsers.unshift(function (value) { ... });
-        
-        // This gives you access to tabContainer's scope methods and properties
-        tabContainer.someFunction();
-        if (tabContainer.tabCount === 0) { ... }
+    constructor() {
+    
+        this.$dependson = function (ngModel, tabContainer) {
+            ngModel.$parsers.unshift(function (value) { ... });
+            
+            // This gives you access to tabContainer's scope methods and properties
+            tabContainer.someFunction();
+            if (tabContainer.tabCount === 0) { ... }
+        }
     }
 }
 ```
 
-> Warning: This new ability to inject component controllers is also a breaking change in 0.2.0. Use of `this.ngModel = function(ngModel) { // do stuff with ngModel }` within the constructor is no longer supported. However, it is easy to comment out the function wrapper and to annotate your component's class with @Inject(['@ngModel']) as well as passing ngModel into the constructor `constructor(ngModel)`. 
+Please note that the injected component controllers are not listed as arguments to the constructor.
+
+> Warning: This is a breaking change introduced in 0.1.7. The use of `this.ngModel = function(ngModel) { // do stuff with ngModel }` within the constructor is no longer supported. Please use the syntax shown above.
 
 
 ### What environment is required?
