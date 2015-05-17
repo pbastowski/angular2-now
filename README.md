@@ -297,11 +297,6 @@ class myValidator {
 > Warning: This new ability to inject component controllers is also a breaking change in 0.2.0. Use of `this.ngModel = function(ngModel) { // do stuff with ngModel }` within the constructor is no longer supported. However, it is easy to comment out the function wrapper and to annotate your component's class with @Inject(['@ngModel']) as well as passing ngModel into the constructor `constructor(ngModel)`. 
 
 
-#### How does this magic work?
-
-I always create a link function for each component and require `"^?ngModel"`. The link function receives ngModel as it's fourth parameter and then checks for ngModel on it's scope. The same ngModel that was earlier created by the constructor function and assigned a `$q.defered()`. If present, scope.ngModel is resolved with the link function's ngModel. The rest you can see in the example above. 
- 
-
 ### What environment is required?
 - Angular 1.3+
 - Babel 5.1.10+ (lower versions process decorators in the wrong order)
