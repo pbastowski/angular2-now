@@ -23,34 +23,42 @@ this.angular2now = angular2now = angular2 = function () {
 
     // Monkey patch angular.module
     angular.module = function () {
-        // A namespace may be specified like this:
-        //     angular.module('ftdesiree:helpers')
-        //
+        /**
+         * Namespacing applies to provider names, not modules. Each module
+         * has to have a unique name of it's own.
+         *
+         * A namespace may be specified like this:
+         *     angular.module('ftdesiree:helpers')
+         * The namespace, once set, will remain in force until removed.
+         * Remove the namespace like this:
+         *     angular.module(':helpers')
+         **/
         currentModule = arguments[0].split(':');
 
         if (currentModule.length === 1) {
-            // no namespace, just the module name
+            // No namespace, just the module name
             currentModule = currentModule[0];
         } else {
-            // split off the name-space and module name
+            // Split off the name-space and module name
             currentNameSpace = currentModule[0];
             currentModule = currentModule[1];
 
-            // reassign arguments[0] without the namespace
+            // Reassign arguments[0] without the namespace
             arguments[0] = currentModule;
-            //console.log('@angular.module: ns: ', currentNameSpace, arguments[0]);
         }
 
         return angularModule.apply(angular, arguments);
     };
 
 
+    // Create a new name from the concatenation of
+    // the currentNameSpace and the name argument
     function nameSpace(name) {
         var nsName = name;
 
         if (currentNameSpace) {
             //nsName = camelCase(currentModule) + '.' + name;
-            nsName = currentNameSpace + '.' + name;
+            nsName = currentNameSpace + '_' + name;
         }
 
         return nsName;
@@ -58,22 +66,22 @@ this.angular2now = angular2now = angular2 = function () {
 
     function Component(options) {
         options = options || {};
+        // Allow shorthand notation of just passing the selector name as a string
+        if (typeof options === 'string')
+            options = { selector: options }
 
         return function (target) {
 
-            // service injections
+            // service injections, which could also have been specified by using @Inject
             if (options.injectables && options.injectables instanceof Array)
                 target = Inject(options.injectables)(target);
 
-            // selector is optional, if not specified then the className is used
+            // Selector name may be prefixed with a '.', in which case "restrict: 'C'" will be used
             options.selector = camelCase(options.selector || '') + '';
             if (options.selector[0] === '.') {
                 var isClass = true;
                 options.selector = options.selector.slice(1);
             }
-
-            // moduleName is use to bootstrap Angular on a component
-            target.moduleName = options.name;
 
             // Save the unCamelCased selector name, so that bootstrap() can use it
             target.selector = unCamelCase(options.selector);
@@ -89,12 +97,17 @@ this.angular2now = angular2now = angular2 = function () {
             var requiredControllers = [options.selector];
             controller.$inject = target.$inject || [];
             controller.$inject = controller.$inject.map(function(dep) {
-                if ( dep[0] === '@' ) {
-                    requiredControllers.push('^?'+dep.slice(1));
+                //if ( dep[0] === '@' || dep[0] === '^' ) {
+                if ( /^@[^]{0,2}/.test(dep[0]) ) {
+                    var searchScope = '?' + (dep[1] === '^' ? '^': '') + (dep[2] === '^' ? '^': '');
+
+                    requiredControllers.push(searchScope + dep.slice(1));
                     dep = '$scope'
                 }
                 return dep;
             });
+
+            //controller.$inject = controller.$inject.filter(function(v) { return v !== '$scope'; });
 
             // Remember the original $inject, as it will be needed in the link function.
             // In the link function we will receive any requested component controllers
@@ -149,7 +162,8 @@ this.angular2now = angular2now = angular2 = function () {
                     var controllerIndex = 0;
                     for (var i= 0; i < args.length; i++) {
                         var arg = args[i];
-                        if (target.$injectDefer[i][0] === '@') {
+                        //if (target.$injectDefer[i][0] === '@') {
+                        if (/^@[^]?/.test(target.$injectDefer[i][0])) {
                             args[i] = controllers[controllerIndex];
                             controllerIndex++;
                         }
@@ -161,6 +175,11 @@ this.angular2now = angular2now = angular2 = function () {
             }
 
             function link(scope, el, attr, controllers) {
+                //// Alternate syntax for the injection of other component's controllers
+                //if (controllers[0].$controllers) {
+                //    controllers[0].$controllers.apply(controllers.slice(1))
+                //}
+
                 // Execute the callback, passing all but the first argument (our own controller)
                 if (controller.___$$cb) {
                     controller.___$$cb(controllers.slice(1));
@@ -170,37 +189,6 @@ this.angular2now = angular2now = angular2 = function () {
             }
         };
 
-
-    }
-
-    // Takes a class and remakes it using Function, so that it's this can be reassigned
-    // and so it can be called and arguments passed to it.
-    // Classes can not be called directly due to Babel restrictions.
-    function makeFunction(target) {
-        // convert to string and remove final "}"
-        var fnBody = target.toString().slice(0, -1);
-        var i = fnBody.indexOf('{');
-        fnBody = [fnBody.slice(0,i-1), fnBody.slice(i+1)];
-
-        //console.log('! makeFunction1: ', fnBody);
-
-        // extract function argument names
-        var fnArgs = fnBody[0].split('function ')[1].split(/[()]/).slice(1,-1)[0].split(', ');
-        //console.log('! makeFunction2: ', fnArgs, fnBody[1]);
-
-        // remove the Babel classCheck... call, which will prevent us from calling this
-        if (fnBody[1].indexOf('_classCallCheck') !== -1) {
-            fnBody[1] = fnBody[1].slice(fnBody[1].indexOf(';') + 1);
-        }
-
-        // Append function body as last arg in fnArgs
-        fnArgs.push(fnBody[1]);
-
-        //console.log('! makeFunction3: ', target.selector, fnArgs);
-
-        var f = Function.apply(null, fnArgs);
-
-        return f
     }
 
     // Does a provider with a specific name exist in the current module
@@ -248,8 +236,10 @@ this.angular2now = angular2now = angular2 = function () {
                 target.$inject = [];
 
             angular.forEach(deps, function (dep) {
-                // Namespace any injectables without an existing module prefix and not prefixed with '$'.
-                if (dep[0] !== '$' && dep[0] !== '@' && dep.indexOf('.') === -1) dep = nameSpace(dep);
+                // Namespace any injectables without an existing nameSpace prefix and also
+                // not already prefixed with '$', '@' or '@^'.
+                if (dep[0] !== '$' && dep[0] !== '@' && dep.indexOf('_') === -1)
+                    dep = nameSpace(dep);
 
                 if (target.$inject.indexOf(dep) === -1)
                     target.$inject.push(dep);
@@ -307,6 +297,9 @@ this.angular2now = angular2now = angular2 = function () {
 
     function Controller(options) {
         options = options || {};
+        // Allow shorthand notation of just passing the name as a string
+        if (typeof options === 'string')
+            options = { name: options }
 
         return function (target) {
             angular.module(currentModule)
@@ -318,6 +311,9 @@ this.angular2now = angular2now = angular2 = function () {
 
     function Service(options) {
         options = options || {};
+        // Allow shorthand notation of just passing the name as a string
+        if (typeof options === 'string')
+            options = { name: options }
 
         return function (target) {
             angular.module(currentModule)
@@ -330,6 +326,9 @@ this.angular2now = angular2now = angular2 = function () {
 
     function Filter(options) {
         options = options || {};
+        // Allow shorthand notation of just passing the name as a string
+        if (typeof options === 'string')
+            options = { name: options }
 
         return function (target) {
 
@@ -347,7 +346,7 @@ this.angular2now = angular2now = angular2 = function () {
             throw new Error("bootstrap: Can't bootstrap Angular without an object");
         }
 
-        var bootModule = target.moduleName || target.selector || currentModule;
+        var bootModule = target.selector || currentModule;
 
         if (bootModule !== currentModule)
             angular.module(bootModule);
@@ -443,10 +442,7 @@ this.angular2now = angular2now = angular2 = function () {
                             controller: options.controller || (!target.selector ? target : undefined) ||(doResolve ? controller : undefined)
                         };
 
-                        //console.log('@State: target.template: ', target.template || target.templateUrl);
-                        //console.log('@State:    sdo.template: ', sdo.template);
-                        //console.log('@State:    sdo: ', resolvedServiceName, sdo);
-
+                        // Create the state
                         $stateProvider.state(options.name, sdo);
 
                         // Publish the resolved values to an injectable service:
@@ -461,8 +457,6 @@ this.angular2now = angular2now = angular2 = function () {
 
                         // Populate the published service with the resolved values
                         function controller() {
-                            //console.log('SSS state controller: ', target.selector);
-
                             var args = Array.prototype.slice.call(arguments);
 
                             var localScope = args[0];
