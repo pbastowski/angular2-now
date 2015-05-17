@@ -298,7 +298,7 @@ class myValidator {
 
 
 ### What environment is required?
-- Angular 1.3+
+- Angular 1.3+ 
 - Babel 5.1.10+ (lower versions process decorators in the wrong order)
 - Meteor 1.1.0.2
 
