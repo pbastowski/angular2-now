@@ -36,25 +36,6 @@ Or, if you want all the angular2-now decorator functions available for use anywh
 
 Please note that to use the Angular 2 `@` notation, as shown in the examples below, such as `@Component` or `@View`, you will need to have a build workflow that uses Babel to transpile your ES6 code to plain ES5 JavaScript that your browser can understand. 
 
-> Starting with angular2-now version `0.2.0` and onwards, you will also need to disable a bit of Babel generated code that prevents the calling of classes as functions. angular2-now needs to be able to instantiate your component's class when then directive link function has completed, so it can inject any dependent component controllers. 
-To achieve this, for example, your gulpfile might have a section like this
-
-```javascript
-gulp.task('build-js', function () {
-    gulp.src(paths.source.jsFiles)
-    // Convert only files with the .es6 and .es6.js extensions 
-    .pipe(tap(function (file, t) {
-        if ( /(\.es6|\.es6\.js)/i.test(path.extname(file.path)) ) {
-            return t.through(babel, [{stage:0}]);
-        }
-    }))
-    // remove the Babel check for calling class as a function
-    .pipe(gulpReplace("throw new TypeError('Cannot call a class as a function');", ''))
-    .pipe(ngAnnotate({ add: true, remove: true, single_quotes: true}))
-    .pipe(gulp.dest(paths.dest));
-});
-```
-
 
 ### Meteor Installation
 
