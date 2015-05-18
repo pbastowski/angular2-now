@@ -13,10 +13,13 @@ this.angular2now = angular2now = angular2 = function () {
         Injectable:    Service,
         bootstrap:     bootstrap,
         State:         State,
+
+        options:       options
     };
 
     var currentModule;
     var currentNameSpace;
+    var controllerAs;
 
     var angularModule = angular.module;
 
@@ -117,7 +120,7 @@ this.angular2now = angular2now = angular2 = function () {
             // Create the angular directive
             var ddo = {
                 restrict:         (options.template + options.templateUrl) ? 'EA' : isClass ? 'C' : 'A',
-                controllerAs:     target.controllerAs || options.selector,
+                controllerAs:     controllerAs || target.controllerAs || options.selector,
                 scope:            target.scope || options['bind'] || {},
                 bindToController: target.bindToController || true,
                 template:         options.template,
@@ -480,6 +483,13 @@ this.angular2now = angular2now = angular2 = function () {
             return target;
         };
 
+    }
+
+    // Allow configuration of some angular2-now default settings
+    // controllerAs: if provided, will user this string instead of component name, for example "vm"
+    function options(options) {
+        if (typeof options.controllerAs !== 'undefined')
+            controllerAs = options.controllerAs;
     }
 
     return angular2now;
