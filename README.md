@@ -55,7 +55,7 @@ The decorators below are not Angular 2, as such, but for me they make coding in 
 
 - **@Service** `({ name: 'serviceName', ?module: 'angularModuleName' })`
 - **@Filter** `({ name: 'filterName', ?module: 'angularModuleName' })`
-- **@State** `({name: 'stateName', ?url: '/stateurl', ?defaultRoute: true/false, ?resolve: {...}, ?controller: controllerFunction, ?template: { } }))`
+- **@State** `({name: 'stateName', ?url: '/stateurl', ?defaultRoute: true/false, ?resolve: {...}, ?controller: controllerFunction, ?template: { }, ?html5Mode: true/false }))`
 
 
 ### Using angular.module 
