@@ -227,7 +227,18 @@ If you don't specify a module "name" in the @Component annotation, then bootstra
 
 ### ControllerAs
 The created components use ControllerAs syntax. So, when referring to properties or functions on the controller's "scope", make sure to prefix them with this in the controller and with the className, or the camel-cased selector name if different from the className, in the HTML templates.
-  
+
+**What if I want to use "vm" as the name of my controller?**
+
+No problem. Just configure angular2-now to use "vm" instead, like this
+
+```javascript
+angular2now.options({ controllerAs: 'vm' })
+```
+
+Do this before you use any angular2-now components!
+
+
 ### Transclude and `<content></content>`
 If your inline template includes a `<content>` tag then `@View` will automatically add `ng-transclude` to it and the directive's transclude flag will be set to true.
 
