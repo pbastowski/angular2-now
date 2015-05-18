@@ -13,7 +13,6 @@ this.angular2now = angular2now = angular2 = function () {
         Injectable:    Service,
         bootstrap:     bootstrap,
         State:         State,
-        Resolve:       Resolve
     };
 
     var currentModule;
@@ -413,8 +412,8 @@ this.angular2now = angular2now = angular2 = function () {
 
             // Configure the state
             angular.module(currentModule)
-                .config(['$urlRouterProvider', '$stateProvider',
-                    function ($urlRouterProvider, $stateProvider) {
+                .config(['$urlRouterProvider', '$stateProvider', '$locationProvider',
+                    function ($urlRouterProvider, $stateProvider, $locationProvider) {
 
                         // Activate this state, if options.defaultRoute = true.
                         // If you don't want this then don't set options.defaultRoute to true
@@ -422,6 +421,10 @@ this.angular2now = angular2now = angular2 = function () {
                         // You can also pass a string to defaultRoute, which will become the default route.
                         if (options.defaultRoute)
                             $urlRouterProvider.otherwise((typeof options.defaultRoute === 'string') ? options.defaultRoute : options.url);
+
+                        // Optionally configure html5Mode
+                        if (! (typeof options.html5Mode === 'undefined'))
+                            $locationProvider.html5Mode(options.html5Mode);
 
                         // This is the state definition object
                         var sdo = {
@@ -476,10 +479,6 @@ this.angular2now = angular2now = angular2 = function () {
 
             return target;
         };
-
-    }
-
-    function Resolve () {
 
     }
 
