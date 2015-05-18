@@ -100,9 +100,7 @@ this.angular2now = angular2now = angular2 = function () {
             target.$inject = target.$inject || [];
             target.$inject = target.$inject.map(function(dep) {
                 if ( /^@[^]{0,2}/.test(dep[0]) ) {
-                    var searchScope = '?' + (dep[1] === '^' ? '^': '') + (dep[2] === '^' ? '^': '');
-
-                    requiredControllers.push(searchScope + dep.slice(1));
+                    requiredControllers.push('?' + dep.slice(1));
                     dep = 'delete-me'
                 }
                 return dep;
