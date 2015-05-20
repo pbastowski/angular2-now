@@ -119,7 +119,7 @@ this.angular2now = angular2now = angular2 = function () {
             var ddo = {
                 restrict:         (options.template + options.templateUrl) ? 'EA' : isClass ? 'C' : 'A',
                 controllerAs:     controllerAs || target.controllerAs || options.selector,
-                scope:            target.scope || options['bind'] || {},
+                scope:            target.hasOwnProperty('scope') ? target.scope : options.hasOwnProperty('scope') ? options.scope : options['bind'] || {},
                 bindToController: target.bindToController || true,
                 template:         options.template,
                 templateUrl:      options.templateUrl,
