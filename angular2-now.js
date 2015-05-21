@@ -1,4 +1,4 @@
-this.angular2now = angular2now = angular2 = function () {
+this.angular2now = angular2now = function () {
 
     'use strict';
 
@@ -118,7 +118,7 @@ this.angular2now = angular2now = angular2 = function () {
             // Create the angular directive
             var ddo = {
                 restrict:         (options.template + options.templateUrl) ? 'EA' : isClass ? 'C' : 'A',
-                controllerAs:     controllerAs || target.controllerAs || options.selector,
+                controllerAs:     options.controllerAs || controllerAs || target.controllerAs || options.selector,
                 scope:            target.hasOwnProperty('scope') ? target.scope : options.hasOwnProperty('scope') ? options.scope : options['bind'] || {},
                 bindToController: target.bindToController || true,
                 template:         options.template,
@@ -340,10 +340,24 @@ this.angular2now = angular2now = angular2 = function () {
         };
     }
 
+    /**
+     * Bootstraps the Angular 1.x app.
+     *
+     * @param ?target   undefined | string | class
+     *      undefined:  bootstraps on document and the current angular module
+     *      string:     will use document.querySelector to find the element by this string
+     *      class:      bootstraps on the component defined on this class, looks for selector
+     *
+     * @param ?config   angular.bootstrap() config object, see AngularJS doco
+     */
     function bootstrap(target, config) {
-        if (!target) {
-            throw new Error("bootstrap: Can't bootstrap Angular without an object");
-        }
+        //if (!target) {
+        //    throw new Error("bootstrap: Can't bootstrap Angular without an object");
+        //}
+
+        if (!target)
+            target = { selector: currentModule };
+
         // Allow string shortcut for target.selector. Can be the name of any HTML tag.
         if (typeof target === 'string') {
             target = {selector: target};
@@ -372,7 +386,21 @@ this.angular2now = angular2now = angular2 = function () {
     }
 
     /**
-     * @State can be used to annotate either a Component or a class.
+     * State can be used to annotate either a Component or a class and assign
+     * a ui-router state to it.
+     *
+     * @param options   literal object
+     *      name:           name of the state
+     *      url:            url associted with this state
+     *      template:       template
+     *      templateUrl:    templateUrl
+     *      defaultRoute:   truthy = .otherwise(url)
+     *                      string = .otherwise(defaultRoute)
+     *      resolve:        Literal object, see ui-router resolve
+     *      abstract:       true/false
+     *      params:         Literal object, see ui-router doco
+     *      controller:     A controller is automaticaly assigned, but if you nee
+     *                      finer control then you can assign your won controller
      *
      * If a class is annotated then it is assumed to be the controller and
      * the state name will be used as the name of the injectable service
@@ -390,8 +418,7 @@ this.angular2now = angular2now = angular2 = function () {
         return function (target) {
 
             var deps;
-            var resolved = {};
-            var resolvedServiceName = nameSpace(camelCase(target.selector || options.name));
+            var resolvedServiceName = nameSpace(camelCase(target.selector || (options.name+'').replace('.', '-')));
 
             // Indicates if there is anything to resolve
             var doResolve;
@@ -407,8 +434,9 @@ this.angular2now = angular2now = angular2 = function () {
             // Create an injectable value service to share the resolved values with the controller
             // The service bears the same name as the component's camelCased selector name.
             if (doResolve) {
-                if (!serviceExists(resolvedServiceName))
-                    angular.module(currentModule).value(resolvedServiceName, resolved);
+                if (!serviceExists(resolvedServiceName)) {
+                    angular.module(currentModule).value(resolvedServiceName, {});
+                }
             }
 
             // Configure the state
@@ -427,6 +455,20 @@ this.angular2now = angular2now = angular2 = function () {
                         if (! (typeof options.html5Mode === 'undefined'))
                             $locationProvider.html5Mode(options.html5Mode);
 
+                        // The user can supply a controller through a parameter in options
+                        // or the class itself can be used as the controller if no component is annotated.
+                        var userController = options.controller || (!target.selector ? target : undefined);
+
+                        // Also, de-namespace the resolve injectables for ui-router to inject correctly
+                        if (userController && userController.$inject && deps.length) {
+                            deps.forEach(function(dep) {
+                                var i = userController.$inject.indexOf(currentNameSpace+'_'+dep);
+                                if (i!==-1)
+                                    userController.$inject[i] = dep;
+                            });
+                        }
+
+
                         // This is the state definition object
                         var sdo = {
                             url:      options.url,
@@ -444,18 +486,22 @@ this.angular2now = angular2now = angular2 = function () {
                             // If this is an abstract state then we just provide a <div ui-view> for the children
                             template: options.templateUrl ? undefined : options.template || (options.abstract ? '<div ui-view=""></div>' : target.selector ? '<' + target.selector + '></' + target.selector + '>' : ''),
 
-                            // Do we need to resolve stuff? If so, then we provide a controller to catch the resolved data
+                            // Do we need to resolve stuff? If so, then we also provide a controller to catch the resolved data.
                             resolve:    resolves,
-                            controller: options.controller || (!target.selector ? target : undefined) ||(doResolve ? controller : undefined)
+
+                            // A user supplied controller OR
+                            // A class, if no Component was annotated (thus no selector is available) OR
+                            // A proxy controller, if resolves were requested with an annotated Component
+                            controller: userController || (doResolve ? controller : undefined)
+                            //controller: options.controller || (!target.selector ? target : undefined) || (doResolve ? controller : undefined)
                         };
 
                         // Create the state
                         $stateProvider.state(options.name, sdo);
 
-                        // Publish the resolved values to an injectable service:
-                        // - "{selectorName}" => stores only local resolved values
-                        // This service can be injected into a component's constructor, for example.
-                        //
+                        // When our automatic controller is used, we inject the resolved values into it,
+                        // along with the injectable service that will be used to publish them.
+                        // If the user supplied a controller than we do not inject anything
                         if (doResolve) {
                             deps.unshift(resolvedServiceName);
 
@@ -466,14 +512,18 @@ this.angular2now = angular2now = angular2 = function () {
                         function controller() {
                             var args = Array.prototype.slice.call(arguments);
 
+                            // This is the service that we "unshifted" earlier
                             var localScope = args[0];
 
                             args = args.slice(1);
                             deps = deps.slice(1);
 
+                            // Now we copy the resolved values to the service.
+                            // This service can be injected into a component's constructor, for example.
                             deps.forEach(function (v, i) {
                                 localScope[v] = args[i];
                             });
+
                         }
 
                     }]);
