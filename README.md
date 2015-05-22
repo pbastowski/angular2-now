@@ -93,7 +93,7 @@ The `nameSpace` portion will be used to automatically prefix all provider names 
 
 As shown above, angular2-now will also automatically prefix with the current name-space your @Injected dependencies that are not already prefixed with another namespace or prefixed with the special characters "$" (Angular's global services) and "@" (component controller injections, such as ngModel).
 
-> Caveat: You can't use the underscore "__" character in naming your providers. This is because angular2-now uses the "_" character to separate the namespace from the provider name. If you need to use "\_" in your provider names then don't use the name-spacing feature of angular2-now. 
+> Caveat: You can't use the underscore "__" character in naming your providers. This is because angular2-now uses it to separate the namespace from the provider name. If you need to use "__" in your provider names then don't use the name-spacing feature of angular2-now. 
 
 
 **Why bother with name-spacing?**
