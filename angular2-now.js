@@ -248,9 +248,10 @@ this.angular2now = angular2now = function () {
 
     function View(options) {
         options = options || {};
-        // Allow shorthand notation of just passing the template as a string
+        // Allow shorthand notation of just passing the templateUrl as a string
         if (typeof options === 'string')
-            options = { template: options }
+            options = { templateUrl: options }
+
         if (!options.template) options.template = undefined;
 
         return function (target) {
