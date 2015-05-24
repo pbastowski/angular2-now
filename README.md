@@ -34,7 +34,7 @@ Or, if you want all the angular2-now decorator functions available for use anywh
 
     angular.extend(window, angular2now)
 
-Please note that to use the Angular 2 `@` notation, as shown in the examples below, such as `@Component` or `@View`, you will need to have a build workflow that uses Babel to transpile your ES6 code to plain ES5 JavaScript that your browser can understand.
+Please note that to use the Angular 2 `@` notation, as shown in the examples below, such as `@Component` or `@View`, you will need to have a build workflow that uses Babel to transpile your ES6 code to plain ES5 JavaScript that your browser can understand. 
 
 
 ### Meteor Installation
@@ -55,7 +55,7 @@ The decorators below are not Angular 2, as such, but for me they make coding in 
 
 - **@Service** `({ name: 'serviceName', ?module: 'angularModuleName' })`
 - **@Filter** `({ name: 'filterName', ?module: 'angularModuleName' })`
-- **@State** `({name: 'stateName', ?url: '/stateurl', ?defaultRoute: true/false, ?resolve: {...}, ?controller: controllerFunction, ?template: { } }))`
+- **@State** `({name: 'stateName', ?url: '/stateurl', ?defaultRoute: true/false, ?resolve: {...}, ?controller: controllerFunction, ?template: { }, ?html5Mode: true/false }))`
 
 
 ### Using angular.module 
@@ -64,9 +64,46 @@ The decorators below are not Angular 2, as such, but for me they make coding in 
 
 This allows us to set the Angular 1 module name in which Components, Services, Filters and State configuration will be created by the @decorator functions. The syntax is identical to Angular's own `angular.module`, see: https://docs.angularjs.org/api/ng/function/angular.module.
  
+ 
 #### How does it work? 
-I have "monkey patched" angular.module() to remember the module name and then call the original angular.module function (and return its return value). 
+angular.module() has been monkey-patched to remember the module name and then call the original angular.module function (and return its return value). 
 
+
+### Name-spacing your app's providers
+
+Creating a namespace for your Angular 1 providers is simple. Just change your use of angular.module from this
+
+    angular.module('moduleName')
+
+to this
+ 
+    angular.module('nameSpace:moduleName')
+
+The `nameSpace` portion will be used to automatically prefix all provider names within your application. For example
+
+    
+    angular.module('webshop:helpers');
+    
+    @Service({ name: "myService" })   // will create a service called "webshop_myService"
+    
+    @Inject(['myService'])  // the "webshop_" a prefix will be added automatically by the annotation
+
+    @Inject(['$anyThing', '@otherComponent', 'booking_getDate'])  // these will not be prefixed
+    
+
+As shown above, angular2-now will also automatically prefix with the current name-space your @Injected dependencies that are not already prefixed with another namespace or prefixed with the special characters "$" (Angular's global services) and "@" (component controller injections, such as ngModel).
+
+> Caveat: You can't use the underscore "__" character in naming your providers. This is because angular2-now uses it to separate the namespace from the provider name. If you need to use "__" in your provider names then don't use the name-spacing feature of angular2-now. 
+
+
+**Why bother with name-spacing?**
+
+Within a bootstrapped Angular 1 app, all module and provider names created must be unique. This is usually not a problem when you're the only one working on your app. 
+
+In a larger company, however, it is common for two or more teams to be working on different parts of the same overall app. Often on different projects. They may be creating different parts of the company homepage, such as booking or webshop. Booking could have a provider called "getData" and webshop could have its own provider named "getData". Within an Angular 1 app this would create a clash, even if these providers were created in different modules. 
+
+To prevent the clash a naming convention is used, which clearly separates the provider names in two different teams. For example, booking could name their "getData" provider "booking_getData" and webshop could call their's "webshop_getData". In this way, all providers within the same Angular 1 bootstrapped app will be unique.
+   
 
 ### ui-router support through @State
 
@@ -90,6 +127,7 @@ Then, you can simply annotate your component with the route/state info, like so
 
 ```javascript
 @State({name: 'defect', url: '/defect', defaultRoute: true})
+
 @Component({selector: 'defect'})
 @View({templateUrl: 'client/defect/defect.html'})
 @Inject(['lookupTables'])
@@ -189,7 +227,18 @@ If you don't specify a module "name" in the @Component annotation, then bootstra
 
 ### ControllerAs
 The created components use ControllerAs syntax. So, when referring to properties or functions on the controller's "scope", make sure to prefix them with this in the controller and with the className, or the camel-cased selector name if different from the className, in the HTML templates.
-  
+
+**What if I want to use "vm" as the name of my controller?**
+
+No problem. Just configure angular2-now to use "vm" instead, like this
+
+```javascript
+angular2now.options({ controllerAs: 'vm' })
+```
+
+Do this before you use any angular2-now components!
+
+
 ### Transclude and `<content></content>`
 If your inline template includes a `<content>` tag then `@View` will automatically add `ng-transclude` to it and the directive's transclude flag will be set to true.
 
@@ -219,40 +268,34 @@ or like this:
 
 I like the first syntax, because it looks a bit like the ES6 module import syntax. 
 
-### How do I access ngModel in my directive/component?
+### How do I access `ngModel` and other component's controllers?
 
-Normally you'd do it in the `link` function, but, we don't have a link function. We have a controller/constructor, which does not have access to ngModel. So, how do we get access to ngModel? 
- 
-> Warning: Breaking change in 0.1.6. `$q` and `$scope` are no longer required to access ngModel, please see below.
-
-You get access to ngModel like this:
+You `@Inject` the names of the components whose controller you want, prefixed with `"@"` or `"@^"` (looks for a parent controller). Due to the nature of Angular 1 and Babel, these dependencies can not be directly injected into the constructor. However, they can be accessed within the constructor like this: 
 
 ```javascript
 @Component({ selector: 'my-validator' })
+@Inject(['@ngModel', '@^tabContainer'])
 class myValidator {
     constructor() {
-        this.ngModel = function (ngModel) {
-            // This is where you do stuff with ngModel, such as 
-            // ngModel.$parsers.unshift(function (value) { ... });
-            //        or
-            // ngModel.$formatters.unshift(function (value) { ... });
-        };
+    
+        this.$dependson = function (ngModel, tabContainer) {
+            ngModel.$parsers.unshift(function (value) { ... });
+            
+            // This gives you access to tabContainer's scope methods and properties
+            tabContainer.someFunction();
+            if (tabContainer.tabCount === 0) { ... }
+        }
     }
 }
 ```
 
-In the above example, we create `this.ngModel` in the `constructor` and assign a callback function to it, which receives the `ngModel` controller when the (hidden) link function actually executes. That's how Angular 1 works.
+Please note that the injected component controllers are not listed as arguments to the constructor.
 
-Angular 2 is a bit different in this aspect. It allows you to inject dependent controllers directly into your constructor, which is very nice. However, it's not easy to implement the same behaviour in Angular 1, but we're trying.
+> Warning: This is a breaking change introduced in 0.1.7. The use of `this.ngModel = function(ngModel) { // do stuff with ngModel }` within the constructor is no longer supported. Please use the syntax shown above.
 
-
-#### How does this magic work?
-
-I always create a link function for each component and require `"^?ngModel"`. The link function receives ngModel as it's fourth parameter and then checks for ngModel on it's scope. The same ngModel that was earlier created by the constructor function and assigned a `$q.defered()`. If present, scope.ngModel is resolved with the link function's ngModel. The rest you can see in the example above. 
- 
 
 ### What environment is required?
-- Angular 1.3+
+- Angular 1.3+ 
 - Babel 5.1.10+ (lower versions process decorators in the wrong order)
 - Meteor 1.1.0.2
 
