@@ -74,7 +74,7 @@ export function Component(options:{
 
     return target;
 
-    function link(scope, el: HTMLElement, attr, controllers: Array) {
+    function link(scope, el: HTMLElement, attr, controllers: Array<any>) {
       // Make the ngModel available to the directive controller(constructor)
       // The controller runs first and the link after.
       // In the controller we define ngModel on $scope, as a $q.defered(),
@@ -139,7 +139,7 @@ export function Inject(deps?: Array<string>) {
 }
 
 
-export function View(options: {transclude?: boolean; directives?: Array}) {
+export function View(options: {transclude?: boolean; template?: string; templateUrl?: string; directives?: Array<any>}) {
   options = options || {};
   if (!options.template) options.template = undefined;
 
@@ -251,6 +251,33 @@ export function bootstrap(target: {moduleName?: string; selector?: string}, conf
 }
 
 //
+// @RouteConfig supports the new router developed for Angular 1.4 & 2
+// https://github.com/angular/router
+export function RouteConfig(instructions) {
+  if (!instructions || !(instructions instanceof Array))
+    throw new Error('@RouteConfig: must provide one or more route instructions');
+
+  return function (target) {
+    for (var i = 0; i < instructions.length; i++) {
+      var instruction = instructions[i];
+      var component = instruction.component;
+      if (undefined !== component && typeof component !== 'string') {
+        component = component.name.replace(/Controller$/, '');
+        component = component[0].toLowerCase() + component.substr(1);
+        instruction.component = component;
+      }
+    }
+
+    angular.module(currentModule)
+        .run(['$router',
+          function ($router) {
+            $router.config(instructions);
+          }
+    ]);
+  }
+}
+
+//
 // @State can be used to annotate either a Component or a class.
 //
 // If class is annotated then it is assumed to be the controller and
@@ -337,7 +364,7 @@ export function State(options) {
             if (doResolve) {
               deps.unshift(resolvedServiceName);
 
-              controller.$inject = deps;
+              controller['$inject'] = deps;
             }
 
             // Populate the published service with the resolved values
