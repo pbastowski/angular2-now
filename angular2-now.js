@@ -200,10 +200,10 @@ this.angular2now = angular2now = function () {
             type = '$provide';
 
         return angular.module(moduleName)
-                ._invokeQueue
-                .find(function(v,i) {
-                    return v[0] === type && v[2][0] === serviceName
-                });
+            ._invokeQueue
+            .find(function(v,i) {
+                return v[0] === type && v[2][0] === serviceName
+            });
     }
 
     function camelCase(s) {

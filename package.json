@@ -1,0 +1,26 @@
+{
+  "name": "angular2-now",
+  "version": "0.1.3",
+  "description": "Use Angular2 @Component syntax with Angular 1.x and Babel & TypeScript",
+  "keywords": [
+    "angular",
+    "angular2",
+    "TypeScript",
+    "Babel"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pbastowski/angular2-now.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pbastowski/angular2-now/issues"
+  },
+  "homepage": "https://github.com/pbastowski/angular2-now#readme",
+  "devDependencies": {
+    "gulp": "^3.8.11",
+    "gulp-babel": "^5.1.0",
+    "gulp-typescript": "^2.6.0",
+    "merge2": "^0.3.5",
+    "typescript": "^1.5.0-beta"
+  }
+}
