@@ -192,6 +192,40 @@ class myApp {
 
 In this case, the class itself is the controller for the route and receives the injected properties directly.  
 
+### New Angular Router
+
+Angular2-now also supports the new router which has been developed for Angular 1.4 and 2.0 - https://github.com/angular/router.
+
+```javascript
+import {Home} from './home/home-controller';
+import {Page1} from './page1/page1-controller';
+
+@Component({
+  selector: 'my-app',
+})
+@View({
+    templateUrl: 'components/app.html'
+})
+@RouteConfig([
+  {path: '/', redirectTo: '/home'},
+  {path: '/home', component: Home, as: 'home'},
+  {path: '/page1', component: Page1, as: 'page1'}
+])
+class MyApp {
+}
+```
+
+
+```javascript
+// also provide `home.html` in same directory
+// In Angular 2, I suppose this would actually be a @Component, but the @View is implied by the name
+@Controller({
+    name: 'HomeController'
+})
+export class Home {
+}
+```
+
 
 ### Bootstrapping the app
 - `bootstrap (app [, config ])` 
