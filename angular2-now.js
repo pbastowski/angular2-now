@@ -1,5 +1,4 @@
-this.angular2now = angular2now = function () {
-
+var angular2now = function () {
     'use strict';
 
     var angular2now = {
@@ -9,7 +8,7 @@ this.angular2now = angular2now = function () {
         Inject:        Inject,
         Controller:    Controller,
         Service:       Service,
-        'Filter':      Filter,
+        Filter:        Filter,
         Injectable:    Service,
         bootstrap:     bootstrap,
         State:         State,
@@ -544,3 +543,18 @@ this.angular2now = angular2now = function () {
     return angular2now;
 
 }();
+
+// Node.js
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = angular2now;
+}
+// AMD / RequireJS
+else if (typeof define !== 'undefined' && define.amd) {
+    define([], function () {
+        return angular2now;
+    });
+}
+// included directly
+else {
+    this.angular2now = angular2now;
+}
