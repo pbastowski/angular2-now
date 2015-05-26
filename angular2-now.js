@@ -122,7 +122,6 @@ var angular2now = function () {
                 bindToController: target.bindToController || true,
                 template:         options.template,
                 templateUrl:      options.templateUrl,
-                //controller:       target.controller || controller,
                 controller:       target,
                 replace:          false,
                 transclude:       /ng-transclude/i.test(options.template) || target.transclude,
@@ -174,13 +173,6 @@ var angular2now = function () {
                 if (controllers[0].$dependson) {
                     controllers[0].$dependson.apply(controllers[0], controllers.slice(1));
                 }
-
-                //// Execute the callback, passing all but the first argument (our own controller)
-                //if (controller.___$$cb) {
-                //    controller.___$$cb(controllers.slice(1));
-                //    delete controller.___$$cb;
-                //}
-
             }
         };
 
@@ -355,8 +347,10 @@ var angular2now = function () {
         //    throw new Error("bootstrap: Can't bootstrap Angular without an object");
         //}
 
-        if (!target)
-            target = { selector: currentModule };
+        if (!target) {
+            target = {selector: currentModule};
+            var bootOnDocument = true;
+        }
 
         // Allow string shortcut for target.selector. Can be the name of any HTML tag.
         if (typeof target === 'string') {
@@ -379,7 +373,12 @@ var angular2now = function () {
 
         function onReady() {
             // Find the component's element
-            var el = document.querySelector(target.selector);
+            if (!bootOnDocument)
+                var el = document.querySelector(target.selector);
+
+            // Or use document, if user passed no arguments
+            else
+                var el = document;
 
             angular.bootstrap(el, [bootModule], config);
         }
