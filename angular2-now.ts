@@ -122,7 +122,7 @@ function unCamelCase(c) {
   return s;
 }
 
-export function Inject(deps?: Array<string>) {
+export function Inject(deps?: Array<string|Object>) {
   deps = deps || [];
   return function (target) {
     if (!target.$inject)
@@ -273,7 +273,7 @@ export function RouteConfig(instructions) {
           function ($router) {
             $router.config(instructions);
           }
-    ]);
+        ]);
   }
 }
 
