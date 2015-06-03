@@ -140,35 +140,11 @@ var angular2now = function () {
 
             return target;
 
-            function controller() {
-                var that = this;
+             function link(scope, el, attr, controllers) {
+                // Create a service with the same name as the selector
+                // That holds a reference to our component
+                //angular.module(currentModule).value(camelCase(target.selector), controllers[0]);
 
-                // Convert arguments to a normal JS array
-                var args = Array.prototype.slice.call(arguments);
-
-                // Create a callback that will be execute in the link function when it executes
-                // where our controller will be actually instantiated.
-                // We need to do this because dependencies on other component controllers are only
-                // available in Angular 1 in the link function.
-                controller.___$$cb = function(controllers) {
-
-                    // Find all the "@*" injections and replace them (in the args array) with the
-                    // actual controller from the passed in controllers array.
-                    var controllerIndex = 0;
-                    for (var i= 0; i < args.length; i++) {
-                        var arg = args[i];
-                        //if (target.$injectDefer[i][0] === '@') {
-                        if (/^@[^]?/.test(target.$injectDefer[i][0])) {
-                            args[i] = controllers[controllerIndex];
-                            controllerIndex++;
-                        }
-                    }
-
-                    target.apply(that, args);
-                };
-            }
-
-            function link(scope, el, attr, controllers) {
                 // Alternate syntax for the injection of other component's controllers
                 if (controllers[0].$dependson) {
                     controllers[0].$dependson.apply(controllers[0], controllers.slice(1));
@@ -323,10 +299,16 @@ var angular2now = function () {
 
         return function (target) {
 
+            filterFunc.$inject = target.$inject;
+
             angular.module(currentModule)
-                .filter(nameSpace(options.name), function () {
-                    return new target;
-                });
+                .filter(nameSpace(options.name), filterFunc);
+
+            function filterFunc() {
+                var args = Array.prototype.slice.call(arguments);
+                var f = new (Function.prototype.bind.apply(target, [null].concat(args)));
+                return f;
+            }
 
             return target;
         };
