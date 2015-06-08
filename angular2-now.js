@@ -497,11 +497,10 @@ var angular2now = function () {
                             var localScope = args[0];
 
                             args = args.slice(1);
-                            deps = deps.slice(1);
 
                             // Now we copy the resolved values to the service.
                             // This service can be injected into a component's constructor, for example.
-                            deps.forEach(function (v, i) {
+                            deps.slice(1).forEach(function (v, i) {
                                 localScope[v] = args[i];
                             });
 
