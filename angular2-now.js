@@ -2,18 +2,19 @@ var angular2now = function () {
     'use strict';
 
     var angular2now = {
-        Component:     Component,
-        Directive:     Component,
-        View:          View,
-        Inject:        Inject,
-        Controller:    Controller,
-        Service:       Service,
-        Filter:        Filter,
-        Injectable:    Service,
-        bootstrap:     bootstrap,
-        State:         State,
+        SetModule:  SetModule,
+        Component:  Component,
+        Directive:  Component,
+        View:       View,
+        Inject:     Inject,
+        Controller: Controller,
+        Service:    Service,
+        Filter:     Filter,
+        Injectable: Service,
+        bootstrap:  bootstrap,
+        State:      State,
 
-        options:       options
+        options: options
     };
 
     var currentModule;
@@ -23,13 +24,15 @@ var angular2now = function () {
     var angularModule = angular.module;
 
     // Monkey patch angular.module
-    angular.module = function () {
+    angular.module = SetModule;
+
+    function SetModule () {
         /**
-         * Namespacing applies to provider names, not modules. Each module
+         * Name-spacing applies to provider names, not modules. Each module
          * has to have a unique name of it's own.
          *
          * A namespace may be specified like this:
-         *     angular.module('ftdesiree:helpers')
+         *     SetModule('ftdesiree:helpers')
          * The namespace, once set, will remain in force until removed.
          * Remove the namespace like this:
          *     angular.module(':helpers')
@@ -140,7 +143,7 @@ var angular2now = function () {
 
             return target;
 
-             function link(scope, el, attr, controllers) {
+            function link(scope, el, attr, controllers) {
                 // Create a service with the same name as the selector
                 // That holds a reference to our component
                 //angular.module(currentModule).value(camelCase(target.selector), controllers[0]);
@@ -156,6 +159,7 @@ var angular2now = function () {
 
     // Does a provider with a specific name exist in the current module
     function serviceExists(serviceName, type) {
+        //return !!angular.injector(['ng', currentModule]).has(serviceName);
         return !!getService(serviceName, currentModule, type);
     }
 
