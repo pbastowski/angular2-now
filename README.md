@@ -139,7 +139,7 @@ class defect {
 
 #### Resolving and injecting dependencies 
 
-To add a `ui-router` resolve block, add in to the @State annotation as shown below.
+To add a `ui-router` resolve block, add it to the @State annotation as shown below.
 
 ```javascript
 @State({
@@ -196,7 +196,7 @@ In this case, the class itself is the controller for the route and receives the 
 
 
 ### Bootstrapping the app
-- `bootstrap (app [, config ])` 
+<code>bootstrap (app [, config ])</code> 
 
 This allows you to bootstrap your Angular 1 app using the Angular 2 component bootstrap syntax. So, there is no need to use `ng-app`. Using `bootstrap` is the equivalend of the Angular 1 manual bootstrapping method: `angular.bootstrap(DOMelement, ['app'])`. The bootstrap function also knows how to handle Meteor.isCordova apps.
 `config` is the same parameter as in angular.bootstrap: https://code.angularjs.org/1.3.15/docs/api/ng/function/angular.bootstrap. It can be used to enforce strictDi, for testing before deployment. 
@@ -316,7 +316,7 @@ Meteor.methods({
 })
 ```
 
-Then, on the Client Side, you annotate a stub method (in this case `send(){}`) in your class or component with <code>@MeteorMethod</code>:
+Then, on the Client Side, you annotate a stub method (in this case `sendEmail(){}`) in your class or component with <code>@MeteorMethod</code>:
  
 ```javascript
 class Mail {
