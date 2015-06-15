@@ -57,13 +57,15 @@ The decorators below are not Angular 2, as such, but for me they make coding in 
 - **@Filter** `({ name: 'filterName', ?module: 'angularModuleName' })`
 - **@State** `({name: 'stateName', ?url: '/stateurl', ?defaultRoute: true/false, ?resolve: {...}, ?controller: controllerFunction, ?template: { }, ?html5Mode: true/false }))`
 
+- **@MeteorMethod** `(method)`
 
-### Using angular.module 
+### Using angular.module or SetModule
 
 - **angular.module** `( 'app', ['angular-meteor', 'my-other-module'] )`
 
 This allows us to set the Angular 1 module name in which Components, Services, Filters and State configuration will be created by the @decorator functions. The syntax is identical to Angular's own `angular.module`, see: https://docs.angularjs.org/api/ng/function/angular.module.
  
+SetModule is equivalent to angular.module. Use the one that you feel is most comfortable for you to use. Note that in some future version the monkey-patched version of angular.module will be deprecate in favor of SetModule.
  
 #### How does it work? 
 angular.module() has been monkey-patched to remember the module name and then call the original angular.module function (and return its return value). 
@@ -292,6 +294,47 @@ class myValidator {
 Please note that the injected component controllers are not listed as arguments to the constructor.
 
 > Warning: This is a breaking change introduced in 0.1.7. The use of `this.ngModel = function(ngModel) { // do stuff with ngModel }` within the constructor is no longer supported. Please use the syntax shown above.
+
+
+## Meteor Helper Annotations
+
+### <code>@MeteorMethod( methodName )</code>
+
+The `@MeteorMethod` annotation is used to create a client-side method that calls a procedure defined on the Meteor server using `Meteor.methods()`. `methodName` is the name of a Meteor method defined on the server side. Here is an example.
+
+On the Server Side you create the Meteor method like this:
+
+```javascript
+Meteor.methods({
+    sendEmail: function(from, to, subject, body) {
+        try {
+            Email.send({from: from, to: to, subject: subject, text: body});
+        } catch (er) {
+            return er;
+        }
+    }
+})
+```
+
+Then, on the Client Side, you annotate a stub method (in this case `send(){}`) in your class or component with <code>@MeteorMethod</code>:
+ 
+```javascript
+class Mail {
+   @MeteorMethod('sendEmail')
+   sendEmail() { }
+}
+```
+And then you use it somewhere, like this:
+
+```javascript
+@Inject(['mail'])
+class myComponent {
+    constructor(mail) {
+        mail.sendEmail('me@home.com', 'you@wherever.net', 'hello', 'Hi there!')
+            .then( () => console.log('success'), (er) => console.log('Error: ', er) );
+    }
+}
+```
 
 
 ### What environment is required?
