@@ -196,7 +196,8 @@ In this case, the class itself is the controller for the route and receives the 
 
 
 ### Bootstrapping the app
-<code>bootstrap (app [, config ])</code> 
+
+#### `bootstrap (app [, config ])` 
 
 This allows you to bootstrap your Angular 1 app using the Angular 2 component bootstrap syntax. So, there is no need to use `ng-app`. Using `bootstrap` is the equivalend of the Angular 1 manual bootstrapping method: `angular.bootstrap(DOMelement, ['app'])`. The bootstrap function also knows how to handle Meteor.isCordova apps.
 `config` is the same parameter as in angular.bootstrap: https://code.angularjs.org/1.3.15/docs/api/ng/function/angular.bootstrap. It can be used to enforce strictDi, for testing before deployment. 
@@ -296,11 +297,11 @@ Please note that the injected component controllers are not listed as arguments 
 > Warning: This is a breaking change introduced in 0.1.7. The use of `this.ngModel = function(ngModel) { // do stuff with ngModel }` within the constructor is no longer supported. Please use the syntax shown above.
 
 
-## Meteor Helper Annotations
+### Meteor Helper Annotations
 
-### <code>@MeteorMethod( methodName )</code>
+#### `@MeteorMethod( methodName )`
 
-The `@MeteorMethod` annotation is used to create a client-side method that calls a procedure defined on the Meteor server using `Meteor.methods()`. `methodName` is the name of a Meteor method defined on the server side. Here is an example.
+The `@MeteorMethod` annotation is used to create a client-side method that calls a procedure defined on the Meteor server. `methodName` is the name of a Meteor method defined on the server side. Here is an example.
 
 On the Server Side you create the Meteor method like this:
 
@@ -316,7 +317,7 @@ Meteor.methods({
 })
 ```
 
-Then, on the Client Side, you annotate a stub method (in this case `sendEmail(){}`) in your class or component with <code>@MeteorMethod</code>:
+On the Client Side, you annotate a stub method, in this case ` sendEmail(){} `, in your Service or Component class with ` @MeteorMethod `:
  
 ```javascript
 class Mail {
@@ -324,7 +325,7 @@ class Mail {
    sendEmail() { }
 }
 ```
-And then you use it somewhere, like this:
+And then you call ` sendEmail() ` somewhere, like this:
 
 ```javascript
 @Inject(['mail'])
