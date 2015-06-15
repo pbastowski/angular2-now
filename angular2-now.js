@@ -2,7 +2,8 @@ var angular2now = function () {
     'use strict';
 
     var angular2now = {
-        SetModule:  SetModule,
+        SetModule: SetModule,
+
         Component:  Component,
         Directive:  Component,
         View:       View,
@@ -14,12 +15,17 @@ var angular2now = function () {
         bootstrap:  bootstrap,
         State:      State,
 
-        options: options
+        options: options,
+
+        MeteorMethod: MeteorMethod
     };
+
+    var $$q = angular.injector(['ng']).get('$q');
 
     var currentModule;
     var currentNameSpace;
     var controllerAs;
+    var ng2nowOptions = {};
 
     var angularModule = angular.module;
 
@@ -477,8 +483,12 @@ var angular2now = function () {
                             // A user supplied controller OR
                             // A class, if no Component was annotated (thus no selector is available) OR
                             // A proxy controller, if resolves were requested with an annotated Component
-                            controller: userController || (doResolve ? controller : undefined)
+                            controller: userController || (doResolve ? controller : undefined),
                             //controller: options.controller || (!target.selector ? target : undefined) || (doResolve ? controller : undefined)
+
+                            // onEnter and onExit events
+                            onEnter: options.onEnter,
+                            onExit:  options.onExit
                         };
 
                         // Create the state
@@ -520,8 +530,54 @@ var angular2now = function () {
     // Allow configuration of some angular2-now default settings
     // controllerAs: if provided, will user this string instead of component name, for example "vm"
     function options(options) {
-        if (typeof options.controllerAs !== 'undefined')
+        if (typeof options.controllerAs !== 'undefined') {
             controllerAs = options.controllerAs;
+        }
+
+        // Optional spinner object can be registered. It must expose show() and hide() methods.
+        // The spinner will be activated before any I/O operations and deactivated once they complete.
+        if (typeof options.spinner !== 'undefined') {
+            ng2nowOptions.spinner = options.spinner;
+        }
+
+    }
+
+    function MeteorMethod(methodName) {
+        return function (target, name, descriptor) {
+
+            // Create a method that calls the back-end
+            target[methodName] = function () {
+                var argv = Array.prototype.slice.call(arguments);
+                var deferred = $$q.defer();
+
+                argv.unshift(methodName);
+                argv.push(resolver);
+
+                // Show the spinner
+                if (ng2nowOptions.spinner) {
+                    ng2nowOptions.spinner.show();
+                }
+
+                Meteor.call.apply(this, argv);
+
+                // Hide the spinner
+                if (ng2nowOptions.spinner) {
+                    deferred.promise.then(function() { ng2nowOptions.spinner.hide() }, function() { ng2nowOptions.spinner.hide() });
+                }
+
+                return deferred.promise;
+
+                function resolver(err, data) {
+                    if (err)
+                        deferred.reject(err);
+                    else
+                        deferred.resolve(data);
+                };
+            }
+
+            return target;
+        }
+
     }
 
     return angular2now;
