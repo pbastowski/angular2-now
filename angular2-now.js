@@ -528,12 +528,12 @@ var angular2now = function () {
 
         // Optional spinner object can be registered. It must expose show() and hide() methods.
         // The spinner will be activated before any I/O operations and deactivated once they complete.
-        ng2nOptions.spinner = options.spinner;
+        ng2nOptions.spinner = options.spinner || {show: angular.noop, hide: angular.noop};
 
-        // ioHooks expose beforeCall() and afterCall().
+        // events expose beforeCall() and afterCall().
         // beforeCall() will be called before any I/O operations.
         // afterCall() will be called after any I/O operations have completed.
-        ng2nOptions.ioHooks = options.ioHooks;
+        ng2nOptions.events = options.events | {beforeCall: angular.noop, afterCall: angular.noop};
 
     }
 
@@ -547,7 +547,8 @@ var angular2now = function () {
     // The name of the Meteor.method is the same as the name of class method.
     function MeteorMethod(_options) {
         var options = angular.merge({}, _options, ng2nOptions);
-        var spinner = options.spinner;
+        var spinner = options.spinner || {show: angular.noop, hide: angular.noop};
+        var events = options.events || {beforeCall: angular.noop, afterCall: angular.noop};
 
         return function (target, name, descriptor) {
 
@@ -567,23 +568,15 @@ var angular2now = function () {
                 argv.unshift(name);
                 argv.push(resolver);
 
-                // Show the spinner
                 if (spinner) spinner.show();
-
-                // Call optional ioHooks.beforeCall()
-                if (options.ioHooks && options.ioHooks.beforeCall)
-                    options.ioHooks.beforeCall();
+                events.beforeCall();  // Call optional events.beforeCall()
 
                 // todo: should call Meteor after resolution of promise returned by beforeCall()
                 Meteor.call.apply(this, argv);
 
                 deferred.promise.finally(function() {
-                    // Hide the spinner
-                    if (spinner) spinner.hide();
-
-                    // Call optional ioHooks.afterCall()
-                    if (options.ioHooks && options.ioHooks.afterCall)
-                        options.ioHooks.afterCall();
+                    spinner.hide();
+                    optionsevents.afterCall();  // Call optional events.afterCall()
                 });
 
                 return deferred.promise;
