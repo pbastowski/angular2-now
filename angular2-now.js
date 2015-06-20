@@ -24,6 +24,7 @@ var angular2now = function () {
     };
 
     var $q = angular.injector(['ng']).get('$q');
+    var $log = angular.injector(['ng']).get('$log');
 
     var currentModule;
     var currentNameSpace;
@@ -61,7 +62,7 @@ var angular2now = function () {
         }
 
         return angularModule.apply(angular, arguments);
-    };
+    }
 
 
     // Create a new name from the concatenation of
@@ -81,7 +82,7 @@ var angular2now = function () {
         options = options || {};
         // Allow shorthand notation of just passing the selector name as a string
         if (typeof options === 'string')
-            options = { selector: options }
+            options = { selector: options };
 
         return function (target) {
 
@@ -167,23 +168,8 @@ var angular2now = function () {
     }
 
     // Does a provider with a specific name exist in the current module
-    function serviceExists(serviceName, type) {
-        //return !!angular.injector(['ng', currentModule]).has(serviceName);
-        return !!getService(serviceName, currentModule, type);
-    }
-
-    function getService(serviceName, moduleName, type) {
-        if (!moduleName)
-            moduleName = currentModule;
-
-        if (!type)
-            type = '$provide';
-
-        return angular.module(moduleName)
-                ._invokeQueue
-                .find(function(v,i) {
-                    return v[0] === type && v[2][0] === serviceName
-                });
+    function serviceExists(serviceName) {
+        return angular.injector(['ng', currentModule]).has(serviceName);
     }
 
     function camelCase(s) {
@@ -230,7 +216,7 @@ var angular2now = function () {
         options = options || {};
         // Allow shorthand notation of just passing the templateUrl as a string
         if (typeof options === 'string')
-            options = { templateUrl: options }
+            options = { templateUrl: options };
 
         if (!options.template) options.template = undefined;
 
@@ -279,7 +265,7 @@ var angular2now = function () {
         options = options || {};
         // Allow shorthand notation of just passing the name as a string
         if (typeof options === 'string')
-            options = { name: options }
+            options = { name: options };
 
         return function (target) {
             angular.module(currentModule)
@@ -293,7 +279,7 @@ var angular2now = function () {
         options = options || {};
         // Allow shorthand notation of just passing the name as a string
         if (typeof options === 'string')
-            options = { name: options }
+            options = { name: options };
 
         return function (target) {
             angular.module(currentModule)
@@ -308,7 +294,7 @@ var angular2now = function () {
         options = options || {};
         // Allow shorthand notation of just passing the name as a string
         if (typeof options === 'string')
-            options = { name: options }
+            options = { name: options };
 
         return function (target) {
 
@@ -541,16 +527,12 @@ var angular2now = function () {
 
         // Optional spinner object can be registered. It must expose show() and hide() methods.
         // The spinner will be activated before any I/O operations and deactivated once they complete.
-        if (typeof options.spinner !== 'undefined') {
-            ng2nowOptions.spinner = options.spinner;
-        }
+        ng2nowOptions.spinner = options.spinner;
 
         // ioHooks expose beforeCall() and afterCall().
         // beforeCall() will be called before any I/O operations.
         // afterCall() will be called after any I/O operations have completed.
-        if (typeof options.ioHooks !== 'undefined') {
-            ng2nowOptions.ioHooks= options.ioHooks;
-        }
+        ng2nowOptions.ioHooks = options.ioHooks;
 
     }
 
@@ -561,29 +543,31 @@ var angular2now = function () {
         }
     }
 
-    function MeteorMethod(methodName, _options) {
+    // The name of the Meteor.method is the same as the name of class method.
+    function MeteorMethod(_options) {
         var options = angular.merge({}, _options, ng2nowOptions);
         var spinner = options.spinner;
 
         return function (target, name, descriptor) {
 
             // Create a method that calls the back-end
-            target[methodName] = function () {
+            target[name] = function () {
                 var argv = Array.prototype.slice.call(arguments);
                 var deferred = $q.defer();
 
                 if (typeof spinner === 'string') {
-                    spinner = angular.injector(['ng', currentModule]).get(options.spinner);
-                    options.spinner = spinner;
+                    if (angular.injector(['ng', currentModule]).has(options.spinner)) {
+                        spinner = angular.injector(['ng', currentModule]).get(options.spinner);
+                        options.spinner = spinner;
+                    } else
+                        throw new Error('Spinner "' + spinner + '" does not exist.');
                 }
 
-                argv.unshift(methodName);
+                argv.unshift(name);
                 argv.push(resolver);
 
                 // Show the spinner
-                if (spinner) {
-                    spinner.show();
-                }
+                if (spinner) spinner.show();
 
                 // Call optional ioHooks.beforeCall()
                 if (options.ioHooks && options.ioHooks.beforeCall)
@@ -594,15 +578,11 @@ var angular2now = function () {
 
                 deferred.promise.finally(function() {
                     // Hide the spinner
-                    if (spinner) {
-                        spinner.hide();
-                    }
+                    if (spinner) spinner.hide();
 
                     // Call optional ioHooks.afterCall()
-                    // If afterCall() returns a promise then finally will be delayed until
-                    // that promise resolves.
                     if (options.ioHooks && options.ioHooks.afterCall)
-                        return options.ioHooks.afterCall();
+                        options.ioHooks.afterCall();
                 });
 
                 return deferred.promise;
@@ -621,7 +601,7 @@ var angular2now = function () {
     }
 
     /**
-     * ng2nowOptions.restOptions sets global options for rest calls. These can be overridden
+     * ng2nowOptions.restOptions are the global options for rest calls. These can be overridden
      * by using the options argument in the RestCall itself.
      *
      * - showSpinner truthy = show the spinner before the ajax call and hide after
@@ -632,11 +612,17 @@ var angular2now = function () {
      */
     ng2nowOptions.restOptions = {
         apiPrefix:    '',
-        jsonPrefix:   'for(;;);',
+        jsonPrefix:   '',
         showError:    1,
         showSpinner:  1,
         ignoreErrors: [],
+        errorHandler: null,
+        method:       'GET'
     };
+
+    // Get $http and $log from angular
+    var $http = angular.injector(['ng']).get('$http');
+    var $log = angular.injector(['ng']).get('$log');
 
     /**
      * RestConfig annotation sets the base URL and other options for rest api calls.
@@ -651,9 +637,18 @@ var angular2now = function () {
         }
     }
 
-    function RestCall(apiTemplate, method, _options) {
-        var options = angular.merge({}, _options, ng2nowOptions.restOptions);
-        var spinner = ng2nowOptions.spinner;
+    function getService(svc) {
+        if (typeof svc === 'object')
+            return svc;
+
+        if (angular.injector(['ng', currentModule]).has(svc))
+            return angular.injector(['ng']).get('$log');
+    }
+
+    function RestCall(apiTemplate, _options) {
+        var options = angular.merge({}, ng2nowOptions.restOptions, _options);
+        var spinner = options.spinner || ng2nowOptions.spinner || { show: angular.noop, hide: angular.noop };
+        //$log.log('@RestCall: options: ', options);
 
         return function (target, name, descriptor) {
 
@@ -669,16 +664,16 @@ var angular2now = function () {
 
                 var args = Array.prototype.slice.call(arguments);
 
-                // Interpolate any parameters in the apiTemplate
+                // Get parameter names from apiTemplate
                 var apiArgs = apiTemplate.match(REGEX) || [];
 
+                // Interpolate the parameters in the apiTemplate
                 apiArgs.forEach(function(name, index) {
                     api = api.replace(name, args[index]);
                 });
                 args.splice(0, apiArgs.length);
 
-                // Show the spinner
-                if (options.showSpinner && spinner) spinner.show();
+                spinner.show();
 
                 // Call optional ioHooks.beforeCall()
                 if (ng2nowOptions.ioHooks && ng2nowOptions.ioHooks.beforeCall)
@@ -686,18 +681,15 @@ var angular2now = function () {
 
                 // todo: should call Meteor after resolution of promise returned by beforeCall()
                 // Call the restService
-                var promise = restService(api, method, args[0], options);
+                var promise = restService(api, options.method, args[0], options);
 
                 // Do post call tasks
                 promise.finally(function() {
-                    // Hide the spinner
-                    if (options.showSpinner && spinner) spinner.hide();
+                    spinner.hide();
 
                     // Call optional ioHooks.afterCall()
-                    // If afterCall() returns a promise then finally will be delayed until
-                    // that promise resolves.
                     if (ng2nowOptions.ioHooks && ng2nowOptions.ioHooks.afterCall)
-                        return ng2nowOptions.ioHooks.afterCall();
+                        ng2nowOptions.ioHooks.afterCall();
                 });
 
                 return promise;
@@ -711,8 +703,7 @@ var angular2now = function () {
     function restService(api, method, args, _options) {
         var options = angular.merge({}, ng2nowOptions.restOptions, _options);
 
-        var $http = angular.injector(['ng']).get('$http');
-        var $log = angular.injector(['ng']).get('$log');
+        //$log.log('restService: options: ', options);
 
         if (!checkParameters()) return;
 
@@ -722,7 +713,7 @@ var angular2now = function () {
             data:              args,
             method:            method,
             transformResponse: function (data) {
-                return stripJsonVulnerabilityPrefix(data);
+                return stripJsonVulnerabilityPrefix(data, options.jsonPrefix);
             }
         }).then(success, failed);
 
@@ -775,23 +766,19 @@ var angular2now = function () {
                         (options.errorMsg ? options.errorMsg + '\n' : '')
                         + er
                         + 'Status code: ' + data.status + '\n\n'
-                        + (data.data ? JSON.stringify(data.data.objectErrors[0].message) : '')
+                        + (data.data ? JSON.stringify(data.data) : '')
                     );
                 }
             }
 
             // must reject this using a new promise, otherwise it will come in through the success side of the chain
             return $q.reject(data);
-            //var deferred = $q.defer();
-            //deferred.reject(data);
-
-            //return deferred.promise;
         }
 
-        function stripJsonVulnerabilityPrefix(data) {
-            if ('string' === typeof data) {
+        function stripJsonVulnerabilityPrefix(data, jsonPrefix) {
+            if (jsonPrefix && 'string' === typeof data) {
                 // Remove the leading JSON vulnerability prefix
-                if (data.indexOf(ng2nowOptions.restOptions.jsonPrefix) > -1)
+                if (data.indexOf(jsonPrefix) > -1)
                     data = angular.fromJson(data.slice(8));
             }
             return data;
