@@ -18,9 +18,7 @@ var angular2now = function () {
         options: options,
         Options: Options,
 
-        MeteorMethod: MeteorMethod,
-        RestCall:     RestCall,
-        RestConfig:   RestConfig
+        MeteorMethod: MeteorMethod
     };
 
     var $q = angular.injector(['ng']).get('$q');
@@ -29,7 +27,10 @@ var angular2now = function () {
     var currentModule;
     var currentNameSpace;
     var controllerAs;
-    var ng2nowOptions = {};
+
+    var ng2nOptions = {
+        currentModule: function() { return currentModule; }
+    };
 
     var angularModule = angular.module;
 
@@ -519,7 +520,7 @@ var angular2now = function () {
     // Allow configuration of some angular2-now default settings
     // controllerAs: if provided, will user this string instead of component name, for example "vm"
     function options(options) {
-        if (!options) return ng2nowOptions;
+        if (!options) return ng2nOptions;
 
         if (typeof options.controllerAs !== 'undefined') {
             controllerAs = options.controllerAs;
@@ -527,25 +528,25 @@ var angular2now = function () {
 
         // Optional spinner object can be registered. It must expose show() and hide() methods.
         // The spinner will be activated before any I/O operations and deactivated once they complete.
-        ng2nowOptions.spinner = options.spinner;
+        ng2nOptions.spinner = options.spinner;
 
         // ioHooks expose beforeCall() and afterCall().
         // beforeCall() will be called before any I/O operations.
         // afterCall() will be called after any I/O operations have completed.
-        ng2nowOptions.ioHooks = options.ioHooks;
+        ng2nOptions.ioHooks = options.ioHooks;
 
     }
 
     function Options(options) {
         return function(target) {
-            angular.merge(ng2nowOptions, options);
+            angular.merge(ng2nOptions, options);
             return target;
         }
     }
 
     // The name of the Meteor.method is the same as the name of class method.
     function MeteorMethod(_options) {
-        var options = angular.merge({}, _options, ng2nowOptions);
+        var options = angular.merge({}, _options, ng2nOptions);
         var spinner = options.spinner;
 
         return function (target, name, descriptor) {
@@ -600,191 +601,6 @@ var angular2now = function () {
 
     }
 
-    /**
-     * ng2nowOptions.restOptions are the global options for rest calls. These can be overridden
-     * by using the options argument in the RestCall itself.
-     *
-     * - showSpinner truthy = show the spinner before the ajax call and hide after
-     * - spinner     object = exposes show() and hide() methods
-     * - showError   truthy = show the error dialog, falsy = don't show it
-     * - ignoreErrors[] array of error/status codes to pass through to the caller
-     * - apiPrefix   string = for example '/rest/'
-     */
-    ng2nowOptions.restOptions = {
-        apiPrefix:    '',
-        jsonPrefix:   '',
-        showError:    1,
-        showSpinner:  1,
-        ignoreErrors: [],
-        errorHandler: null,
-        method:       'GET'
-    };
-
-    // Get $http and $log from angular
-    var $http = angular.injector(['ng']).get('$http');
-    var $log = angular.injector(['ng']).get('$log');
-
-    /**
-     * RestConfig annotation sets the base URL and other options for rest api calls.
-     *
-     * @param options same as restOptions, above, but can be changed per call
-     */
-
-    function RestConfig(options) {
-        return function (target) {
-            angular.merge(ng2nowOptions.restOptions, options);
-            return target;
-        }
-    }
-
-    function getService(svc) {
-        if (typeof svc === 'object')
-            return svc;
-
-        if (angular.injector(['ng', currentModule]).has(svc))
-            return angular.injector(['ng']).get('$log');
-    }
-
-    function RestCall(apiTemplate, _options) {
-        var options = angular.merge({}, ng2nowOptions.restOptions, _options);
-        var spinner = options.spinner || ng2nowOptions.spinner || { show: angular.noop, hide: angular.noop };
-        //$log.log('@RestCall: options: ', options);
-
-        return function (target, name, descriptor) {
-
-            target[name] = function() {
-                var api = apiTemplate;
-                var REGEX = /\${(\w+)}/g;
-
-                if (typeof spinner === 'string') {
-                    spinner = angular.injector(['ng', currentModule]).get(spinner);
-                    ng2nowOptions.spinner = spinner;
-                    window.sp = spinner;
-                }
-
-                var args = Array.prototype.slice.call(arguments);
-
-                // Get parameter names from apiTemplate
-                var apiArgs = apiTemplate.match(REGEX) || [];
-
-                // Interpolate the parameters in the apiTemplate
-                apiArgs.forEach(function(name, index) {
-                    api = api.replace(name, args[index]);
-                });
-                args.splice(0, apiArgs.length);
-
-                spinner.show();
-
-                // Call optional ioHooks.beforeCall()
-                if (ng2nowOptions.ioHooks && ng2nowOptions.ioHooks.beforeCall)
-                    ng2nowOptions.ioHooks.beforeCall();
-
-                // todo: should call Meteor after resolution of promise returned by beforeCall()
-                // Call the restService
-                var promise = restService(api, options.method, args[0], options);
-
-                // Do post call tasks
-                promise.finally(function() {
-                    spinner.hide();
-
-                    // Call optional ioHooks.afterCall()
-                    if (ng2nowOptions.ioHooks && ng2nowOptions.ioHooks.afterCall)
-                        ng2nowOptions.ioHooks.afterCall();
-                });
-
-                return promise;
-
-            }
-
-            return target;
-        }
-    }
-
-    function restService(api, method, args, _options) {
-        var options = angular.merge({}, ng2nowOptions.restOptions, _options);
-
-        //$log.log('restService: options: ', options);
-
-        if (!checkParameters()) return;
-
-        // Call the REST API
-        var pr = $http({
-            url:               options.apiPrefix + api,
-            data:              args,
-            method:            method,
-            transformResponse: function (data) {
-                return stripJsonVulnerabilityPrefix(data, options.jsonPrefix);
-            }
-        }).then(success, failed);
-
-        return pr;
-
-        function checkParameters() {
-            if (!angular.isString(api))
-                throw new Error('restService: api parameter empty');
-
-            // UPPER CASE and trim method name, for doing comparisons
-            method = (method || '').toUpperCase().trim();
-
-            // Default method is GET.
-            if (!method) method = 'GET';
-
-            // Only GET, POST, DELETE, UPDATE and PUT are allowed
-            if (!/^(GET|POST|DELETE|UPDATE|PUT)$/.test(method))
-                return false;
-
-            // All is good, parameter checks passed.
-            return true;
-        }
-
-        function success(data) {
-            return data.data;
-        }
-
-        // global API failure handler
-        function failed(data) {
-            // Status code 400 is now actually a data validation error, so, no default messages for it any more.
-            // Perhaps, one day it may be moved to the success side of the equation and passed in as an error object.
-            // see: http://stackoverflow.com/questions/3290182/rest-http-status-codes-for-failed-validation-or-invalid-duplicate
-            if (data.status !== 400) {
-
-                var er = 'An unexpected error was encountered. The details are below.\n\n';
-
-                // 404 = not found (ex: API method does not exist)
-                if (data.status === 404) er = 'Method ' + api + ' does not exist.\n\n';
-                // 403 = forbidden (ex: user already logged in, so, can't log in again)
-                if (data.status === 403) er = 'Method ' + api + ' is not allowed in this context.\n\n';
-                // 401 = authorization required (ex: logout when logged out already)
-                if (data.status === 401) er = 'Method ' + api + ' requires authorization.\n\n';
-
-                // log the error, showing the submitted data and the returned data
-                $log.warn('Error: ', method, api, '\n', args, '\n', data.data);
-
-                if (options.showError && !(options.ignoreErrors && options.ignoreErrors.indexOf(data.status) > -1)) {
-                    // handle options.ignoreErrors array, if present
-                    alert(
-                        (options.errorMsg ? options.errorMsg + '\n' : '')
-                        + er
-                        + 'Status code: ' + data.status + '\n\n'
-                        + (data.data ? JSON.stringify(data.data) : '')
-                    );
-                }
-            }
-
-            // must reject this using a new promise, otherwise it will come in through the success side of the chain
-            return $q.reject(data);
-        }
-
-        function stripJsonVulnerabilityPrefix(data, jsonPrefix) {
-            if (jsonPrefix && 'string' === typeof data) {
-                // Remove the leading JSON vulnerability prefix
-                if (data.indexOf(jsonPrefix) > -1)
-                    data = angular.fromJson(data.slice(8));
-            }
-            return data;
-        }
-    }
-
     return angular2now;
 
 }();
@@ -795,7 +611,7 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 // AMD / RequireJS
 else if (typeof define !== 'undefined' && define.amd) {
-    define([], function () {
+    define('angular2now', [], function () {
         return angular2now;
     });
 }
