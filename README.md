@@ -229,7 +229,7 @@ If you don't specify a module "name" in the @Component annotation, then bootstra
 
 
 ### ControllerAs
-The created components use ControllerAs syntax. So, when referring to properties or functions on the controller's "scope", make sure to prefix them with this in the controller and with the className, or the camel-cased selector name if different from the className, in the HTML templates.
+The created components use ControllerAs syntax. So, when referring to properties or functions on the controller's "scope", make sure to prefix them with `this` in the controller and with the `className`, or the camel-cased selector name if different from the className, in the HTML templates.
 
 **What if I want to use "vm" as the name of my controller?**
 
@@ -299,9 +299,9 @@ Please note that the injected component controllers are not listed as arguments 
 
 ### Meteor Helper Annotations
 
-#### `@MeteorMethod( methodName )`
+#### `@MeteorMethod( ?options )`
 
-The `@MeteorMethod` annotation is used to create a client-side method that calls a procedure defined on the Meteor server. `methodName` is the name of a Meteor method defined on the server side. Here is an example.
+The `@MeteorMethod` annotation is used to create a client-side method that calls a procedure defined on the Meteor server. The `options` argument is optional. Here is an example.
 
 On the Server Side you create the Meteor method like this:
 
@@ -317,11 +317,11 @@ Meteor.methods({
 })
 ```
 
-On the Client Side, you annotate a stub method, in this case ` sendEmail(){} `, in your Service or Component class with ` @MeteorMethod `:
+On the Client Side, you annotate a stub method, in this case ` sendEmail(){} `, in your Service or Component class with ` @MeteorMethod() `. The name of the stub method must be the same as the name of the Meteor method on the server:
  
 ```javascript
 class Mail {
-   @MeteorMethod('sendEmail')
+   @MeteorMethod()
    sendEmail() { }
 }
 ```
@@ -335,6 +335,40 @@ class myComponent {
             .then( () => console.log('success'), (er) => console.log('Error: ', er) );
     }
 }
+```
+
+#### `options` argument
+
+`options` allows you to override global options on a per-method basis. These options are: 
+
+Attribute | Type |Description
+----------|------|-------------------
+spinner	| object | exposes show() and hide() methods, that show and hide a busy-spinner
+events	| object | exposes beforeCall() and afterCall(), which will be called before and after the ajax call. Only `afterCall` is guaranteed to run after the call to the MeteorMethod completes.
+
+For example, options can be defined at the global level like this:
+
+```javascript
+import {options} from 'angular2now';
+
+angular2now.options({
+    spinner: {
+        show: function () { document.body.style.background = 'yellow'; },
+        hide: function () { document.body.style.background = ''; }
+    },
+    events:  {
+        beforeCall: () => console.log('< BEFORE call'),
+        afterCall:  () => console.log('> AFTER call'),
+    }
+});
+
+```
+
+When defining a @MeteorMethod(), the options can be overridden like this:
+
+```javascript
+@MeteorMethod({ spinner: { ... }, events: { ... })
+sendEmail() {}
 ```
 
 
