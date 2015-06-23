@@ -46,26 +46,27 @@ Please note that to use the Angular 2 `@` notation, as shown in the examples bel
 
 The following decorators have been implemented to support the Angular 2.0 component syntax, as far as possible.
 
-- **@Component** `({ selector: 'tag-name', bind: { a: '=', etc: '@' }, injectables: ['$http', myServiceClass], ?module: 'angularModuleName', ?name: 'bootstrapComponentName' })`
+- **@Component** `({ selector: 'tag-name', bind: { a: '=', etc: '@' }, injectables: ['$http', myServiceClass] })`
 - **@View** `({ template: '<div>Inline template</div>', templateUrl: 'pth/to/template.html'})`
 - **@Inject** `(['$http', myServiceClass, '$q'])`
 - **bootstrap** `(app [, config ])` 
 
 The decorators below are not Angular 2, as such, but for me they make coding in Angular a bit nicer. 
 
-- **@Service** `({ name: 'serviceName', ?module: 'angularModuleName' })`
-- **@Filter** `({ name: 'filterName', ?module: 'angularModuleName' })`
-- **@State** `({name: 'stateName', ?url: '/stateurl', ?defaultRoute: true/false, ?resolve: {...}, ?controller: controllerFunction, ?template: { }, ?html5Mode: true/false }))`
+- **@Service** `({ name: 'serviceName' })`
+- **@Filter** `({ name: 'filterName' })`
+- **@State** `({name: 'stateName', ?url: '/stateurl', ?defaultRoute: true/false or '/default/route/url', ?resolve: {...}, ?controller: controllerFunction, ?template: { }, ?html5Mode: true/false }))`
 
-- **@MeteorMethod** `(method)`
+- **@MeteorMethod** `( ?options )`
 
-### Using angular.module or SetModule
 
-- **angular.module** `( 'app', ['angular-meteor', 'my-other-module'] )`
+### Using SetModule (previously angular.module, deprecated)
+
+- **SetModule** `( 'app', ['angular-meteor', 'my-other-module'] )`
 
 This allows us to set the Angular 1 module name in which Components, Services, Filters and State configuration will be created by the @decorator functions. The syntax is identical to Angular's own `angular.module`, see: https://docs.angularjs.org/api/ng/function/angular.module.
  
-SetModule is equivalent to angular.module. Use the one that you feel is most comfortable for you to use. Note that in some future version the monkey-patched version of angular.module will be deprecate in favor of SetModule.
+> SetModule is currently equivalent and interchangeable with angular.module. However, the monkey-patching of angular.module is deprecated and will be removed in favor of SetModule in a future release of angular2-now. Use SetModule from now on.
  
 #### How does it work? 
 angular.module() has been monkey-patched to remember the module name and then call the original angular.module function (and return its return value). 
@@ -73,18 +74,18 @@ angular.module() has been monkey-patched to remember the module name and then ca
 
 ### Name-spacing your app's providers
 
-Creating a namespace for your Angular 1 providers is simple. Just change your use of angular.module from this
+Creating a namespace for your Angular 1 providers is simple. Just change your use of SetModule from this
 
-    angular.module('moduleName')
+    SetModule('moduleName')
 
 to this
  
-    angular.module('nameSpace:moduleName')
+    SetModule('nameSpace:moduleName')
 
 The `nameSpace` portion will be used to automatically prefix all provider names within your application. For example
 
     
-    angular.module('webshop:helpers');
+    SetModule('webshop:helpers');
     
     @Service({ name: "myService" })   // will create a service called "webshop_myService"
     
@@ -100,11 +101,11 @@ As shown above, angular2-now will also automatically prefix with the current nam
 
 **Why bother with name-spacing?**
 
-Within a bootstrapped Angular 1 app, all module and provider names created must be unique. This is usually not a problem when you're the only one working on your app. 
+Within a bootstrapped Angular 1 app, all module and provider names created must be unique. This is usually not a problem when you are the only one working on your app. 
 
 In a larger company, however, it is common for two or more teams to be working on different parts of the same overall app. Often on different projects. They may be creating different parts of the company homepage, such as booking or webshop. Booking could have a provider called "getData" and webshop could have its own provider named "getData". Within an Angular 1 app this would create a clash, even if these providers were created in different modules. 
 
-To prevent the clash a naming convention is used, which clearly separates the provider names in two different teams. For example, booking could name their "getData" provider "booking_getData" and webshop could call their's "webshop_getData". In this way, all providers within the same Angular 1 bootstrapped app will be unique.
+To prevent the clash a naming convention is used, which clearly separates the provider names in two different teams. For example, booking could name their "getData" provider "booking_getData" and webshop could call their "webshop_getData". In this way, all providers within the same Angular 1 bootstrapped app will be unique.
    
 
 ### ui-router support through @State
@@ -123,7 +124,7 @@ Bower:
 
 And then add the `ui.router` dependency to your bootstrap module, like this
   
-    angular.module('myApp', ['angular-meteor', 'ui.router']);
+    SetModule('myApp', ['angular-meteor', 'ui.router']);
 
 Then, you can simply annotate your component with the route/state info, like so 
 
@@ -172,6 +173,7 @@ class defect {
 
 The resolved values are made available for injection into a component's constructor, as shown above. The injected parameter `defect` is the name of a service created for you that holds the resolved return values. The name of this service is always the camelCased version of your component's selector. So, if the selector == 'my-app', then the name of the injectable service will be 'myApp'. 
 
+
 #### States without a component
     
 It is also possible to define a state without a component, as in
@@ -192,7 +194,7 @@ class myApp {
 }
 ```
 
-In this case, the class itself is the controller for the route and receives the injected properties directly.  
+In this case, the class constructor is the controller for the route and receives the injected properties directly.  
 
 
 ### Bootstrapping the app
@@ -209,9 +211,9 @@ Somewhere in your HTML add this:
 And in your JavaScript add the code below.  
 
 ```javascript
-angular.module('app', []);
+SetModule('my-app', []);
 
-@Component({selector: 'my-app', name: 'app' })
+@Component({selector: 'my-app' })
 @View({template: `<content></content>`})
 class app { 
 }
@@ -219,13 +221,7 @@ class app {
 bootstrap(app);
 ```
 
-A bootstrap component can optionally specify the component name, which is the module name that will be used to bootstrap that Angular app. So, if the bootstrap module name was 'socially', then the example above would look like this:
-
-    @Component({ selector: 'my-app', name: 'socially' })
-
-And you would also need to create the module named "socially".
-
-If you don't specify a module "name" in the @Component annotation, then bootstrap() will use the selector name as the name for your bootstrap module. 
+In the example above, notice that the bootstrap module must have the same name as the bootstrap component's selector.
 
 
 ### ControllerAs
@@ -389,10 +385,10 @@ sendEmail() {}
 // "Import" the angular2-now decorators and functions into local scope
 var {Component, Template, Service, Filter, Inject, bootstrap} = angular2now;
 
-// Use angular.module() to create the 'my-components' module for our components/directives.
+// Use SetModule() to create the 'my-components' module for our components/directives.
 // All components created with @Component, @Filter and @Service will automatically
 // go into this module.
-angular.module('my-components', []);
+SetModule('my-components', []);
 
 // The filter name is 'ucase'. You can use this like so: "'string' | ucase"
 @Filter({ name: 'ucase' })
@@ -534,7 +530,7 @@ class bigBooger extends booger {
 
 // This assumes that the angular-meteor package is used and that your components will be 
 // created in an Angular 1.x module called "my-components". 
-angular.module('myApp', [
+SetModule('myApp', [
     'angular-meteor',
     'my-components'
 ]);
@@ -542,7 +538,7 @@ angular.module('myApp', [
 
 // The component "name", below, is optional. If you don't supply a component name
 // then the camelCased selector name will be used. If the selector name is not supplied then
-// the current module name, as specified with angular.module(), will be used
+// the current module name, as specified with SetModule(), will be used
 // to bootstrap the app.
 // In your HTML add "<my-app></my-app>" within the body, where you want your app to exist.
 // The '<content></content>' template ensures that any content is transcluded.
