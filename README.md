@@ -248,7 +248,7 @@ Templates specified using the templateUrl property aren't currently checked and 
 
 ### Importing the required "@" decorators from the package
 
-This package exports the object `angular2now` (angular2 deprecated since 0.1.2), from which you can import the decorators that you need, like so:
+This package exports the object `angular2now` from which you can import the decorators that you need, like so:
 
 ```javascript
 // Import the Angular2now decorators using ES6 destructuring assignment
@@ -265,7 +265,14 @@ or like this:
  ...
 ```
 
-I like the first syntax, because it looks a bit like the ES6 module import syntax. 
+Alternatively, I have created a meteor package `pbastowski:require`, which allows you to write your imports like this
+
+```javascript
+import {Component, View, bootstrap} from 'angular2now';
+```
+ 
+> `pbastowski:require` does not implement RequireJS. It is only a little stub that allows you to write nicer looking import statements. 
+
 
 ### How do I access `ngModel` and other component's controllers?
 
