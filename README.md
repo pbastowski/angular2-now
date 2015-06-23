@@ -138,6 +138,21 @@ class defect {
 }
 ```
 
+The `defaultRoute` property, if set to True, will make the annotated State the default for your app. That it, if the user types an unrecognised path into the address bar, or does not type any path other than the url of your app, they will be redirected to the defaultRoute. It is a bit like the old 404 not found redirect, except that in single page apps there is no 404. There is just the default page (or route).
+ 
+In certain cases it may not be enough to just set `defaultRoute = True`. For example, consider a deep state tree, such as below
+ 
+ State | URL | abstract | default
+ ------|-----|----------|---------
+ root  | ""  | true | no
+ root.app | "/app" | true | no
+ root.app.step1  | "/step1" | false | yes
+ 
+The default state "root.app.step1" is the child of two abstract parent states, one of which has a URL. To get this to work as expected, you will need to set `defaultRoute = '/app/step1'`. This is because UI router appends all the parent states together to form the final URL, which in the above example is '/app' + '/step1' = '/app/step1'. 
+
+> Setting `defaultRoute = true` only works for simple routes without parent states that have their own URLs. For nested states, where the default state has parent states with their own URLs, always specify the `defaultRoute` as a string that represents the final URL that you want the app to navigate to by default.
+
+
 #### Resolving and injecting dependencies 
 
 To add a `ui-router` resolve block, add it to the @State annotation as shown below.
