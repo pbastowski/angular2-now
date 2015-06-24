@@ -10,27 +10,60 @@ If either of the statements below applies to you, then you need angular2-now:
 
 You are welcome to contribute to this project.
 
-### Can I use this outside of Meteor?
+### What's implemented?
 
-Yes, you can. The angular2-now.js library works with both ES6 (Babel) and plain ES5. ES6 examples are in this README and for an ES5 usage demo see [Plunker](http://plnkr.co/edit/uxV781?p=preview).
+The following annotations have been implemented to support the Angular 2.0 component syntax, as far as possible.
 
-Install it like this
+- **@Component** `({ selector: 'tag-name', bind: { a: '=', etc: '@' }, injectables: ['$http', myServiceClass] })`
+- **@View** `({ template: '<div>Inline template</div>', templateUrl: 'pth/to/template.html'})`
+- **@Inject** `(['$http', myServiceClass, '$q'])`
+- **bootstrap** `(app [, config ])` 
+
+The annotations below are not Angular 2, as such, but for me they make coding in Angular a bit nicer. 
+
+- **@Service** `({ name: 'serviceName' })`
+- **@Filter** `({ name: 'filterName' })`
+- **@State** `({name: 'stateName', ?url: '/stateurl', ?defaultRoute: true/false or '/default/route/url', ?resolve: {...}, ?controller: controllerFunction, ?template: { }, ?html5Mode: true/false }))`
+
+The annotation below will only work with Meteor.
+
+- **@MeteorMethod** `( ?options )`
+
+
+### Can I use this library outside of Meteor?
+
+Yes, you can. The angular2-now.js library works with both ES6 (Babel) and plain ES5. ES6 examples are in this README and also in the following github repositories:
+
+- https://github.com/pbastowski/Thinkster-MEAN-Tutorial-in-angular-meteor/tree/feature/ng2-now-with-services
+- https://github.com/pbastowski/meteor-angular-socially/tree/feature/ng2now
+- https://github.com/pbastowski/todo-ng2now
+
+For an ES5 usage demo see [Plunker](http://plnkr.co/edit/uxV781?p=preview).
+
+
+#### Bower Installation
+ 
 
     bower install angular2-now
 
-To use this library, include it in your Angular 1.3 (or higher) project, ensuring that it loads before it's functions are used. `window.angular2now` gives you access to all the decorator functions. You can import the functions you need into each module that requires them, like this:
+To use this library, include it in your Angular 1.3 (or higher) project, ensuring that it loads before it's functions are used. `window.angular2now` gives you access to all the annotations. You can import the functions you need into each module that requires them, like this:
 
-Babel/ES6
+##### Babel/ES6
 
     var {Component, View, Inject} = angular2now;
 
-ES5
+or, if you've configured SystemJS correctly, you may be able to import like this
+
+    import {Component, View, Inject} from 'angular2now';
+    
+
+##### ES5
 
     var Component = angular2now.Component;
     var View = angular2now.View;
     var Inject = angular2now.Inject;
 
-Or, if you want all the angular2-now decorator functions available for use anywhere in your application without explicitly importing them, then you could try this
+Or, if you want all the angular2-now annotations available for use anywhere in your application without explicitly importing them, then you could try this
 
     angular.extend(window, angular2now)
 
@@ -42,31 +75,15 @@ Please note that to use the Angular 2 `@` notation, as shown in the examples bel
     meteor add pbastowski:angular2-now
     
 
-### What's implemented?
+## API
 
-The following decorators have been implemented to support the Angular 2.0 component syntax, as far as possible.
-
-- **@Component** `({ selector: 'tag-name', bind: { a: '=', etc: '@' }, injectables: ['$http', myServiceClass] })`
-- **@View** `({ template: '<div>Inline template</div>', templateUrl: 'pth/to/template.html'})`
-- **@Inject** `(['$http', myServiceClass, '$q'])`
-- **bootstrap** `(app [, config ])` 
-
-The decorators below are not Angular 2, as such, but for me they make coding in Angular a bit nicer. 
-
-- **@Service** `({ name: 'serviceName' })`
-- **@Filter** `({ name: 'filterName' })`
-- **@State** `({name: 'stateName', ?url: '/stateurl', ?defaultRoute: true/false or '/default/route/url', ?resolve: {...}, ?controller: controllerFunction, ?template: { }, ?html5Mode: true/false }))`
-
-- **@MeteorMethod** `( ?options )`
-
-
-### Using SetModule (previously angular.module, deprecated)
+### Using SetModule
 
 - **SetModule** `( 'app', ['angular-meteor', 'my-other-module'] )`
 
-This allows us to set the Angular 1 module name in which Components, Services, Filters and State configuration will be created by the @decorator functions. The syntax is identical to Angular's own `angular.module`, see: https://docs.angularjs.org/api/ng/function/angular.module.
+This allows us to set the Angular 1 module name in which ll Components, Services, Filters and State configuration will be created by the annotations. The syntax is identical to Angular's own `angular.module`, see: https://docs.angularjs.org/api/ng/function/angular.module. Use `SetModule` in the same places where you would use `angular.module`.
  
-> SetModule is currently equivalent and interchangeable with angular.module. However, the monkey-patching of angular.module is deprecated and will be removed in favor of SetModule in a future release of angular2-now. Use SetModule from now on.
+> SetModule is currently equivalent and interchangeable with angular.module. However, using angular.module is deprecated and will be removed in favor of SetModule in a future release of angular2-now. Use SetModule from now on.
  
 #### How does it work? 
 angular.module() has been monkey-patched to remember the module name and then call the original angular.module function (and return its return value). 
@@ -261,12 +278,12 @@ Templates specified using the templateUrl property aren't currently checked and 
     @View({ templateUrl: '/client/mytemplate.html', transclude: true })
 
 
-### Importing the required "@" decorators from the package
+### Importing the required annotations from angular2-now
 
-This package exports the object `angular2now` from which you can import the decorators that you need, like so:
+This package exports the object `angular2now` from which you can import the annotations that you need, like so:
 
 ```javascript
-// Import the Angular2now decorators using ES6 destructuring assignment
+// Import the Angular2now annotations using ES6 destructuring assignment
 // Look up ES6 destructuring here: https://babeljs.io/docs/learn-es6/ 
 var {Component, Template, Service, Filter, Inject, bootstrap} = angular2now;
 ```
@@ -392,7 +409,7 @@ sendEmail() {}
 
 ### What environment is required?
 - Angular 1.3+ 
-- Babel 5.1.10+ (lower versions process decorators in the wrong order)
+- Babel 5.1.10+ (lower versions process annotations in the wrong order)
 - Meteor 1.1.0.2
 
 #### Browsers
@@ -404,7 +421,7 @@ sendEmail() {}
 
 ```javascript
 
-// "Import" the angular2-now decorators and functions into local scope
+// "Import" the angular2-now annotations and functions into local scope
 var {Component, Template, Service, Filter, Inject, bootstrap} = angular2now;
 
 // Use SetModule() to create the 'my-components' module for our components/directives.
