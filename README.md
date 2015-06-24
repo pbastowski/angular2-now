@@ -29,22 +29,25 @@ The annotation below will only work with Meteor.
 
 - **@MeteorMethod** `( ?options )`
 
+### Code demos
 
-### Can I use this library outside of Meteor?
-
-Yes, you can. The angular2-now.js library works with both ES6 (Babel) and plain ES5. ES6 examples are in this README and also in the following github repositories:
+You may want to see the following github repositories for some examples of usage, before you start coding. It could save you some "WTF" time.
 
 - https://github.com/pbastowski/Thinkster-MEAN-Tutorial-in-angular-meteor/tree/feature/ng2-now-with-services
 - https://github.com/pbastowski/meteor-angular-socially/tree/feature/ng2now
 - https://github.com/pbastowski/todo-ng2now
 
-For an ES5 usage demo see [Plunker](http://plnkr.co/edit/uxV781?p=preview).
+
+### Can I use this library outside of Meteor?
+
+Yes, you can. The angular2-now.js library works with both ES6 (Babel) and plain ES5. ES6 examples are in this README and also in Code Demos, above. For an ES5 usage demo see [Plunker](http://plnkr.co/edit/uxV781?p=preview).
 
 
 #### Bower Installation
  
 
     bower install angular2-now
+    
 
 To use this library, include it in your Angular 1.3 (or higher) project, ensuring that it loads before it's functions are used. `window.angular2now` gives you access to all the annotations. You can import the functions you need into each module that requires them, like this:
 
