@@ -336,11 +336,7 @@ var angular2now = function () {
      * @param ?config   angular.bootstrap() config object, see AngularJS doco
      */
     function bootstrap(target, config) {
-        //if (!target) {
-        //    throw new Error("bootstrap: Can't bootstrap Angular without an object");
-        //}
-
-        if (!target) {
+        if (!target || (target && !target.selector && typeof target === 'function')) {
             target = {selector: currentModule};
             var bootOnDocument = true;
         }
@@ -371,7 +367,7 @@ var angular2now = function () {
 
             // Or use document, if user passed no arguments
             else
-                var el = document;
+                var el = document.body;
 
             angular.bootstrap(el, [bootModule], config);
         }
@@ -604,6 +600,37 @@ var angular2now = function () {
         }
 
     }
+
+    // Takes a class and remakes it using Function, so that it's this can be reassigned
+    // and so it can be called and arguments passed to it.
+    // Classes can not be called directly due to Babel restrictions.
+    window.makeFunction = makeFunction;
+    function makeFunction(target) {
+        // convert to string and remove final "}"
+        //var fnBody = target.toString().slice(0, -1).split('{');
+        var fnBody = target.toString().slice(0, -1);
+        var i = fnBody.indexOf('{');
+        fnBody = [fnBody.slice(0,i-1), fnBody.slice(i+1)];
+
+        console.log('! makeFunction1: ', fnBody);
+
+        // extract function argument names
+        var fnArgs = fnBody[0].split('function ')[1].split(/[()]/).slice(1,-1)[0].split(', ');
+        console.log('! makeFunction2: ', fnArgs, fnBody[1]);
+
+        // remove the Babel classCheck... call
+        fnBody[1] = fnBody[1].slice(fnBody[1].indexOf(';')+1);
+
+        // append function body as last arg in fnArgs
+        fnArgs.push(fnBody[1]);
+
+        console.log('! makeFunction3: ', fnArgs);
+
+        var f = Function.apply(null, fnArgs);
+
+        return f
+    }
+
 
     return angular2now;
 
