@@ -1,6 +1,6 @@
 Package.describe({
     name:          'pbastowski:angular2-now',
-    version:       '0.3.1',
+    version:       '0.3.2',
     summary:       'Use Angular2 @Component syntax with Angular 1.x and Babel',
     git:           'https://github.com/pbastowski/angular2-now.git',
     documentation: 'README.md'

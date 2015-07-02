@@ -448,7 +448,7 @@ var angular2now = function () {
                         var userController = options.controller || (!target.selector ? target : undefined);
 
                         // Also, de-namespace the resolve injectables for ui-router to inject correctly
-                        if (userController && userController.$inject && userController.$inject.length && deps.length) {
+                        if (userController && userController.$inject && userController.$inject.length && deps && deps.length) {
                             deps.forEach(function(dep) {
                                 var i = userController.$inject.indexOf(currentNameSpace+'_'+dep);
                                 if (i!==-1)
