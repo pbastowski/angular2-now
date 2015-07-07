@@ -1,8 +1,8 @@
 ## Angular 2.0 component syntax using Angular 1 and Babel
 
-### ** Breaking Change Warning **
+### ** Upcoming Breaking Change Warning **
 
-> Please note that <code>angular.module</code> is no longer being "monkey-patched" by the angular2-now library as of version 0.4.0. Please use <code>SetModule</code>, described below, instead. SetModule has the exact same syntax as angular.module. This change was necessary due to problems encountered with the monkey-patching approach under certain conditions.
+> Please note that <code>angular.module</code> will no longer be "monkey-patched" by the angular2-now library as of version 0.4.0. Please use <code>SetModule</code>, described below, instead. SetModule has the exact same syntax as angular.module. This change is necessary due to problems encountered with the monkey-patching approach under certain conditions.
 
 This library allows you to continue using Angular 1.3 or higher, while giving you the opportunity to start coding your Angular 1 applications in Angular 2 syntax. You get to keep your investment in Angular 1 while preparing for Angular 2.  
 

@@ -35,7 +35,7 @@ var angular2now = function () {
     var angularModule = angular.module;
 
     // Monkey patch angular.module
-    //angular.module = SetModule;
+    angular.module = SetModule;
 
     function SetModule () {
         /**
