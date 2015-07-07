@@ -1,6 +1,6 @@
 ## Angular 2.0 component syntax using Angular 1 and Babel
 
-## Breaking Change Warning
+### ** Breaking Change Warning **
 
 > Please note that <code>angular.module</code> is no longer being "monkey-patched" by the angular2-now library as of version 0.4.0. Please use <code>SetModule</code>, described below, instead. SetModule has the exact same syntax as angular.module. This change was necessary due to problems encountered with the monkey-patching approach under certain conditions.
 
