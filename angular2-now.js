@@ -35,7 +35,7 @@ var angular2now = function () {
     var angularModule = angular.module;
 
     // Monkey patch angular.module
-    angular.module = SetModule;
+    //angular.module = SetModule;
 
     function SetModule () {
         /**
@@ -180,9 +180,9 @@ var angular2now = function () {
     }
 
     function unCamelCase(c) {
-        var s = c.replace(/([A-Z])/g, function (a, b) {
-            return '-' + b.toLowerCase();
-        });
+        var s = c.replace(/([A-Z])/g, '-$1')
+                 .replace(/--/g, '-')
+                 .toLowerCase();
         if (s[0] === '-') s = s.slice(1);
         return s;
     }

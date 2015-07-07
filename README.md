@@ -1,10 +1,12 @@
-## Angular 2.0 component syntax using Angular 1.x and Babel
+## Angular 2.0 component syntax using Angular 1 and Babel
 
-This library allows you to continue using Angular 1.3 or higher, while giving you the opportunity to start coding your Angular 1.x applicantions in Angular 2 syntax. You get to keep your investment in Angular 1.x while preparing for Angular 2.  
+> Breaking Change Warning: Please note that <code>angular.module</code> is no longer being "monkey-patched" by the angular2-now library as of version 0.4.0. Please use <code>SetModule</code>, described below, instead. SetModule has the exact same syntax as angular.module. This change was necessary due to problems encountered with the monkey-patching approach under certain conditions.
+
+This library allows you to continue using Angular 1.3 or higher, while giving you the opportunity to start coding your Angular 1 applications in Angular 2 syntax. You get to keep your investment in Angular 1 while preparing for Angular 2.  
 
 If either of the statements below applies to you, then you need angular2-now:
 
-- You are about to start a new development in Angular 1.x and are thinking about migrating to Angular 2, when it finally arrives.
+- You are about to start a new development in Angular 1 and are thinking about migrating to Angular 2, when it finally arrives.
 
 - You just like the clean syntax of Angular 2, but don't care much for the rest of Angular 2 at this stage.
 
@@ -18,6 +20,7 @@ The following annotations have been implemented to support the Angular 2.0 compo
 - **@View** `({ template: '<div>Inline template</div>', templateUrl: 'pth/to/template.html'})`
 - **@Inject** `(['$http', myServiceClass, '$q'])`
 - **bootstrap** `(app [, config ])` 
+- **SetModule** `('my-app', ['angular-meteor'])`
 
 The annotations below are not Angular 2, as such, but for me they make coding in Angular a bit nicer. 
 
@@ -472,7 +475,7 @@ class otherService {
     // The name of the directive will be the camelCased version of the selector name.
     selector: 'file-change',
     
-    // bind is the same as scope was in Angular 1.x
+    // bind is the same as scope was in Angular 1
     // Plus, all components always use private scope.
     bind: { fileChange: '&' }
 })
@@ -523,7 +526,7 @@ class uploadedImages {
     }
 })
 @View({
-    // templateUrl works the same as in Angular 1.x directives.
+    // templateUrl works the same as in Angular 1 directives.
     templateUrl: 'client/booger.html'
 })
 @Inject(['$element'])
@@ -571,7 +574,7 @@ class bigBooger extends booger {
 // Finally, we get ready to bootstrap the app.
 
 // This assumes that the angular-meteor package is used and that your components will be 
-// created in an Angular 1.x module called "my-components". 
+// created in an Angular 1 module called "my-components". 
 SetModule('myApp', [
     'angular-meteor',
     'my-components'
