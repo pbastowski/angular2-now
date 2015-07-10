@@ -21,8 +21,9 @@ var angular2now = function () {
         MeteorMethod: MeteorMethod
     };
 
-    var $q = angular.injector(['ng']).get('$q');
-    var $log = angular.injector(['ng']).get('$log');
+    var inj = angular.injector(['ng']);
+    var $q = inj.get('$q');
+    var $log = inj.get('$log');
 
     var currentModule;
     var currentNameSpace;
@@ -170,7 +171,18 @@ var angular2now = function () {
 
     // Does a provider with a specific name exist in the current module
     function serviceExists(serviceName) {
-        return angular.injector(['ng', currentModule]).has(serviceName);
+        return !!getService(serviceName);
+    }
+
+    function getService(serviceName, moduleName) {
+        if (!moduleName)
+            moduleName = currentModule;
+
+        return angular.module(moduleName)
+            ._invokeQueue
+            .find(function (v, i) {
+                return v[0] === '$provide' && v[2][0] === serviceName
+            });
     }
 
     function camelCase(s) {
@@ -542,6 +554,17 @@ var angular2now = function () {
         // afterCall() will be called after any I/O operations have completed.
         ng2nOptions.events = options.events | {beforeCall: angular.noop, afterCall: angular.noop};
 
+        // The noConflict option allows us to control whether or not angular2-now
+        // monkey-patches angular.module.
+        //  true = don't monkey patch.
+        //  false = (default for versions < 0.4.0)  DO monkey patch angular.module
+        //          for backwards compatibility
+        if (typeof options.noConflict !== 'undefined') {
+            if (options.noConflict)
+                angular.module = angularModule;
+            else
+                angular.module = SetModule;
+        }
     }
 
     function Options(options) {
@@ -605,7 +628,7 @@ var angular2now = function () {
 
 }();
 
-// Node.js
+// Node.js style
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = angular2now;
 }
