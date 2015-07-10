@@ -384,11 +384,12 @@ class myComponent {
 
 `options` allows you to override global options on a per-method basis. These options are: 
 
-Attribute | Type |Description
+Attribute | Type | Description
 ----------|------|-------------------
-spinner	| object | exposes show() and hide() methods, that show and hide a busy-spinner
-events	| object | exposes beforeCall() and afterCall(), which will be called before and after the ajax call. Only `afterCall` is guaranteed to run after the call to the MeteorMethod completes.
-
+controllerAs | string | Allows you to specify a default controllerAs prefix to use for all components. The default prefix is the camel-cased version of the component's selector.   
+spinner	| object | Exposes show() and hide() methods, that show and hide a busy-spinner
+events	| object | Exposes beforeCall() and afterCall(), which will be called before and after the ajax call. Only `afterCall` is guaranteed to run after the call to the MeteorMethod completes.
+noConflict | boolean | **false** = (default for version < 0.4.0) monkey-patch `angular.module`, **true** = don't monkey-patch  
 For example, options can be defined at the global level like this:
 
 ```javascript

@@ -616,8 +616,8 @@ var angular2now = function () {
                         deferred.reject(err);
                     else
                         deferred.resolve(data);
-                };
-            }
+                }
+            };
 
             return target;
         }
