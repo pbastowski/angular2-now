@@ -1,0 +1,27 @@
+{
+  "name": "angular2-now",
+  "version": "0.3.4",
+  "description": "Angular 2 component syntax for Angular 1 apps",
+  "main": "angular2-now.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pbastowski/angular2-now.git"
+  },
+  "keywords": [
+    "angular",
+    "angular1",
+    "angular2",
+    "annotations",
+    "decorators",
+    "babel"
+  ],
+  "author": "Paul Bastowski <pbastowski@gmail.com> (https://github.com/pbastowski)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pbastowski/angular2-now/issues"
+  },
+  "homepage": "https://github.com/pbastowski/angular2-now"
+}
