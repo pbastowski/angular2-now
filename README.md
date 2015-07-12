@@ -48,11 +48,17 @@ You may want to see the following github repositories for some examples of usage
 Yes, you can. The angular2-now.js library works with both ES6 (Babel) and plain ES5. ES6 examples are in this README and also in Code Demos, above. For an ES5 usage demo see [Plunker](http://plnkr.co/edit/uxV781?p=preview).
 
 
-#### Bower Installation
- 
+#### Installation
+
+Angular2-now is available on npm, jspm and Bower. 
+
+
+    npm install angular2-now
+
+    jspm install npm:angular2-now
 
     bower install angular2-now
-    
+
 
 To use this library, include it in your Angular 1.3 (or higher) project, ensuring that it loads before it's functions are used. `window.angular2now` gives you access to all the annotations. You can import the functions you need into each module that requires them, like this:
 
