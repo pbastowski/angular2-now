@@ -552,7 +552,7 @@ var angular2now = function () {
         // events expose beforeCall() and afterCall().
         // beforeCall() will be called before any I/O operations.
         // afterCall() will be called after any I/O operations have completed.
-        ng2nOptions.events = options.events | {beforeCall: angular.noop, afterCall: angular.noop};
+        ng2nOptions.events = options.events || {beforeCall: angular.noop, afterCall: angular.noop};
 
         // The noConflict option allows us to control whether or not angular2-now
         // monkey-patches angular.module.
