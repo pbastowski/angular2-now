@@ -606,7 +606,7 @@ var angular2now = function () {
 
                 deferred.promise.finally(function() {
                     spinner.hide();
-                    optionsevents.afterCall();  // Call optional events.afterCall()
+                    options.events.afterCall();  // Call optional events.afterCall()
                 });
 
                 return deferred.promise;
