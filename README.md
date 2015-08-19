@@ -45,7 +45,11 @@ You may want to see the following github repositories for some examples of usage
 
 ### Can I use this library outside of Meteor?
 
-Yes, you can. The angular2-now.js library works with both ES6 (Babel) and plain ES5. ES6 examples are in this README and also in Code Demos, above. For an ES5 usage demo see [Plunker](http://plnkr.co/edit/uxV781?p=preview).
+Yes, you can. The angular2-now.js library works with both ES6 (Babel) and plain ES5.
+ 
+Here is an ES6 example [ES6 Angular2-now](http://plnkr.co/edit/JhHlOr?p=preview). Also, there are examples in this README and in Code Demos, above. 
+
+For an ES5 usage demo see [ES5 Agular2-now](http://plnkr.co/edit/uxV781?p=preview).
 
 
 #### Installation
