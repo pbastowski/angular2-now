@@ -20,7 +20,7 @@ The following annotations have been implemented to support the Angular 2.0 compo
 
 - **@Component** `({ selector: 'tag-name', bind: { a: '=', etc: '@' }, injectables: ['$http', myServiceClass] })`
 - **@View** `({ template: '<div>Inline template</div>', templateUrl: 'pth/to/template.html'})`
-- **@Inject** `(['$http', myServiceClass, '$q'])`
+- **@Inject** `(['$http', myServiceClass, '$q'])` or `('$http', myServiceClass, '$q')
 - **bootstrap** `(app [, config ])` 
 - **SetModule** `('my-app', ['angular-meteor'])`
 
