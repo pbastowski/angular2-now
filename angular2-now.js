@@ -199,16 +199,34 @@ var angular2now = function () {
         return s;
     }
 
-    function Inject(deps) {
-        if (typeof deps !== 'undefined' && !(deps instanceof Array)) {
-            throw new Error('@Inject: dependencies must be passed as an array.');
+    // 2015-09-01 Replaced the whole Inject function with a new more flexible version.
+    // Thanks to Steven Weingärtner for his code, which works with both Classes and Methods,
+    // as well as preserving injectables from a parent class (when extending a parent class).
+    // New features:
+    // - Dependencies can be passed in as arguments, not requiring the array wrapper. The
+    //   original syntax with the array wrapper is still supported.
+    // - Methods of a class can now be Injected also
+    // - Child classes will inherit the parent class's injectables, which will be appended
+    //   to the end of the child's dependencies
+    function Inject() {
+        var deps;
+        if (arguments[0] instanceof Array)
+            deps = arguments[0];
+        else
+            deps = Array.prototype.slice.call(arguments);
+
+        if (deps.length === 0) {
+            throw new Error('@Inject: No dependencies passed in');
         }
 
-        deps = deps || [];
+        return function (target, name, descriptor) {
+            var injectable = target;
+            if (descriptor)
+                injectable = descriptor.value;
 
-        return function (target) {
-            if (!target.$inject)
-                target.$inject = [];
+            var existingInjects = injectable.$inject;
+
+            injectable.$inject = [];
 
             angular.forEach(deps, function (dep) {
                 // Namespace any injectables without an existing nameSpace prefix and also
@@ -216,11 +234,16 @@ var angular2now = function () {
                 if (dep[0] !== '$' && dep[0] !== '@' && dep.indexOf('_') === -1)
                     dep = nameSpace(dep);
 
-                if (target.$inject.indexOf(dep) === -1)
-                    target.$inject.push(dep);
+                if (injectable.$inject.indexOf(dep) === -1) {
+                    injectable.$inject.push(dep);
+                }
             });
 
-            return target;
+            if (existingInjects) {
+                injectable.$inject = injectable.$inject.concat(existingInjects);
+            }
+
+            return descriptor || target;
         };
     }
 
