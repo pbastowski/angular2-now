@@ -224,7 +224,10 @@ var angular2now = function () {
             if (descriptor)
                 injectable = descriptor.value;
 
-            var existingInjects = injectable.$inject;
+            if (!injectable)
+                throw new TypeError('@Inject can only be used with classes or class methods.')
+
+             var existingInjects = injectable.$inject;
 
             injectable.$inject = [];
 
