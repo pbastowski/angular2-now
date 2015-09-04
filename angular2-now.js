@@ -23,7 +23,7 @@ var angular2now = function () {
 
     var inj = angular.injector(['ng']);
     var $q = inj.get('$q');
-    var $log = inj.get('$log');
+    //var $log = inj.get('$log');
 
     var currentModule;
     var currentNameSpace;
@@ -251,10 +251,6 @@ var angular2now = function () {
     }
 
 
-    var _templateCacheTranscluded = {};
-    var _templateCache;
-    var _templateCacheModule;
-
     function View(options) {
         options = options || {};
         // Allow shorthand notation of just passing the templateUrl as a string
@@ -276,30 +272,6 @@ var angular2now = function () {
             // Check for the new <content> tag and add ng-transclude to it, if not there.
             if (target.template)
                 target.template = transcludeContent(target.template);
-
-            // Check for <content> in cached templates
-            if (! _templateCache || ! _templateCacheModule) {
-                // The templates will be cached in the module 'angular-meteor', if Meteor is used, otherwise
-                // we expect them to be in the currentModule.
-                // todo: revise this - the user may be loading the templates into a different module altogether
-                _templateCacheModule = ('undefined' === typeof Meteor) ? currentModule : 'angular-meteor';
-                var _templateCache = angular.injector(['ng', _templateCacheModule]).get('$templateCache');
-            }
-
-            if (target.templateUrl && !_templateCacheTranscluded[target.templateUrl]) {
-                var template = _templateCache.get(target.templateUrl);
-                if (template && /<content/i.test(template) && !/<content ng-transclude/i.test(template)) {
-                    template = transcludeContent(template);
-                    _templateCache.put(target.templateUrl, template);
-
-                    $log.log('@@ Adding ng-transclude to: ', target.templateUrl);
-
-                    // Remember that we have already transcluded this template and don't do it again
-                    _templateCacheTranscluded[target.templateUrl] = true;
-                }
-                //else
-                //    throw new Error('@View: Invalid templateUrl: "' + target.templateUrl + '".');
-            }
 
             return target;
         };
