@@ -180,9 +180,9 @@ var angular2now = function () {
 
         return angular.module(moduleName)
             ._invokeQueue
-            .find(function (v, i) {
+            .filter(function (v, i) {
                 return v[0] === '$provide' && v[2][0] === serviceName
-            });
+            })[0];
     }
 
     function camelCase(s) {
@@ -248,7 +248,9 @@ var angular2now = function () {
     }
 
 
-    //var _templateCacheTranscluded = {};
+    var _templateCacheTranscluded = {};
+    var _templateCache;
+    var _templateCacheModule;
 
     function View(options) {
         options = options || {};
@@ -273,25 +275,28 @@ var angular2now = function () {
                 target.template = transcludeContent(target.template);
 
             // Check for <content> in cached templates
-            //if ('undefined' === typeof Meteor)
-            //    var _templateCache = angular.injector(['ng', currentModule]).get('$templateCache');
-            //else
-            //    var _templateCache = angular.injector(['ng', 'angular-meteor', currentModule]).get('$templateCache');
-            //
-            //if (target.templateUrl && !_templateCacheTranscluded[target.templateUrl]) {
-            //    var template = _templateCache.get(target.templateUrl);
-            //    if (template && /<content/i.test(template) && !/<content ng-transclude/i.test(template)) {
-            //        template = transcludeContent(template);
-            //        _templateCache.put(target.templateUrl, template);
-            //
-            //        $log.log('@@ Adding ng-transclude to: ', target.templateUrl);
-            //
-            //        // Remember that we have already transcluded this template and don't do it again
-            //        _templateCacheTranscluded[target.templateUrl] = true;
-            //    }
-            //    //else
-            //    //    throw new Error('@View: Invalid templateUrl: "' + target.templateUrl + '".');
-            //}
+            if (! _templateCache || ! _templateCacheModule) {
+                // The templates will be cached in the module 'angular-meteor', if Meteor is used, otherwise
+                // we expect them to be in the currentModule.
+                // todo: revise this - the user may be loading the templates into a different module altogether
+                _templateCacheModule = ('undefined' === typeof Meteor) ? currentModule : 'angular-meteor';
+                var _templateCache = angular.injector(['ng', _templateCacheModule]).get('$templateCache');
+            }
+
+            if (target.templateUrl && !_templateCacheTranscluded[target.templateUrl]) {
+                var template = _templateCache.get(target.templateUrl);
+                if (template && /<content/i.test(template) && !/<content ng-transclude/i.test(template)) {
+                    template = transcludeContent(template);
+                    _templateCache.put(target.templateUrl, template);
+
+                    $log.log('@@ Adding ng-transclude to: ', target.templateUrl);
+
+                    // Remember that we have already transcluded this template and don't do it again
+                    _templateCacheTranscluded[target.templateUrl] = true;
+                }
+                //else
+                //    throw new Error('@View: Invalid templateUrl: "' + target.templateUrl + '".');
+            }
 
             return target;
         };
