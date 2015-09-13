@@ -586,7 +586,7 @@ var angular2now = function () {
         return function (target, name, descriptor) {
 
             // Create a method that calls the back-end
-            target[name] = function () {
+            descriptor.value = function () {
                 var argv = Array.prototype.slice.call(arguments);
                 var deferred = $q.defer();
 
@@ -622,7 +622,7 @@ var angular2now = function () {
                 }
             };
 
-            return target;
+            return descriptor;
         }
 
     }
