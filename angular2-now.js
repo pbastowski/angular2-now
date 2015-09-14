@@ -4,16 +4,18 @@ var angular2now = function () {
     var angular2now = {
         SetModule: SetModule,
 
-        Component:  Component,
-        Directive:  Component,
-        View:       View,
-        Inject:     Inject,
-        Controller: Controller,
-        Service:    Service,
-        Filter:     Filter,
-        Injectable: Service,
-        bootstrap:  bootstrap,
-        State:      State,
+        Component:   Component,
+        Directive:   Component,
+        ScopeShared: ScopeShared,
+        ScopeNew:    ScopeNew,
+        View:        View,
+        Inject:      Inject,
+        Controller:  Controller,
+        Service:     Service,
+        Filter:      Filter,
+        Injectable:  Service,
+        bootstrap:   bootstrap,
+        State:       State,
 
         options: options,
         Options: Options,
@@ -78,6 +80,24 @@ var angular2now = function () {
         }
 
         return nsName;
+    }
+
+    // Cancels out the automatic creation of isolate scope for the directive,
+    // because Angular 1.x allows only one isolate scope directive per element.
+    // This is useful when actually creating directives, which add behaviour
+    // to an existing element, as opposed to components which are stand alone
+    // bits of html and behaviour.
+    // The other way to do this is to pass "scope: undefined" to @Component.
+    function ScopeShared (target) {
+        target.scope = undefined;
+        return target
+    }
+
+    // Requests a new scope to be created when the directive is created.
+    // The other way to do this is to pass "scope: true" to @Component.
+    function ScopeNew (target) {
+        target.scope = true;
+        return target
     }
 
     function Component(options) {
@@ -394,7 +414,7 @@ var angular2now = function () {
      *
      * @param options   literal object
      *      name:           name of the state
-     *      url:            url associted with this state
+     *      url:            url associated with this state
      *      template:       template
      *      templateUrl:    templateUrl
      *      defaultRoute:   truthy = .otherwise(url)
@@ -402,8 +422,8 @@ var angular2now = function () {
      *      resolve:        Literal object, see ui-router resolve
      *      abstract:       true/false
      *      params:         Literal object, see ui-router doco
-     *      controller:     A controller is automaticaly assigned, but if you nee
-     *                      finer control then you can assign your won controller
+     *      controller:     A controller is automatically assigned, but if you need
+     *                      finer control then you can assign your own controller
      *
      * If a class is annotated then it is assumed to be the controller and
      * the state name will be used as the name of the injectable service
