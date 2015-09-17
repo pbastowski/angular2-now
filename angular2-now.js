@@ -100,6 +100,22 @@ var angular2now = function () {
         return target
     }
 
+    //function Directive(options) {
+    //
+    //    // A string passed is assumed to be the attribute name of the directive.
+    //    if (typeof options === 'string')
+    //        options = { selector: options };
+    //
+    //    // Directives have shared scope by default (scope:undefined).
+    //    // Optionally they can have a new scope created (scope: true).
+    //    // If you require an isolate scope for your directive then
+    //    // pass "scope: { ... }" in options.
+    //    if (options && !options.hasOwnProperty('scope'))
+    //        angular.merge(options, { scope: undefined });
+    //
+    //    return Component(options);
+    //}
+
     function Component(options) {
         options = options || {};
         // Allow shorthand notation of just passing the selector name as a string
@@ -381,6 +397,10 @@ var angular2now = function () {
             target = {selector: target};
         }
 
+        // Mark this class as a bootstrap component. This allows @State
+        // to handle it correctly.
+        target.bootstrap = true;
+
         var bootModule = target.selector || currentModule;
 
         if (bootModule !== currentModule)
@@ -500,28 +520,35 @@ var angular2now = function () {
                             // ALso, parameters that do not appear in the URL can be configured here.
                             params:   options.params,
 
-                            // The bootstrap component should always be abstract, otherwise weird stuff happens.
-
+                            // The State applied to a bootstrap component can be abstract,
+                            // if you don't want that state to be able to activate.
                             abstract: options.abstract,
 
                             templateUrl: options.templateUrl,
 
-                            // If this is an abstract state then we just provide a <div ui-view> for the children
-                            template: options.templateUrl ? undefined : options.template || (options.abstract ? '<div ui-view=""></div>' : target.selector ? '<' + target.selector + '></' + target.selector + '>' : ''),
+                            // This is the "inline" template, as opposed to the templateUrl.
+                            // 1) If options.templateUrl is specified then template will be set to undefined.
+                            // 2) If options.template is provided then it will be used.
+                            // 3) Otherwise, if this is a component, but not the bootstrap(**) component,
+                            //    then we use it's selector to create the inline template "<selector></selector>".
+                            // 4) Otherwise, we provide the following default template "<div ui-view></div>".
+                            //(**) The bootstrap component will be rendered by Angular directly and must not
+                            //     be rendered again by ui-router, or you will literally see it twice.
+                            // todo: allow the user to specify their own div/span instead of forcing "div(ui-view)"
+                            template: options.templateUrl ? undefined : options.template || ((target.template || target.templateUrl) && !target.bootstrap && target.selector ? target.selector.replace(/^(.*)$/, '<$1></$1>') : '<div ui-view=""></div>'),
 
                             // Do we need to resolve stuff? If so, then we also provide a controller to catch the resolved data.
                             resolve:    resolves,
 
                             // A user supplied controller OR
-                            // A class, if no Component was annotated (thus no selector is available) OR
-                            // A proxy controller, if resolves were requested with an annotated Component
+                            // An internally created proxy controller, if resolves were requested for a Component.
                             controller: userController || (doResolve ? controller : undefined),
-                            //controller: options.controller || (!target.selector ? target : undefined) || (doResolve ? controller : undefined)
 
                             // onEnter and onExit events
                             onEnter: options.onEnter,
                             onExit:  options.onExit
                         };
+
 
                         // Create the state
                         $stateProvider.state(options.name, sdo);
