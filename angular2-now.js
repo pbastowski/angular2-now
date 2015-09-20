@@ -544,6 +544,10 @@ var angular2now = function () {
                             // An internally created proxy controller, if resolves were requested for a Component.
                             controller: userController || (doResolve ? controller : undefined),
 
+                            // Optionally controllerAs can be specifically set for those situations,
+                            // when we use @State on a class and there is no @Component defined.
+                            controllerAs: target.controllerAs || options.controllerAs || (ng2nOptions.hasOwnProperty('controllerAs') && !target.hasOwnProperty('selector') ? ng2nOptions.controllerAs : undefined),
+
                             // onEnter and onExit events
                             onEnter: options.onEnter,
                             onExit:  options.onExit
