@@ -25,7 +25,6 @@ var angular2now = function () {
 
     var inj = angular.injector(['ng']);
     var $q = inj.get('$q');
-    //var $log = inj.get('$log');
 
     var currentModule;
     var currentNameSpace;

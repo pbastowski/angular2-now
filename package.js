@@ -1,6 +1,6 @@
 Package.describe({
     name:          'pbastowski:angular2-now',
-    version:       '0.3.8',
+    version:       '0.3.9',
     summary:       'Use Angular 2 @Component syntax with Angular 1 and Babel',
     git:           'https://github.com/pbastowski/angular2-now.git',
     documentation: 'README.md'
@@ -8,10 +8,8 @@ Package.describe({
 
 Package.onUse(function (api) {
     api.versionsFrom('1.1.0.2');
-    api.use('angular@1.0.0-rc.6', 'client');
-    api.use('pbastowski:angular-babel@0.1.9', 'client');
-    api.imply('angular@1.0.0-rc.6', 'client');
-    api.imply('pbastowski:angular-babel@0.1.9', 'client');
+    api.use('angular@1.0.0-rc.11', 'client');
+    api.imply('angular@1.0.0-rc.11', 'client');
     api.addFiles(['angular2-now.js', 'exports.js'], ['client']);
     api.export(['angular2now']);
 });
