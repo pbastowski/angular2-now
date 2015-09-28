@@ -23,6 +23,8 @@ var angular2now = function () {
         MeteorMethod: MeteorMethod
     };
 
+    var isCordova = typeof cordova !== 'undefined';
+
     var inj = angular.injector(['ng']);
     var $q = inj.get('$q');
 
@@ -409,7 +411,7 @@ var angular2now = function () {
             config = {strictDi: false};
 
         if (!Meteor) var Meteor = {};
-        if (Meteor.isCordova)
+        if (isCordova)
             angular.element(document).on("deviceready", onReady);
         else
             angular.element(document).ready(onReady);
