@@ -125,6 +125,36 @@ var angular2now = function () {
 
         return function (target) {
 
+            // ------------ The code below defers th controller --------
+            //console.log('---- before: ', options.selector, target);
+                // Save the original prototype
+                var oldproto = target.prototype;
+    
+                // Save the original constructor, so we can call it later
+                var construct = target.prototype.constructor;
+    
+                // Save any static properties
+                var staticProps = {};
+                for (var i in target)
+                    if (target.hasOwnProperty(i)) staticProps[i] = target[i];
+    
+                // Create a new constructor, which holds the injected deps.
+                var injectedDeps;
+                target = function stub() {
+                    this.injectedDeps = Array.prototype.slice.call(arguments);
+                    console.log('@Component: Stub constructor: ', this.injectedDeps);
+                }
+    
+                // Restore the original prototype
+                target.prototype = oldproto;
+    
+                // Restore saved static properties
+                for (var i in staticProps)
+                    target[i] = staticProps[i];
+            
+            //console.log('---- after: ', options.selector, target);
+            // ---------------------------------------------------------
+            
             // service injections, which could also have been specified by using @Inject
             if (options.injectables && options.injectables instanceof Array)
                 target = Inject(options.injectables)(target);
@@ -181,6 +211,9 @@ var angular2now = function () {
                 link:             options.link || target.link || link
             };
 
+            if (target.prototype.$$tracked)
+                console.log('@Component: ', target.selector, target.prototype.$$tracked, target.$inject);
+
             try {
                 angular.module(currentModule)
                     .directive(options.selector, function () {
@@ -191,17 +224,69 @@ var angular2now = function () {
             }
 
             return target;
+            
+            function controller () {
+                var args = Array.prototype.slice.call(arguments);
+                
+            }
 
             function link(scope, el, attr, controllers) {
                 // Create a service with the same name as the selector
                 // That holds a reference to our component
                 //angular.module(currentModule).value(camelCase(target.selector), controllers[0]);
 
+                // Activate watchers for the Meteor Tracker
+                if (target.prototype.$$tracked) {
+                    for (var dep in target.prototype.$$tracked) {
+                        var watched = target.selector + '.' + dep;
+                        console.log('### link: watch ', watched);
+                        scope.$watch(watched, function (nv, ov) {
+                            if (nv !== ov) 
+                                target.prototype.$$tracked[dep].changed();
+                        });
+                        target.prototype.$$tracked[dep].depend();
+                    }
+                }
+                
+                // Call the original constructor
+                console.log('<<< injectedDeps: ', target.selector, controllers[0].injectedDeps, controllers[0]);
+                construct.apply(controllers[0], controllers[0].injectedDeps);
+                
                 // Alternate syntax for the injection of other component's controllers
                 if (controllers[0].$dependson) {
                     controllers[0].$dependson.apply(controllers[0], controllers.slice(1));
                 }
             }
+
+            //function deferController(target, injectedDeps) {
+            //    // save the original prototype
+            //    var oldproto = target.prototype;
+            //
+            //    // save the original constructor, so we can call it later
+            //    var construct = target.prototype.constructor;
+            //
+            //    // Save any previous decorated values
+            //    var decorations = {};
+            //    for (var i in target)
+            //        if (target.hasOwnProperty(i)) decorations[i] = target[i];
+            //
+            //    // Create a new constructor, which holds the injected deps.
+            //    var injectedDeps;
+            //    target = function stub() {
+            //        var injectedDeps = Array.prototype.slice.call(arguments);
+            //        console.log('Stub constructor', injectedDeps, 'xxx=', xxx, this);
+            //    }
+            //
+            //    // Restore the original prototype
+            //    target.prototype = oldproto;
+            //
+            //    // Restore any previous decorations and their values
+            //    for (var i in decorations)
+            //        target[i] = decorations[i];
+            //
+            //    return target;
+            //}
+
         };
 
     }
