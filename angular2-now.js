@@ -175,7 +175,7 @@ var angular2now = function () {
                 template:         options.template,
                 templateUrl:      options.templateUrl,
                 controller:       target,
-                replace:          false,
+                replace:          options.replace || false,
                 transclude:       /ng-transclude/i.test(options.template) || target.transclude,
                 require:          options.require || target.require || requiredControllers,
                 link:             options.link || target.link || link
