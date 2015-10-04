@@ -25,6 +25,8 @@ var angular2now = function () {
 
     var isCordova = typeof cordova !== 'undefined';
 
+    var slice = Array.prototype.slice;
+
     var inj = angular.injector(['ng']);
     var $q = inj.get('$q');
 
@@ -125,36 +127,10 @@ var angular2now = function () {
 
         return function (target) {
 
-            // ------------ The code below defers th controller --------
-            //console.log('---- before: ', options.selector, target);
-                // Save the original prototype
-                var oldproto = target.prototype;
-    
-                // Save the original constructor, so we can call it later
-                var construct = target.prototype.constructor;
-    
-                // Save any static properties
-                var staticProps = {};
-                for (var i in target)
-                    if (target.hasOwnProperty(i)) staticProps[i] = target[i];
-    
-                // Create a new constructor, which holds the injected deps.
-                var injectedDeps;
-                target = function stub() {
-                    this.injectedDeps = Array.prototype.slice.call(arguments);
-                    console.log('@Component: Stub constructor: ', this.injectedDeps);
-                }
-    
-                // Restore the original prototype
-                target.prototype = oldproto;
-    
-                // Restore saved static properties
-                for (var i in staticProps)
-                    target[i] = staticProps[i];
-            
-            //console.log('---- after: ', options.selector, target);
-            // ---------------------------------------------------------
-            
+            // Create a stub controller and substitute it for the target's constructor,
+            // so that we can call the target's constructor later, within the link function.
+            target = deferController (target, controller);
+
             // service injections, which could also have been specified by using @Inject
             if (options.injectables && options.injectables instanceof Array)
                 target = Inject(options.injectables)(target);
@@ -172,6 +148,10 @@ var angular2now = function () {
             // The template can be passed in from the @View decorator
             options.template = target.template || undefined;
             options.templateUrl = target.templateUrl || undefined;
+
+            // Save the full injection string, because we're about to chop it up below.
+            // The full list is required when we instantiate the real controller in the link function.
+            target.$originalInject = target.$inject;
 
             // Build the require array.
             // Our controller needs the same injections as the component's controller,
@@ -205,14 +185,11 @@ var angular2now = function () {
                 template:         options.template,
                 templateUrl:      options.templateUrl,
                 controller:       target,
-                replace:          false,
+                replace:          options.replace || false,
                 transclude:       /ng-transclude/i.test(options.template) || target.transclude,
                 require:          options.require || target.require || requiredControllers,
                 link:             options.link || target.link || link
             };
-
-            if (target.prototype.$$tracked)
-                console.log('@Component: ', target.selector, target.prototype.$$tracked, target.$inject);
 
             try {
                 angular.module(currentModule)
@@ -224,68 +201,89 @@ var angular2now = function () {
             }
 
             return target;
-            
-            function controller () {
-                var args = Array.prototype.slice.call(arguments);
-                
+
+            // The stub controller below saves injected objects, so we can re-inject them
+            // into the "real" controller when the link function executes.
+            // This allows me to add stuff to the controller and it's "this", which are required
+            // for some future functionality.
+            function controller() {
+                this.$$injectedDeps = slice.call(arguments);
+            }
+
+            // This function allows me to replace a component's "real" constructor with my own.
+            // I do this, because I want to instantiate the real constructor in teh link function,
+            // after Angular has wired everything up together. Also, this enables me to inject
+            // other component's controllers into the constructor, the same way as you would
+            // inject a service.
+            // The component's original constructor is assigned to the init method of the
+            // component's class. It is the init method that is called within the link function.
+            function deferController (target, controller) {
+                // Save the original prototype
+                var oldproto = target.prototype;
+
+                // Save the original constructor, so we can call it later
+                var construct = target.prototype.constructor;
+
+                // Save any static properties
+                var staticProps = {};
+                for (var i in target)
+                    if (target.hasOwnProperty(i)) staticProps[i] = target[i];
+
+                // Assign a new constructor, which holds the injected deps.
+                target = controller;
+
+                // Restore the original prototype
+                target.prototype = oldproto;
+
+                // Restore saved static properties
+                for (var i in staticProps)
+                    target[i] = staticProps[i];
+
+                if (!target.prototype.init)
+                    target.prototype.init = construct;
+
+                return target;
             }
 
             function link(scope, el, attr, controllers) {
-                // Create a service with the same name as the selector
-                // That holds a reference to our component
-                //angular.module(currentModule).value(camelCase(target.selector), controllers[0]);
+                // Get a reference to the stub controller
+                var stubController = controllers[0];
 
-                // Activate watchers for the Meteor Tracker
-                if (target.prototype.$$tracked) {
-                    for (var dep in target.prototype.$$tracked) {
-                        var watched = target.selector + '.' + dep;
-                        console.log('### link: watch ', watched);
-                        scope.$watch(watched, function (nv, ov) {
-                            if (nv !== ov) 
-                                target.prototype.$$tracked[dep].changed();
-                        });
-                        target.prototype.$$tracked[dep].depend();
-                    }
+                // We need to support the old syntax of injecting component controllers using
+                // "this.$dependson".
+                if (! target.hasOwnProperty('oldSyntax') )
+                    target.oldSyntax = stubController.init.toString().indexOf('this.$dependson') !== -1;
+
+                // So, this is the old way
+                if (target.oldSyntax) {
+                    // Call the original constructor, which is now called init, injecting all
+                    // requested dependencies that are not component controllers.
+                    stubController.init.apply(stubController, stubController.$$injectedDeps);
+
+                    // Alternate syntax for the injection of other component's controllers
+                    // So, this is where we inject any requested component controllers.
+                    stubController.$dependson.apply(stubController, controllers.slice(1));
                 }
-                
-                // Call the original constructor
-                console.log('<<< injectedDeps: ', target.selector, controllers[0].injectedDeps, controllers[0]);
-                construct.apply(controllers[0], controllers[0].injectedDeps);
-                
-                // Alternate syntax for the injection of other component's controllers
-                if (controllers[0].$dependson) {
-                    controllers[0].$dependson.apply(controllers[0], controllers.slice(1));
+                else
+                {
+                    // Rebuild the injected array using the $$injectedDeps and
+                    // the controllers received in this link function.
+                    var inject = [];
+                    var ctlCounter=1; // start with the second injected controller (self if first)
+                    var depCounter=0; // start with the first object in $$injectedDeps
+                    for (var dep in target.$originalInject) {
+                        if ( /^@[^]{0,2}/.test(target.$originalInject[dep]) ) {
+                            inject.push(controllers[ctlCounter]);
+                            ctlCounter++;
+                        } else
+                            inject.push(stubController.$$injectedDeps[depCounter++])
+                    }
+
+                    // Call the original constructor, which is now called init, injecting all the
+                    // dependencies requested.
+                    stubController.init.apply(stubController, inject);
                 }
             }
-
-            //function deferController(target, injectedDeps) {
-            //    // save the original prototype
-            //    var oldproto = target.prototype;
-            //
-            //    // save the original constructor, so we can call it later
-            //    var construct = target.prototype.constructor;
-            //
-            //    // Save any previous decorated values
-            //    var decorations = {};
-            //    for (var i in target)
-            //        if (target.hasOwnProperty(i)) decorations[i] = target[i];
-            //
-            //    // Create a new constructor, which holds the injected deps.
-            //    var injectedDeps;
-            //    target = function stub() {
-            //        var injectedDeps = Array.prototype.slice.call(arguments);
-            //        console.log('Stub constructor', injectedDeps, 'xxx=', xxx, this);
-            //    }
-            //
-            //    // Restore the original prototype
-            //    target.prototype = oldproto;
-            //
-            //    // Restore any previous decorations and their values
-            //    for (var i in decorations)
-            //        target[i] = decorations[i];
-            //
-            //    return target;
-            //}
 
         };
 
@@ -335,7 +333,7 @@ var angular2now = function () {
         if (arguments[0] instanceof Array)
             deps = arguments[0];
         else
-            deps = Array.prototype.slice.call(arguments);
+            deps = slice.call(arguments);
 
         if (deps.length === 0) {
             throw new Error('@Inject: No dependencies passed in');
@@ -453,7 +451,7 @@ var angular2now = function () {
                 .filter(nameSpace(options.name), filterFunc);
 
             function filterFunc() {
-                var args = Array.prototype.slice.call(arguments);
+                var args = slice.call(arguments);
                 var f = new (Function.prototype.bind.apply(target, [null].concat(args)));
                 return f;
             }
@@ -654,7 +652,7 @@ var angular2now = function () {
 
                         // Populate the published service with the resolved values
                         function controller() {
-                            var args = Array.prototype.slice.call(arguments);
+                            var args = slice.call(arguments);
 
                             // This is the service that we "unshifted" earlier
                             var localScope = args[0];
@@ -724,7 +722,7 @@ var angular2now = function () {
 
             // Create a method that calls the back-end
             descriptor.value = function () {
-                var argv = Array.prototype.slice.call(arguments);
+                var argv = slice.call(arguments);
                 var deferred = $q.defer();
 
                 if (typeof spinner === 'string') {
