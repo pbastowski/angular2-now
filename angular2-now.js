@@ -5,7 +5,7 @@ var angular2now = function () {
         SetModule: SetModule,
 
         Component:   Component,
-        Directive:   Component,
+        Directive:   Directive,
         ScopeShared: ScopeShared,
         ScopeNew:    ScopeNew,
         View:        View,
@@ -85,6 +85,11 @@ var angular2now = function () {
         return nsName;
     }
 
+    // @ScopeShared decorator function
+    // Usage:
+    //     @Component(...)
+    //     @ScopeShared
+    //     class MyComponent { }
     // Cancels out the automatic creation of isolate scope for the directive,
     // because Angular 1.x allows only one isolate scope directive per element.
     // This is useful when actually creating directives, which add behaviour
@@ -96,6 +101,11 @@ var angular2now = function () {
         return target
     }
 
+    // @ScopeNew decorator function
+    // Usage:
+    //     @Component(...)
+    //     @ScopeNew
+    //     class MyComponent { }
     // Requests a new scope to be created when the directive is created.
     // The other way to do this is to pass "scope: true" to @Component.
     function ScopeNew (target) {
@@ -103,22 +113,34 @@ var angular2now = function () {
         return target
     }
 
-    //function Directive(options) {
-    //
-    //    // A string passed is assumed to be the attribute name of the directive.
-    //    if (typeof options === 'string')
-    //        options = { selector: options };
-    //
-    //    // Directives have shared scope by default (scope:undefined).
-    //    // Optionally they can have a new scope created (scope: true).
-    //    // If you require an isolate scope for your directive then
-    //    // pass "scope: { ... }" in options.
-    //    if (options && !options.hasOwnProperty('scope'))
-    //        angular.merge(options, { scope: undefined });
-    //
-    //    return Component(options);
-    //}
+    // @Directive decorator function
+    // A directive differs from a component in that it is an attribute on an existing element.
+    // This allows the directive to add behaviour to an existing element, without replacing that
+    // element entirely.
+    //     <div this-is-a-directive></div>
+    //     <this-is-a-component></this-is-a-component>
+    // Whereas a component is expected to have isolate scope, a directive is expected to have
+    // shared scope (mainly because Angular only allows one isolate scope per element).
+    function Directive(options) {
 
+        // A string passed is assumed to be the attribute name of the directive, otherwise an
+        // options object is expected.
+        if (typeof options === 'string')
+            options = { selector: options };
+
+        // Directives have shared scope by default (scope:undefined).
+        // Optionally they can have a new scope created (scope: true).
+        // If you require an isolate scope for your directive then
+        // pass "scope: { ... }" in options.
+        if (options && !options.hasOwnProperty('scope'))
+            angular.merge(options, { scope: undefined });
+
+        return Component(options);
+    }
+
+
+    // @Component decorator function
+    //
     function Component(options) {
         options = options || {};
         // Allow shorthand notation of just passing the selector name as a string
@@ -204,7 +226,7 @@ var angular2now = function () {
 
             // The stub controller below saves injected objects, so we can re-inject them
             // into the "real" controller when the link function executes.
-            // This allows me to add stuff to the controller and it's "this", which are required
+            // This allows me to add stuff to the controller and it's "this", which is required
             // for some future functionality.
             function controller() {
                 this.$$injectedDeps = slice.call(arguments);
@@ -239,8 +261,12 @@ var angular2now = function () {
                 for (var i in staticProps)
                     target[i] = staticProps[i];
 
-                if (!target.prototype.init)
-                    target.prototype.init = construct;
+                // Store the original constructor under the name $$init,
+                // which we will call in the link function.
+                target.prototype.$$init = construct;
+
+                // Hide $$init from the user's casual inspections of the controller
+                //Object.defineProperty(target.prototype, "$$init", {enumerable: false})
 
                 return target;
             }
@@ -249,39 +275,28 @@ var angular2now = function () {
                 // Get a reference to the stub controller
                 var stubController = controllers[0];
 
-                // We need to support the old syntax of injecting component controllers using
-                // "this.$dependson".
-                if (! target.hasOwnProperty('oldSyntax') )
-                    target.oldSyntax = stubController.init.toString().indexOf('this.$dependson') !== -1;
-
-                // So, this is the old way
-                if (target.oldSyntax) {
-                    // Call the original constructor, which is now called init, injecting all
-                    // requested dependencies that are not component controllers.
-                    stubController.init.apply(stubController, stubController.$$injectedDeps);
-
-                    // Alternate syntax for the injection of other component's controllers
-                    // So, this is where we inject any requested component controllers.
-                    stubController.$dependson.apply(stubController, controllers.slice(1));
+                // Rebuild the injected array using the $$injectedDeps and
+                // the controllers received in this link function.
+                var inject = [];
+                var ctlCounter=1; // start with the second injected controller (self if first)
+                var depCounter=0; // start with the first object in $$injectedDeps
+                for (var dep in target.$originalInject) {
+                    if ( /^@[^]{0,2}/.test(target.$originalInject[dep]) ) {
+                        inject.push(controllers[ctlCounter]);
+                        ctlCounter++;
+                    } else
+                        inject.push(stubController.$$injectedDeps[depCounter++]);
                 }
-                else
-                {
-                    // Rebuild the injected array using the $$injectedDeps and
-                    // the controllers received in this link function.
-                    var inject = [];
-                    var ctlCounter=1; // start with the second injected controller (self if first)
-                    var depCounter=0; // start with the first object in $$injectedDeps
-                    for (var dep in target.$originalInject) {
-                        if ( /^@[^]{0,2}/.test(target.$originalInject[dep]) ) {
-                            inject.push(controllers[ctlCounter]);
-                            ctlCounter++;
-                        } else
-                            inject.push(stubController.$$injectedDeps[depCounter++])
-                    }
 
-                    // Call the original constructor, which is now called init, injecting all the
-                    // dependencies requested.
-                    stubController.init.apply(stubController, inject);
+                // Call the original constructor, which is now called init, injecting all the
+                // dependencies requested.
+                stubController.$$init.apply(stubController, inject);
+
+                // Support the old syntax for the injection of other component's controllers.
+                // In the old syntax, the controller defined a $dependson callback, which we
+                // call in the link function, injecting the controllers we received.
+                if (stubController.$dependson) {
+                    stubController.$dependson.apply(stubController, controllers.slice(1));
                 }
             }
 

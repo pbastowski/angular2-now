@@ -1,10 +1,14 @@
 ## Angular 2.0 component syntax using Angular 1 and Babel
 
-### ** Upcoming Breaking Change Warning **
+### ** v0.4.0 Breaking Changes **
 
-> Please note that <code>angular.module</code> will no longer be "monkey-patched" by the angular2-now library as of version 0.4.0. Please use <code>SetModule</code>, described below, instead. SetModule has the exact same syntax as angular.module. This change is necessary due to problems encountered with the monkey-patching approach under certain conditions.
+#### angular.module no longer "monkey patched"
+As of v0.4.0 <code>angular.module</code> is no longer "monkey-patched" by the angular2-now library. Please use <code>SetModule</code>, described below, instead. SetModule has the exact same syntax as angular.module. This change is necessary due to problems encountered with the monkey-patching approach under certain conditions.
 
-This library allows you to continue using Angular 1.3 or higher, while giving you the opportunity to start coding your Angular 1 applications in Angular 2 syntax. You get to keep your investment in Angular 1 while preparing for Angular 2.  
+#### @Directive assumes `shared` instead of `isolate` scope
+As of v0.4.0 the `@Directive` annotation assumes shared scope. Previously it always assumed isolate scope, which you could override with `{ scope: undefined }`.   
+
+This library allows you to continue using Angular 1.3 or higher, while giving you the opportunity to start coding your Angular 1 applications in Angular 2 syntax. You get to keep your investment in Angular 1 while preparing for Angular 2. 
 
 If either of the statements below applies to you, then you need angular2-now:
 
@@ -19,7 +23,7 @@ You are welcome to contribute to this project.
 The following annotations have been implemented to support the Angular 2.0 component syntax, as far as possible.
 
 - **@Component** `({ selector: 'tag-name', bind: { a: '=', etc: '@' }, injectables: ['$http', myServiceClass] })`
-- **@View** `({ template: '<div>Inline template</div>', templateUrl: 'pth/to/template.html'})`
+- **@View** `({ template: '<div>Inline template</div>', templateUrl: 'path/to/template.html'})`
 - **@Inject** `(['$http', myServiceClass, '$q'])` or `('$http', myServiceClass, '$q')
 - **bootstrap** `(app [, config ])` 
 - **SetModule** `('my-app', ['angular-meteor'])`
