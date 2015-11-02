@@ -457,7 +457,7 @@ var angular2now = function () {
     function State(options) {
 
         if (!options || !(options instanceof Object) || options.name === undefined)
-            throw new Error('@State: Valid options are: name, url, defaultRoute, template, resolve, abstract.');
+            throw new Error('@State: Valid options are: name, url, defaultRoute, template, resolve, abstract, data.');
 
         return function (target) {
 
@@ -551,7 +551,10 @@ var angular2now = function () {
 
                             // onEnter and onExit events
                             onEnter: options.onEnter,
-                            onExit:  options.onExit
+                            onExit:  options.onExit,
+
+                            // Custom data
+                            data: options.data
                         };
 
 
