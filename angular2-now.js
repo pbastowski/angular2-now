@@ -650,7 +650,10 @@ var angular2now = function () {
 
                             // onEnter and onExit events
                             onEnter: options.onEnter,
-                            onExit:  options.onExit
+                            onExit:  options.onExit,
+
+                            // Custom data
+                            data: options.data
                         };
 
 
