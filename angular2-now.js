@@ -28,6 +28,7 @@ var angular2now = function () {
     var slice = Array.prototype.slice;
 
     var inj = angular.injector(['ng']);
+    var injector;
     var $q = inj.get('$q');
 
     var currentModule;
@@ -153,7 +154,7 @@ var angular2now = function () {
             // so that we can call the target's constructor later, within the link function.
             target = deferController (target, controller);
 
-            // service injections, which could also have been specified by using @Inject
+            // Service injections, which could also have been specified by using @Inject
             if (options.injectables && options.injectables instanceof Array)
                 target = Inject(options.injectables)(target);
 
@@ -219,7 +220,7 @@ var angular2now = function () {
                         return ddo;
                     });
             } catch (er) {
-                throw new Error('Does module "' + currentModule + '" exist? You may need to use angular.module("youModuleName").');
+                throw new Error('Does module "' + currentModule + '" exist? You may need to use SetModule("youModuleName").');
             }
 
             return target;
@@ -523,7 +524,7 @@ var angular2now = function () {
             else
                 var el = document.body;
 
-            angular.bootstrap(el, [bootModule], config);
+            injector = angular.bootstrap(el, [bootModule], config);
         }
     }
 
