@@ -32,7 +32,7 @@ Use angular2-now with an **ES6 transpiler** like **Babel** or **TypeScript**. Bo
 
 Include angular2-now in your AngularJS project, ensuring that it loads before any of it's functions are used. If you're not using any module loaders, then `window.angular2now` gives you direct access to all the annotation functions.
  
-### Usage with SystemJS
+### With SystemJS
  
 If your app loads SystemJS before angular2-now, then angular2-now will register itself with SystemJS and you will be able to import annotations as shown below.
 
@@ -40,13 +40,13 @@ If your app loads SystemJS before angular2-now, then angular2-now will register 
 import {Component, View, Inject, bootstrap, Options} from 'angular2now';
 ```
 
-### Usage with Meteor
+### With Meteor
 
 With Meteor 1.2 you will be using `angular2-now` in combination with `angular-meteor`, whose package name is simply `angular`. `angular-meteor` automatically includes `pbastowski:angular-babel`, which provides ES6 (ES2015) support. So, there is no need for you to add Babel to your Meteor project explicitly. You can also use TypeScript, if you want, by adding the package `pbastowski:typescript` to your project.
 
 #### Meteor and SystemJS module loader
 
-SystemJS support is provided by adding the package `pbastowski:systemjs` to your project. Make sure to read the [README](https://github.com/pbastowski/angular-meteor-babel) for `pbastowski:angular-babel` to understand:
+SystemJS support is provided by adding the package `pbastowski:systemjs` to your project. Make sure to read the [README](https://github.com/pbastowski/angular-meteor-babel/tree/meteor1.2) for `pbastowski:angular-babel` to understand:
 - how to enable SystemJS support and 
 - how `angular-babel` names SystemJS modules in your project
 
