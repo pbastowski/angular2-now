@@ -78,7 +78,7 @@ import "MyService";
 import {thing1} from "things"    
 ```
 
-> When using `pbastowski:require` individual objects are `export`ed by their name. There is no concept of a module, as such. Think of exporting as making the object global. In fact you can also access the exported object through `window.things` or `window.MyService`. 
+> When using `pbastowski:require` individual objects are exported by their name. There is no concept of a module, as such. Think of exporting as making the object global. In fact you can also access the exported object through `window.things` or `window.MyService`. 
 
 In the above example, when we `import "MyService"` we are actually importing the whole class object, whereas `thing1` is the only object imported from `things`. 
 
