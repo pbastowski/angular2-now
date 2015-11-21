@@ -52,7 +52,7 @@ SystemJS support is provided by adding the package `pbastowski:systemjs` to your
 
 Otherwise, you might have trouble importing from them. 
 
-### Meteor without SystemJS (the old way)
+#### Meteor without SystemJS (the old way)
 
 Meteor does not need any kind of module loader, because it bundles and loads your files according to its [convention](http://docs.meteor.com/#/full/fileloadorder). This may be enough for you, if you're happy to use angular2-now through the globally visible `window.angular2now` object.
   
