@@ -26,7 +26,7 @@ Note: This version of angular2-now (version 1.0.0 and higher) works with Meteor 
 <script src="https://npmcdn.com/angular2-now@0.3.15/angular2-now.js"></script>
 ```
     
-## Usage
+## Usage with ES6
 
 Use angular2-now with an **ES6 transpiler** like **Babel** or **TypeScript**. Both work equally well.
 
@@ -140,16 +140,6 @@ The annotation below will only work with Meteor.
 @MeteorMethod( ?options )
 ```
 
-## Can I use angular2-now outside of Meteor?
-
-Yes, you can. The angular2-now.js library works with both ES6 (Babel) and plain ES5.
- 
-Here is an ES6 example [ES6 Angular2-now](http://plnkr.co/edit/JhHlOr?p=preview). Also, there are examples in this README and in Code Demos, above. 
-
-For an ES5 usage demo see [ES5 Agular2-now](http://plnkr.co/edit/uxV781?p=preview).
-
-
-
 ## Code demos
 
 Please visit the following github repositories and Plunker examples before you start coding. It will save you some "WTF" time.
@@ -205,26 +195,38 @@ class Defect {
 }
 ```
 
-The `defaultRoute` property, if set to `true`, will make the annotated State the default for your app. That it, if the user types an unrecognised path into the address bar, or does not type any path other than the url of your app, they will be redirected to the defaultRoute. It is a bit like the old 404 not found redirect, except that in single page apps there is no 404. There is just the default page (or route). 
+#### defaultRoute
 
-> Meteor apps automatically redirect all unrecognised routes to the app root "/". However, if you're not using Meteor, you'll want to make sure that all unrecognised routes are redirected to the app root, which in many cases is "/". 
+```javascript
+{ name: 'root',               url: '' }
+{ name: 'root.defect',        url: '/defect', defaultRoute: '/defect' }
+{ name: 'root.defect.report', url: '/report', defaultRoute: '/defect/report' }
+{ name: 'root.defect',        url: '/defect', defaultRoute: true }
+```
+
+The `defaultRoute` property makes the annotated state the default for your app. That is, if the user types an unrecognised path into the address bar, or does not type any path other than the url of your app, they will be redirected to the path specified in defaultRoute. It is a bit like the old 404 not found redirect, except that in single page apps there is no 404. There is just the default page (or route). 
+
+> Meteor's web server automatically redirects all unrecognised routes to the app root "/". However, if you're not using Meteor, you'll want to make sure that all unrecognised routes are redirected to the app root, which in many cases is "/". 
+
+Note that `defaultRoute: true` only works when the state's `url` is the same as it's defaultRoute.
+
+For example
+
+```javascript
+{ name: 'root.defect', url: '/defect', defaultRoute: '/defect' }
+```
+
+can be replaced with 
+
+```javascript
+{ name: 'root.defect', url: '/defect', defaultRoute: true }
+```
  
-In certain cases it may not be enough to just set `defaultRoute = True`. For example, consider a deep state tree, such as below
- 
- State | URL | abstract | default
- ------|-----|----------|---------
- root  | ""  | true | no
- root.app | "/app" | true | no
- root.app.step1  | "/step1" | false | yes
- 
-The default state "root.app.step1" is the child of two abstract parent states, one of which has a URL. To get this to work as expected, you will need to set `defaultRoute = '/app/step1'`. This is because UI router appends all the parent states together to form the final URL, which in the above example is '/app' + '/step1' = '/app/step1'. 
+For nested states, where the default state has parent states with their own URLs, always specify the `defaultRoute` as a string that represents the final URL that you want the app to navigate to by default.
 
-> Setting `defaultRoute = true` only works for simple routes without parent states that have their own URLs. For nested states, where the default state has parent states with their own URLs, always specify the `defaultRoute` as a string that represents the final URL that you want the app to navigate to by default.
+#### Resolving Values
 
-
-#### Resolving and injecting dependencies 
-
-To add a `ui-router` resolve block, add it to the @State annotation as shown below.
+A `ui-router` resolve block can be added to the @State annotation, as shown below.
 
 ```javascript
 @State({
@@ -232,35 +234,35 @@ To add a `ui-router` resolve block, add it to the @State annotation as shown bel
     url: '/defect', 
     defaultRoute: true,
     resolve: {
-        user: function() { return 'paul'; },
+        user: ['$q', function($q) { return 'paul'; }],
         role: function() { return 'admin'; }
     }
 })
-```
 
-A resolve block can also be added as a `static` property on the class itself, like shown below. Either way produces the same results.
+@Component({ selector: 'defect' })
+@View({ tamplateUrl: 'client/defect/defect.html' })
+@Inject('defect')
 
-```javascript
-@State({ name: 'root', url: '' })
-@Inject(['defect'])
-class defect {
+class Defect {
     constructor(defect) { 
         // defect.name == 'paul'
         // defect.role == 'admin'
     }
-    static resolve = {
-        user: function() { return 'paul'; },
-        role: function() { return 'admin'; }
-    }
 }
 ```
 
-The resolved values are made available for injection into a component's constructor, as shown above. The injected parameter `defect` is the name of a service created for you that holds the resolved return values. The name of this service is always the camelCased version of your component's selector. So, if the selector == 'my-app', then the name of the injectable service will be 'myApp'. 
+Adding a @State annotation to a Component does NOT make the component's Class the State's controller and thus you can't directly inject resolved values into it. This is, because the Component's Class is the Component's controller and can not also be reused as the State's controller.
+
+Read on for how to inject the resolved values into your component's controller.
+
+####  Injecting Resolved Dependencies into your component's controller
+
+The resolved values are made available for injection into a component's constructor, as shown in the example above. The injected parameter `defect` is the name of a service automatically created for you, which holds the resolved return values. The name of this service is always the camelCased version of your component's selector. So, if the selector == 'my-app', then the name of the injectable service will be 'myApp'. 
 
 
 #### States without a component
     
-It is also possible to define a state without a component, as in
+It is also possible to define a state without a component, as shown below, provided that you do not also annotate it's Class as a Component.
 
 ```javascript
 @State({ 
@@ -271,27 +273,34 @@ It is also possible to define a state without a component, as in
         role: function() { return 'admin'; } 
     } 
 })
-class myApp {
+class App {
     constructor(user, role) {
         console.log('myApp resolved: ', user, role);
     }
 }
 ```
 
-In this case, the class constructor is the controller for the route and receives the injected properties directly.  
-
+In this case, the class constructor is the controller for the route and receives the injected properties directly (as per ui-router documentation).  
 
 ### Bootstrapping the app
 
-#### `bootstrap (app [, config ])` 
+This allows you to bootstrap your Angular 1 app using the Angular 2 component bootstrap syntax. There is no need to use `ng-app`. 
 
-This allows you to bootstrap your Angular 1 app using the Angular 2 component bootstrap syntax. So, there is no need to use `ng-app`. Using `bootstrap` is the equivalend of the Angular 1 manual bootstrapping method: `angular.bootstrap(DOMelement, ['app'])`. The bootstrap function also knows how to handle Cordova apps.
-`config` is the same parameter as in angular.bootstrap: https://code.angularjs.org/1.3.15/docs/api/ng/function/angular.bootstrap. It can be used to enforce strictDi, for testing before deployment. 
+```javascript
+bootstrap (App [, config ])
+``` 
 
-Somewhere in your HTML add this:
+Using `bootstrap` is the equivalent of the Angular 1 manual bootstrapping method: `angular.bootstrap(DOMelement, ['app'])`. The bootstrap function also knows how to handle Cordova apps.
+`config` is the same parameter as in [angular.bootstrap()](https://code.angularjs.org/1.3.15/docs/api/ng/function/angular.bootstrap). It can be used to enforce strictDi, for testing before deployment to production. 
+
+#### An example showing how to bootstrap an app
+
+In your HTML body add this:
+
 ```html
 <my-app>Optional content inside my app that can be transcluded</my-app>
 ```
+
 And in your JavaScript add the code below.  
 
 ```javascript
@@ -299,73 +308,87 @@ SetModule('my-app', []);
 
 @Component({selector: 'my-app' })
 @View({template: `<content></content>`})
-class app { 
+class App { 
 }
 
-bootstrap(app);
+bootstrap(App);
 ```
 
-In the example above, notice that the bootstrap module must have the same name as the bootstrap component's selector.
+> The bootstrap module must have the same name as the bootstrap component's selector.
 
+### ControllerAs syntax
 
-### ControllerAs
-The created components use ControllerAs syntax. So, when referring to properties or functions on the controller's "scope", make sure to prefix them with `this` in the controller and with the `className`, or the camel-cased selector name if different from the className, in the HTML templates.
+The created components use `ControllerAs` syntax. So, when referring to properties or functions on the controller's "scope", make sure to prefix them with `this` in the controller and with the camel-cased selector name in the HTML templates. If the component's selector is `home-page` then your html might look like this:
 
-**What if I want to use "vm" as the name of my controller?**
+```html
+<div ng-click="homePage.test()"></div>
+```
 
-No problem. Just configure angular2-now to use "vm" instead, like this
+#### Can I use `vm` instead of `homePage`?
+
+Sure. If you want to use `vm` as the controller name for a specific component, then do this:
 
 ```javascript
-angular2now.options({ controllerAs: 'vm' })
+@Component({ selector: 'defect', controllerAs: 'vm' })
+class Defect { 
+    test() {}
+}
+```
+
+and then in your HTML template you will then be able do this:
+
+```html
+<div ng-click="vm.test()"></div>
+```
+
+#### I want to use "vm" as the name of all my component's controllers
+
+No problem. Just configure angular2-now to use `vm` instead, like this
+
+```javascript
+import {options} from 'angular2now';
+options({ controllerAs: 'vm' })
 ```
 
 Do this before you use any angular2-now components!
 
 
-### Transclude and `<content></content>`
-If your inline template includes a `<content>` tag then `@View` will automatically add `ng-transclude` to it and the directive's transclude flag will be set to true.
-
-Templates specified using the templateUrl property aren't currently checked and thus do not get `ng-transclude` added to them by `@View`. You will have to manually add ng-transclude to the element you want to transclude in your non-inline templates and also add `transclude: true` to the @View annotation's options, as shown below:
-
-    @View({ templateUrl: '/client/mytemplate.html', transclude: true })
-
-
-### Importing the required annotations from angular2-now
-
-This package exports the object `angular2now` from which you can import the annotations that you need, like so:
-
-```javascript
-// Import the Angular2now annotations using ES6 destructuring assignment
-// Look up ES6 destructuring here: https://babeljs.io/docs/learn-es6/ 
-var {Component, Template, Service, Filter, Inject, bootstrap} = angular2now;
-```
-
-or like this:
-
-```javascript
-// You can also do it like this
- var Component = angular2now.Component;
- var Template = angular2now.Template;
- ...
-```
-
-Alternatively, I have created a meteor package `pbastowski:require`, which allows you to write your imports like this
-
-```javascript
-import {Component, View, bootstrap} from 'angular2now';
-```
+### Transclusion
  
-> `pbastowski:require` does not implement RequireJS. It is only a little stub that allows you to write nicer looking import statements. 
+#### Inline templates
+ 
+If your inline `template` includes `<content></content>` then `@View` will automatically add `ng-transclude` to it and internally the directive's `transclude` flag will be set to `true`.
 
+So, this inline HTML template
+
+```html
+h2 This is my header
+<content></content>  
+```
+
+will be automatically changed to look like this 
+
+```html
+h2 This is my header
+<content ng-transclude></content>  
+```
+
+#### `templateUrl`` and transclusion
+
+Templates specified using the `templateUrl` property aren't currently checked and thus do not get `ng-transclude` added to them by `@View`. You will have to manually add ng-transclude to the element you want to transclude in your template. You will also need to add `transclude: true` to the @View annotation's options, as shown below:
+
+```javascript
+@View({ templateUrl: '/client/mytemplate.html', transclude: true })
+```
 
 ### How do I access `ngModel` and other component's controllers?
 
-You `@Inject` the names of the components whose controller you want, prefixed with `"@"` or `"@^"` (looks for a parent controller). Due to the nature of Angular 1 and Babel, these dependencies can not be directly injected into the constructor. However, they can be accessed within the constructor like this: 
+You `@Inject` the names of the components whose controllers you want. Prefix each controller name with `"@"` or `"@^"` (looks for a parent controller). These dependencies are not directly injected into the constructor (controller), because they are not available at the time the constructor executes, but at `link` time (see AngularJS documentation about this). However, they can be accessed within the constructor like this: 
 
 ```javascript
-@Component({ selector: 'my-validator' })
-@Inject(['@ngModel', '@^tabContainer'])
-class myValidator {
+@Component({ selector: 'tab' })
+@Inject('@ngModel', '@^tabContainer')
+class Tab {
     constructor() {
     
         this.$dependson = function (ngModel, tabContainer) {
@@ -381,16 +404,17 @@ class myValidator {
 
 Please note that the injected component controllers are not listed as arguments to the constructor.
 
-> Warning: This is a breaking change introduced in 0.1.7. The use of `this.ngModel = function(ngModel) { // do stuff with ngModel }` within the constructor is no longer supported. Please use the syntax shown above.
+## Meteor Helper Annotations
 
+### MeteorMethod
 
-### Meteor Helper Annotations
+```javascript
+@MeteorMethod( ?options )
+```
 
-#### `@MeteorMethod( ?options )`
+The `MeteorMethod` annotation is used to create a client-side method that calls a procedure defined on the Meteor server. The `options` argument is optional. Here is an example.
 
-The `@MeteorMethod` annotation is used to create a client-side method that calls a procedure defined on the Meteor server. The `options` argument is optional. Here is an example.
-
-On the Server Side you create the Meteor method like this:
+On the server side you create the Meteor method like this:
 
 ```javascript
 Meteor.methods({
@@ -404,7 +428,7 @@ Meteor.methods({
 })
 ```
 
-On the Client Side, you annotate a stub method, in this case ` sendEmail(){} `, in your Service or Component class with ` @MeteorMethod() `. The name of the stub method must be the same as the name of the Meteor method on the server:
+On the client side, you annotate a stub method, in this case `sendEmail(){}`, in your `Service` or `Component` class with `@MeteorMethod()`. The name of the stub method must be the same as the name of the Meteor method on the server:
  
 ```javascript
 class Mail {
@@ -412,11 +436,12 @@ class Mail {
    sendEmail() { }
 }
 ```
+
 And then you call ` sendEmail() ` somewhere, like this:
 
 ```javascript
-@Inject(['mail'])
-class myComponent {
+@Inject('mail')
+class MyComponent {
     constructor(mail) {
         mail.sendEmail('me@home.com', 'you@wherever.net', 'hello', 'Hi there!')
             .then( () => console.log('success'), (er) => console.log('Error: ', er) );
@@ -424,7 +449,7 @@ class myComponent {
 }
 ```
 
-#### `options` argument
+#### The `options` argument
 
 `options` allows you to override global options on a per-method basis. These options are: 
 
@@ -434,12 +459,13 @@ controllerAs | string | Allows you to specify a default controllerAs prefix to u
 spinner	| object | Exposes show() and hide() methods, that show and hide a busy-spinner
 events	| object | Exposes beforeCall() and afterCall(), which will be called before and after the ajax call. Only `afterCall` is guaranteed to run after the call to the MeteorMethod completes.
 noConflict | boolean | **false** = (default for version < 0.4.0) monkey-patch `angular.module`, **true** = don't monkey-patch  
+
 For example, options can be defined at the global level like this:
 
 ```javascript
 import {options} from 'angular2now';
 
-angular2now.options({
+options({
     spinner: {
         show: function () { document.body.style.background = 'yellow'; },
         hide: function () { document.body.style.background = ''; }
@@ -452,7 +478,7 @@ angular2now.options({
 
 ```
 
-When defining a @MeteorMethod(), the options can be overridden like this:
+When defining a `MeteorMethod`, the options can be overridden like this:
 
 ```javascript
 @MeteorMethod({ spinner: { ... }, events: { ... })
