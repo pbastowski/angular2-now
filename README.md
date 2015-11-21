@@ -68,6 +68,7 @@ On the other hand, if you like to use ES6 `import ... from` statements in your p
 
 ```javascript
 export class MyService { }
+ 
 export var things = {
     thing1,
     thing2
