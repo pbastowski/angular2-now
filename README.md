@@ -505,3 +505,23 @@ sendEmail() {}
 - Chrome
 - FireFox
 - Safari desktop and mobile (IOS 7 or better)
+
+## I need more Angular 2 features
+
+Then you may want to have a look at [ng-forward](https://github.com/ngUpgraders/ng-forward). It is a very comprehensive library with a lot of Angular 2 features and it is developed by really clever people, whom I had the pleasure to work with :)
+
+### But I really love angular2-now, so, can't you just add more Angular 2 features?
+
+The short answer is no, because I designed `angular2-now` for a specific purpose with narrow requirements:
+
+- make Angular 1 coding simple and fun for myself and my team
+- make me think of web apps in terms of components within components, instead of HTML + controllers + directives + ui-router 
+- make ui-router configuration simple (because it is not) 
+
+As it stands now, the above three requirements are satisfied for myself, but if you would like to contribute then I am happy to consider a PR.
+
+## Contributing
+
+If you think you have a great feature that should be incorporated in the main library, or a fix for a bug, or some doco updates then please send me a PR.
+
+When sending code changes or new code make sure to describe in details what it is that you are trying to achieve and what the code does. I am not going to accept pure code without detailed descriptions of what it does and why.
