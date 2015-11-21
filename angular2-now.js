@@ -1,6 +1,9 @@
 var angular2now = function () {
     'use strict';
 
+    var isCordova, slice, inj, $q, currentModule, currentNameSpace
+    var controllerAs, ng2nOptions, angularModule, injector;
+
     var angular2now = {
         SetModule: SetModule,
 
@@ -23,23 +26,22 @@ var angular2now = function () {
         MeteorMethod: MeteorMethod
     };
 
-    var isCordova = typeof cordova !== 'undefined';
+    function init() {
+        isCordova = typeof cordova !== 'undefined';
+        inj = angular.injector(['ng']);
+        $q = inj.get('$q');
 
-    var inj = angular.injector(['ng']);
-    var $q = inj.get('$q');
+        ng2nOptions = {
+            currentModule: function () {
+                return currentModule;
+            }
+        };
 
-    var currentModule;
-    var currentNameSpace;
-    var controllerAs;
+        angularModule = angular.module;
 
-    var ng2nOptions = {
-        currentModule: function() { return currentModule; }
-    };
-
-    var angularModule = angular.module;
-
-    // Monkey patch angular.module
-    angular.module = SetModule;
+        // Monkey patch angular.module
+        //angular.module = SetModule;
+    }
 
     function SetModule () {
         /**
@@ -680,6 +682,25 @@ var angular2now = function () {
             return descriptor;
         }
 
+    }
+
+    if (typeof System !== 'undefined' && System.register) {
+
+        System.register("angular2now", [], function (_export) {
+
+            for (var i in angular2now)
+                _export(i, angular2now[i]);
+
+            return {
+                setters: [],
+                execute: function () {
+                    init();
+                }
+            };
+
+        })
+    } else {
+        init();
     }
 
     return angular2now;

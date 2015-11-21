@@ -1,49 +1,140 @@
-## Angular 2.0 component syntax using Angular 1 and Babel
+# Angular 2.0 component syntax for Angular 1 apps
 
-### ** Upcoming Breaking Change Warning **
+Angular2-now gives you the ability to start coding your Angular 1.4+ apps using Angular 2 component syntax. You get to keep your investment in Angular 1 while learning some Angular 2 concepts.
 
-> Please note that <code>angular.module</code> will no longer be "monkey-patched" by the angular2-now library as of version 0.4.0. Please use <code>SetModule</code>, described below, instead. SetModule has the exact same syntax as angular.module. This change is necessary due to problems encountered with the monkey-patching approach under certain conditions.
+So, if you like the clean syntax of Angular 2, but are not yet ready or able to commit to it, then this library might just be what you're looking for.
 
-This library allows you to continue using Angular 1.3 or higher, while giving you the opportunity to start coding your Angular 1 applications in Angular 2 syntax. You get to keep your investment in Angular 1 while preparing for Angular 2.  
+Note: This version of angular2-now (version 1.0.0 and higher) works with Meteor 1.2 or higher. The latest Meteor 1.1 package version is 0.3.15.
 
-If either of the statements below applies to you, then you need angular2-now:
+## Install
 
-- You are about to start a new development in Angular 1 and are thinking about migrating to Angular 2, when it finally arrives.
+#### NPM
 
-- You just like the clean syntax of Angular 2, but don't care much for the rest of Angular 2 at this stage.
+    npm install angular2-now
+    
+#### BOWER
 
-You are welcome to contribute to this project.
+    bower install angular2-now
 
-### What's implemented?
+#### Meteor
 
-The following annotations have been implemented to support the Angular 2.0 component syntax, as far as possible.
+    meteor add pbastowski:angular2-now
 
-- **@Component** `({ selector: 'tag-name', bind: { a: '=', etc: '@' }, injectables: ['$http', myServiceClass] })`
-- **@View** `({ template: '<div>Inline template</div>', templateUrl: 'pth/to/template.html'})`
-- **@Inject** `(['$http', myServiceClass, '$q'])` or `('$http', myServiceClass, '$q')
-- **bootstrap** `(app [, config ])` 
-- **SetModule** `('my-app', ['angular-meteor'])`
+#### CDN:
 
-The annotations below are not Angular 2, as such, but for me they make coding in Angular a bit nicer. 
+```html
+<script src="https://npmcdn.com/angular2-now@0.3.15/angular2-now.js"></script>
+```
+    
+## Usage
 
-- **@Service** `({ name: 'serviceName' })`
-- **@Filter** `({ name: 'filterName' })`
-- **@State** `({name: 'stateName', ?url: '/stateurl', ?defaultRoute: true/false or '/default/route/url', ?resolve: {...}, ?controller: controllerFunction, ?template: { }, ?html5Mode: true/false }))`
+Use angular2-now with an **ES6 transpiler** like **Babel** or **TypeScript**. Both work equally well.
+
+Include angular2-now in your AngularJS project, ensuring that it loads before any of it's functions are used. If you're not using any module loaders, then `window.angular2now` gives you direct access to all the annotation functions.
+ 
+### Usage with SystemJS
+ 
+If your app loads SystemJS before angular2-now, then angular2-now will register itself with SystemJS and you will be able to import annotations as shown below.
+
+```javascript
+import {Component, View, Inject, bootstrap, Options} from 'angular2now';
+```
+
+### Usage with Meteor
+
+With Meteor 1.2 you will be using `angular2-now` in combination with `angular-meteor`, whose package name is simply `angular`. `angular-meteor` automatically includes `pbastowski:angular-babel`, which provides ES6 (ES2015) support. So, there is no need for you to add Babel to your Meteor project explicitly. You can also use TypeScript, if you want, by adding the package `pbastowski:typescript` to your project.
+
+#### Meteor and SystemJS module loader
+
+SystemJS support is provided by adding the package `pbastowski:systemjs` to your project. Make sure to read the [README](https://github.com/pbastowski/angular-meteor-babel) for `pbastowski:angular-babel` to understand:
+- how to enable SystemJS support and 
+- how `angular-babel` names SystemJS modules in your project
+
+Otherwise, you might have trouble importing from them. 
+
+### Meteor without SystemJS (the old way)
+
+Meteor does not need any kind of module loader, because it bundles and loads your files according to its [convention](http://docs.meteor.com/#/full/fileloadorder). This may be enough for you, if you're happy to use angular2-now through the globally visible `window.angular2now` object.
+  
+On the other hand, if you like to use ES6 `import ... from` statements in your project and don't want to use SystemJS, then add the package `pbastowski:require` to your project. It provides basic `module.exports` functionality in the browser and will allow you to export like this
+
+**MyService.js**
+
+```javascript
+export class MyService { }
+export var things = {
+    thing1,
+    thing2
+}
+```
+
+And import like this
+
+**MyComponent.js**
+
+```javascript
+import "MyService";
+
+import {thing1} from "things"    
+```
+
+> Individual objects are `export`ed by their name. There is no concept of a module, as such. Think of exporting as making the object global and in fact you can also access it through `window.things` or `window.MyService`. 
+
+In the above example, when we `import "MyService"` we are actually importing the whole class object, whereas `thing1` is the only object imported from `things`. 
+
+## What Angular 2 annotations can I use in my Angular 1 apps?
+
+The following annotations have been implemented to support Angular 2.0 component syntax. 
+
+```javascript
+@Component({ 
+    selector: 'tag-name', 
+    bind: { twoWay: '=', value: '@', function: '&' }
+})
+
+@View({ 
+    template: '<div>Inline template</div>',  // inline template 
+    templateUrl: 'path/to/the_template.html'      // importing a template
+})
+
+@Inject('$http', '$q'); // Passing injectables directly
+                        // Also valid: @Inject(['$http', '$q'])
+
+class App {
+    constructor($http, $q) { }
+}
+
+bootstrap(App, ?config) 
+```
+
+The annotations below are not Angular 2, but for me they make coding in Angular a lot nicer. 
+
+```javascript
+@Service({ name: 'serviceName' })
+@Filter({ name: 'filterName' })
+```
+
+Client-side routing with ui-router
+```javascript
+@State({
+    name: 'stateName', 
+    ?url: '/stateurl', 
+    ?defaultRoute: true/false or '/default/route/url', 
+    ?resolve: {...}, 
+    ?controller: controllerFunction, 
+    ?template: { }, 
+    ?html5Mode: true/false 
+}))
+```
+
+
+SetModule('my-app', ['angular-meteor'])
 
 The annotation below will only work with Meteor.
 
 - **@MeteorMethod** `( ?options )`
 
-### Code demos
-
-You may want to see the following github repositories for some examples of usage, before you start coding. It could save you some "WTF" time.
-
-- https://github.com/pbastowski/Thinkster-MEAN-Tutorial-in-angular-meteor/tree/feature/ng2-now-with-services
-- https://github.com/pbastowski/meteor-angular-socially/tree/feature/ng2now
-- https://github.com/pbastowski/todo-ng2now
-
-
-### Can I use this library outside of Meteor?
+### Can I use angular2-now outside of Meteor?
 
 Yes, you can. The angular2-now.js library works with both ES6 (Babel) and plain ES5.
  
@@ -52,46 +143,22 @@ Here is an ES6 example [ES6 Angular2-now](http://plnkr.co/edit/JhHlOr?p=preview)
 For an ES5 usage demo see [ES5 Agular2-now](http://plnkr.co/edit/uxV781?p=preview).
 
 
-#### Installation
 
-Angular2-now is available on npm, jspm and Bower. 
+### Code demos
 
+You may want to see the following github repositories for some examples of usage, before you start coding. It could save you some "WTF" time.
 
-    npm install angular2-now
+#### ES6 examples
 
-    jspm install npm:angular2-now
+- [ES6 Angular2-now Plunker](http://plnkr.co/edit/JhHlOr?p=preview)
 
-    bower install angular2-now
+#### Meteor
 
-
-To use this library, include it in your Angular 1.3 (or higher) project, ensuring that it loads before it's functions are used. `window.angular2now` gives you access to all the annotations. You can import the functions you need into each module that requires them, like this:
-
-##### Babel/ES6
-
-    var {Component, View, Inject} = angular2now;
-
-or, if you've configured SystemJS correctly, you may be able to import like this
-
-    import {Component, View, Inject} from 'angular2now';
-    
-
-##### ES5
-
-    var Component = angular2now.Component;
-    var View = angular2now.View;
-    var Inject = angular2now.Inject;
-
-Or, if you want all the angular2-now annotations available for use anywhere in your application without explicitly importing them, then you could try this
-
-    angular.extend(window, angular2now)
-
-Please note that to use the Angular 2 `@` notation, as shown in the examples below, such as `@Component` or `@View`, you will need to have a build workflow that uses Babel to transpile your ES6 code to plain ES5 JavaScript that your browser can understand. 
+- https://github.com/pbastowski/Thinkster-MEAN-Tutorial-in-angular-meteor/tree/feature/ng2-now-with-services
 
 
-### Meteor Installation
-
-    meteor add pbastowski:angular2-now
-    
+- https://github.com/pbastowski/meteor-angular-socially/tree/feature/ng2now
+- https://github.com/pbastowski/todo-ng2now
 
 ## API
 
