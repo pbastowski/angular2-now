@@ -97,12 +97,18 @@ SetModule('my-app', ['angular-meteor']);  // Use SetModule in place of angular.m
 
 @Component({ 
     selector: 'my-app', 
-    bind: { twoWay: '=', value: '@', function: '&' }
+    bind: { twoWay: '=', value: '@', function: '&' },
+    services: ['$http', '$q', 'myService'],
+    replace: true or false,
+    transclude: true or false,
+    scope: undefined or true or same as bind,
+    
 })
 
 @View({ 
-    template: '<div>Inline template</div>',  // inline template 
-    templateUrl: 'path/to/the_template.html'      // importing a template
+    template: '<div>Inline template</div>',    // inline template 
+    templateUrl: 'path/to/the_template.html',  // importing a template
+    transclude: true or false
 })
 
 @Inject('$http', '$q'); // Passing injectables directly
@@ -115,12 +121,18 @@ class App {
 bootstrap(App, ?config);  // config is optional
 ```
 
-The annotations below are not Angular 2, but for me they make coding in Angular a lot nicer. 
+The annotations below are not Angular 2, but for me they make coding in Angular a bit nicer. 
 
 ```javascript
-@Service({ name: 'serviceName' });
-
-@Filter({ name: 'filterName' });
+@Service({ name: 'serviceName' })
+ 
+@Filter({ name: 'filterName' })
+ 
+@Directive()     // alias for @Component
+ 
+@ScopeShared()  // same as { scope: undefined } on Component
+ 
+@ScopeNew()     // same as { scope: true } on Component 
 ```
 
 Client-side routing with ui-router
@@ -128,11 +140,15 @@ Client-side routing with ui-router
 @State({
     name: 'stateName', 
     ?url: '/stateurl', 
-    ?defaultRoute: true/false or '/default/route/url', 
+    ?defaultRoute: true/false or '/default/route/url',
+    ?abstract: true or false,
+    ?html5Mode: true/false,
+    ?params: { id: 123 },  // default params, see ui-router docs
+    ?data: { a: 1, b: 2},  // custom data
     ?resolve: {...}, 
     ?controller: controllerFunction, 
-    ?template: { }, 
-    ?html5Mode: true/false 
+    ?template: '<div></div>',
+    ?templateUrl: 'client/app/app.html',
 }))
 ```
 
@@ -163,7 +179,23 @@ Please visit the following github repositories and Plunker examples before you s
 
 ## API in-depth
 
-### Use SetModule instead of angular.module
+### Component vs Directive
+
+`Directive` is an alias for `Component`, which means it does the same thing, but is spelled different. The main difference between directives and components is that directives have no template HTML. A Directive is an attribute on an existing HTML element that simply adds new behaviour to that element. It is one attribute amongst any number of other attributes on an element.
+
+There is an implication to this, in that AngularJS only allows one directive to have isolate scope on the same HTML element. By default, `Component` creates isolate scope and since `Directive` is an alias for `Component` it also creates isolate scope. This sometimes causes issues.
+ 
+ To overcome that, you can use a couple of annotations: 
+ - `ScopeShared` same as passing `{ scope: undefined }` to `@Directive`
+ - `ScopeNew` same as passing `{ scope: true }` to `@Directive`
+ 
+ ```javascript
+@Directive({ ... })
+@ScopeShared()
+class MyDirective { }
+```
+
+### SetModule instead of angular.module
 
 ```javascript
 SetModule( 'app', ['angular-meteor', 'ui.router', 'my-other-module'] )
