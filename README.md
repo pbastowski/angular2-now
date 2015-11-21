@@ -8,21 +8,25 @@ Note: This version of angular2-now (version 1.0.0 and higher) works with Meteor 
 
 ## Install
 
-#### NPM
+**NPM**
 
     npm install angular2-now
     
-#### BOWER
+**BOWER**
 
     bower install angular2-now
 
-#### Meteor
+**Meteor**
 
     meteor add pbastowski:angular2-now
 
-#### CDN:
+**CDN**
 
 ```html
+<!-- Meteor 1.2 -->
+<script src="https://npmcdn.com/angular2-now@1.0.0/angular2-now.js"></script>
+ 
+<!-- Meteor 1.1 -->
 <script src="https://npmcdn.com/angular2-now@0.3.15/angular2-now.js"></script>
 ```
     
@@ -373,7 +377,7 @@ h2 This is my header
 <content ng-transclude></content>  
 ```
 
-#### `templateUrl`` and transclusion
+#### `templateUrl` and transclusion
 
 Templates specified using the `templateUrl` property aren't currently checked and thus do not get `ng-transclude` added to them by `@View`. You will have to manually add ng-transclude to the element you want to transclude in your template. You will also need to add `transclude: true` to the @View annotation's options, as shown below:
 
@@ -403,6 +407,37 @@ class Tab {
 ```
 
 Please note that the injected component controllers are not listed as arguments to the constructor.
+
+### angular2-now `options`
+
+Below is the list of angular2-now options that can be changed.
+
+Attribute | Type | Description
+----------|------|-------------------
+controllerAs | string | Allows you to specify a default controllerAs prefix to use for all components. The default prefix is the camel-cased version of the component's selector.   
+spinner	| object | Exposes show() and hide() methods, that show and hide a busy-spinner
+events	| object | Exposes beforeCall() and afterCall(), which will be called before and after the ajax call. Only `afterCall` is guaranteed to run after the call to the MeteorMethod completes.
+
+
+Options can be defined or changed like this:
+
+```javascript
+import {options} from 'angular2now';
+
+options({
+    spinner: {
+        show: function () { document.body.style.background = 'yellow'; },
+        hide: function () { document.body.style.background = ''; }
+    },
+    events:  {
+        beforeCall: () => console.log('< BEFORE call'),
+        afterCall:  () => console.log('> AFTER call'),
+    }
+})
+```
+
+Do this before executing any other angular2-now code.
+
 
 ## Meteor Helper Annotations
 
@@ -451,32 +486,7 @@ class MyComponent {
 
 #### The `options` argument
 
-`options` allows you to override global options on a per-method basis. These options are: 
-
-Attribute | Type | Description
-----------|------|-------------------
-controllerAs | string | Allows you to specify a default controllerAs prefix to use for all components. The default prefix is the camel-cased version of the component's selector.   
-spinner	| object | Exposes show() and hide() methods, that show and hide a busy-spinner
-events	| object | Exposes beforeCall() and afterCall(), which will be called before and after the ajax call. Only `afterCall` is guaranteed to run after the call to the MeteorMethod completes.
-noConflict | boolean | **false** = (default for version < 0.4.0) monkey-patch `angular.module`, **true** = don't monkey-patch  
-
-For example, options can be defined at the global level like this:
-
-```javascript
-import {options} from 'angular2now';
-
-options({
-    spinner: {
-        show: function () { document.body.style.background = 'yellow'; },
-        hide: function () { document.body.style.background = ''; }
-    },
-    events:  {
-        beforeCall: () => console.log('< BEFORE call'),
-        afterCall:  () => console.log('> AFTER call'),
-    }
-});
-
-```
+The `options` argument of `MeteorMethod` allows you to override global options on a per-method basis. To find out what global angular2-now options are available please the **angular2-now  Options** section.
 
 When defining a `MeteorMethod`, the options can be overridden like this:
 
@@ -485,30 +495,26 @@ When defining a `MeteorMethod`, the options can be overridden like this:
 sendEmail() {}
 ```
 
+## What environment is required?
+- Angular 1.4+ 
+- Babel 5.1.10+
+- Meteor 1.2+
 
-### What environment is required?
-- Angular 1.3+ 
-- Babel 5.1.10+ (lower versions process annotations in the wrong order)
-- Meteor 1.1.0.2
-
-#### Browsers
+### Browsers
 - IE9+
 - Chrome
 - FireFox
+- Safari desktop and mobile (IOS 7 or better)
 
-### Examples
+## Examples
 
 ```javascript
+import {Component, Template, Service, Filter, Inject, bootstrap} from 'angular2now';
 
-// "Import" the angular2-now annotations and functions into local scope
-var {Component, Template, Service, Filter, Inject, bootstrap} = angular2now;
+// Use SetModule() to create the 'my-app' module for our components.
+SetModule('my-app', []);
 
-// Use SetModule() to create the 'my-components' module for our components/directives.
-// All components created with @Component, @Filter and @Service will automatically
-// go into this module.
-SetModule('my-components', []);
-
-// The filter name is 'ucase'. You can use this like so: "'string' | ucase"
+// The filter name is 'ucase'. In HTML use the filter like so: "'string' | ucase"
 @Filter({ name: 'ucase' })
 class filter1 {
     constructor (prefix) {
