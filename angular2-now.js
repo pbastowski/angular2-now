@@ -130,6 +130,9 @@ var angular2now = function () {
             // service injections, which could also have been specified by using @Inject
             if (options.injectables && options.injectables instanceof Array)
                 target = Inject(options.injectables)(target);
+            // injectables has been renamed to services
+            if (options.services && options.services instanceof Array)
+                target = Inject(options.services)(target);
 
             // Selector name may be prefixed with a '.', in which case "restrict: 'C'" will be used
             options.selector = camelCase(options.selector || '') + '';
@@ -141,7 +144,12 @@ var angular2now = function () {
             // Save the unCamelCased selector name, so that bootstrap() can use it
             target.selector = unCamelCase(options.selector);
 
-            // The template can be passed in from the @View decorator
+            // template options can be set with Component or with View
+            // so, we run View on the passed in options first.
+            if (options.template || options.templateUrl || options.transclude || options.directives)
+                View(options)(target);
+
+            // The template(Url) can also be passed in from the @View decorator
             options.template = target.template || undefined;
             options.templateUrl = target.templateUrl || undefined;
 
@@ -296,17 +304,17 @@ var angular2now = function () {
         if (typeof options === 'string')
             options = { templateUrl: options };
 
-        if (!options.template) options.template = undefined;
+        //if (!options.template) options.template = undefined;
 
         return function (target) {
-            target.template = options.template;
-            target.templateUrl = options.templateUrl;
+            target.template = options.template || target.template;
+            target.templateUrl = options.templateUrl || target.templateUrl;
 
             // When a templateUrl is specified in options, then transclude can also be specified
-            target.transclude = options.transclude;
+            target.transclude = options.transclude || target.transclude;
 
             // directives is an array of child directive controllers (Classes)
-            target.directives = options.directives;
+            target.directives = options.directives || target.directives;
 
             // Check for the new <content> tag and add ng-transclude to it, if not there.
             if (target.template)
