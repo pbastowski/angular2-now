@@ -31,6 +31,8 @@ Note: This version of angular2-now (version 1.0.0 and higher) works with Meteor 
 Use angular2-now with an **ES6 transpiler** like **Babel** or **TypeScript**. Both work equally well.
 
 Include angular2-now in your AngularJS project, ensuring that it loads before any of it's functions are used. If you're not using any module loaders, then `window.angular2now` gives you direct access to all the annotation functions.
+
+> See the **Code Demos** section below for examples.
  
 ### With SystemJS
  
@@ -87,8 +89,10 @@ In the above example, when we `import "MyService"` we are actually importing the
 The following annotations have been implemented to support Angular 2.0 component syntax. 
 
 ```javascript
+SetModule('my-app', ['angular-meteor']);  // Use SetModule in place of angular.module
+
 @Component({ 
-    selector: 'tag-name', 
+    selector: 'my-app', 
     bind: { twoWay: '=', value: '@', function: '&' }
 })
 
@@ -104,14 +108,15 @@ class App {
     constructor($http, $q) { }
 }
 
-bootstrap(App, ?config) 
+bootstrap(App, ?config);  // config is optional
 ```
 
 The annotations below are not Angular 2, but for me they make coding in Angular a lot nicer. 
 
 ```javascript
-@Service({ name: 'serviceName' })
-@Filter({ name: 'filterName' })
+@Service({ name: 'serviceName' });
+
+@Filter({ name: 'filterName' });
 ```
 
 Client-side routing with ui-router
@@ -127,14 +132,15 @@ Client-side routing with ui-router
 }))
 ```
 
-
-SetModule('my-app', ['angular-meteor'])
+### Meteor specific annotations
 
 The annotation below will only work with Meteor.
 
-- **@MeteorMethod** `( ?options )`
+```javascript
+@MeteorMethod( ?options )
+```
 
-### Can I use angular2-now outside of Meteor?
+## Can I use angular2-now outside of Meteor?
 
 Yes, you can. The angular2-now.js library works with both ES6 (Babel) and plain ES5.
  
@@ -144,77 +150,36 @@ For an ES5 usage demo see [ES5 Agular2-now](http://plnkr.co/edit/uxV781?p=previe
 
 
 
-### Code demos
+## Code demos
 
-You may want to see the following github repositories for some examples of usage, before you start coding. It could save you some "WTF" time.
+Please visit the following github repositories and Plunker examples before you start coding. It will save you some "WTF" time.
 
 #### ES6 examples
 
-- [ES6 Angular2-now Plunker](http://plnkr.co/edit/JhHlOr?p=preview)
+[ES6 Angular2-now Plunker](http://plnkr.co/edit/JhHlOr?p=preview)
 
-#### Meteor
+#### Meteor examples on GitHub
 
-- https://github.com/pbastowski/Thinkster-MEAN-Tutorial-in-angular-meteor/tree/feature/ng2-now-with-services
+[Thinkster-MEAN-Tutorial-in-angular-meteor](https://github.com/pbastowski/Thinkster-MEAN-Tutorial-in-angular-meteor/tree/feature/ng2-now-with-services)
 
+[meteor-angular-socially](https://github.com/pbastowski/meteor-angular-socially/tree/feature/ng2now)
 
-- https://github.com/pbastowski/meteor-angular-socially/tree/feature/ng2now
-- https://github.com/pbastowski/todo-ng2now
-
-## API
-
-### Using SetModule
-
-- **SetModule** `( 'app', ['angular-meteor', 'my-other-module'] )`
-
-This allows us to set the Angular 1 module name in which ll Components, Services, Filters and State configuration will be created by the annotations. The syntax is identical to Angular's own `angular.module`, see: https://docs.angularjs.org/api/ng/function/angular.module. Use `SetModule` in the same places where you would use `angular.module`.
- 
-> SetModule is currently equivalent and interchangeable with angular.module. However, using angular.module is deprecated and will be removed in favor of SetModule in a future release of angular2-now. Use SetModule from now on.
- 
-#### How does it work? 
-angular.module() has been monkey-patched to remember the module name and then call the original angular.module function (and return its return value). 
+[todo-ng2now](https://github.com/pbastowski/todo-ng2now)
 
 
-### Name-spacing your app's providers
+## API in-depth
 
-Creating a namespace for your Angular 1 providers is simple. Just change your use of SetModule from this
+### Use SetModule instead of angular.module
 
-    SetModule('moduleName')
+```javascript
+SetModule( 'app', ['angular-meteor', 'ui.router', 'my-other-module'] )
+```
 
-to this
- 
-    SetModule('nameSpace:moduleName')
-
-The `nameSpace` portion will be used to automatically prefix all provider names within your application. For example
-
-    
-    SetModule('webshop:helpers');
-    
-    @Service({ name: "myService" })   // will create a service called "webshop_myService"
-    
-    @Inject(['myService'])  // the "webshop_" a prefix will be added automatically by the annotation
-
-    @Inject(['$anyThing', '@otherComponent', 'booking_getDate'])  // these will not be prefixed
-    
-
-As shown above, angular2-now will also automatically prefix with the current name-space your @Injected dependencies that are not already prefixed with another namespace or prefixed with the special characters "$" (Angular's global services) and "@" (component controller injections, such as ngModel).
-
-> Caveat: You can't use the underscore `_` character in naming your providers. This is because angular2-now uses it to separate the namespace from the provider name. If you need to use `_` in your provider names then don't use the name-spacing feature of angular2-now. 
-
-
-**Why bother with name-spacing?**
-
-Within a bootstrapped Angular 1 app, all module and provider names created must be unique. This is usually not a problem when you are the only one working on your app. 
-
-In a larger company, however, it is common for two or more teams to be working on different parts of the same overall app. Often on different projects. They may be creating different parts of the company homepage, such as booking or webshop. Booking could have a provider called "getData" and webshop could have its own provider named "getData". Within an Angular 1 app this would create a clash, even if these providers were created in different modules. 
-
-To prevent the clash a naming convention is used, which clearly separates the provider names in two different teams. For example, booking could name their "getData" provider "booking_getData" and webshop could call their "webshop_getData". In this way, all providers within the same Angular 1 bootstrapped app will be unique.
-   
-
+You must use `SetModule` at least once in your app, before you use any annotations, to tell angular2-now in which module to create all Components, Services, Filters and State configuration. The syntax is identical to Angular's own [angular.module()](https://docs.angularjs.org/api/ng/function/angular.module). Use `SetModule` in the same places you would normally use `angular.module`.
+  
 ### ui-router support through @State
 
-This is completely not Angular 2, but I love how easy it makes my routing.
-
-You'll have to include ui-router in your app
+This is completely not Angular 2, but I love how easy it makes my routing. You'll have to include ui-router in your app
 
 Meteor:
 
@@ -236,11 +201,13 @@ Then, you can simply annotate your component with the route/state info, like so
 @Component({selector: 'defect'})
 @View({templateUrl: 'client/defect/defect.html'})
 @Inject(['lookupTables'])
-class defect { 
+class Defect { 
 }
 ```
 
-The `defaultRoute` property, if set to True, will make the annotated State the default for your app. That it, if the user types an unrecognised path into the address bar, or does not type any path other than the url of your app, they will be redirected to the defaultRoute. It is a bit like the old 404 not found redirect, except that in single page apps there is no 404. There is just the default page (or route).
+The `defaultRoute` property, if set to `true`, will make the annotated State the default for your app. That it, if the user types an unrecognised path into the address bar, or does not type any path other than the url of your app, they will be redirected to the defaultRoute. It is a bit like the old 404 not found redirect, except that in single page apps there is no 404. There is just the default page (or route). 
+
+> Meteor apps automatically redirect all unrecognised routes to the app root "/". However, if you're not using Meteor, you'll want to make sure that all unrecognised routes are redirected to the app root, which in many cases is "/". 
  
 In certain cases it may not be enough to just set `defaultRoute = True`. For example, consider a deep state tree, such as below
  

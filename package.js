@@ -2,7 +2,7 @@ Package.describe({
     name:          'pbastowski:angular2-now',
     version:       '1.0.0',
     summary:       'Angular 2 @Component syntax for Meteor 1.2 and AngularJS',
-    git:           'https://github.com/pbastowski/angular2-now.git',
+    git:           'https://github.com/pbastowski/angular2-now/tree/meteor1.2',
     documentation: 'README.md'
 });
 
