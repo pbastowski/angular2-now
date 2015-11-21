@@ -101,8 +101,7 @@ SetModule('my-app', ['angular-meteor']);  // Use SetModule in place of angular.m
     services: ['$http', '$q', 'myService'],
     replace: true or false,
     transclude: true or false,
-    scope: undefined or true or same as bind,
-    
+    scope: undefined or true or same as bind
 })
 
 @View({ 
@@ -130,9 +129,9 @@ The annotations below are not Angular 2, but for me they make coding in Angular 
  
 @Directive()     // alias for @Component
  
-@ScopeShared()  // same as { scope: undefined } on Component
+@ScopeShared()  // same as { scope: undefined } on @Directive
  
-@ScopeNew()     // same as { scope: true } on Component 
+@ScopeNew()     // same as { scope: true } on @Directive 
 ```
 
 Client-side routing with ui-router
