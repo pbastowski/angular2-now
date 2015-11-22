@@ -527,6 +527,10 @@ When defining a `MeteorMethod`, the options can be overridden like this:
 sendEmail() {}
 ```
 
+## Breaking changes between 1.0.0 and 0.3.15
+
+- `angular.module` is no longer monkey-patched by angular2-now. You must use `SetModule` instead of `angular.module` for all modules where you wish to use angular2-now. SetModule has the exact same syntax as angular.module. This change was necessary due to problems encountered with the monkey-patching approach under certain conditions.
+
 ## What environment is required?
 - Angular 1.4+ 
 - Babel 5.1.10+
