@@ -8,8 +8,8 @@ Package.describe({
 
 Package.onUse(function (api) {
     api.versionsFrom('1.2.0.1');
-    api.use('angular@1.0.1', 'client');
-    api.imply('angular@1.0.1', 'client');
+    api.use('angular@1.2.2', 'client');
+    api.imply('angular@1.2.2', 'client');
 
     // Make sure we load after pbastowski:systemjs, if it's used
     api.use('pbastowski:systemjs', 'client', {weak: true});
