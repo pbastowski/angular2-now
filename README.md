@@ -37,7 +37,7 @@ Use angular2-now with an **ES6 transpiler** like **Babel** or **TypeScript**. Bo
 
 Include angular2-now in your AngularJS project, ensuring that it loads before any of it's functions are used. If you're not using any module loaders, then `window.angular2now` gives you direct access to all the annotation functions.
 
-> See the **Code Demos** section below for examples.
+> See the **Examples and Demos** section below for examples.
  
 ### With SystemJS
  
@@ -92,24 +92,24 @@ In the above example, when we `import "MyService"` we are actually importing the
 
 ## Which Angular 2 annotations can I use in my Angular 1 apps?
 
-The following annotations have been implemented to support Angular 2.0 component syntax. 
+The following annotations have been implemented to support Angular 2.0 component syntax. Any parameters preceeded with `?` are optional.
 
 ```javascript
 SetModule('my-app', ['angular-meteor']);  // Use SetModule in place of angular.module
 
 @Component({ 
     selector: 'my-app', 
-    bind: { twoWay: '=', value: '@', function: '&' },
-    services: ['$http', '$q', 'myService'],
-    replace: true or false,
-    transclude: true or false,
-    scope: undefined or true or same as bind
+    ?bind: { twoWay: '=', value: '@', function: '&' },
+    ?services: ['$http', '$q', 'myService'],
+    ?replace: true or false,
+    ?transclude: true or false,
+    ?scope: undefined or true or same as bind
 })
 
 @View({ 
     template: '<div>Inline template</div>',    // inline template 
     templateUrl: 'path/to/the_template.html',  // importing a template
-    transclude: true or false
+    ?transclude: true or false
 })
 
 @Inject('$http', '$q'); // Passing injectables directly
