@@ -5,7 +5,7 @@ Angular2-now gives you the ability to start coding your Angular 1.4+ apps using 
 
 So, if you like the clean syntax of Angular 2, but are not yet ready or able to commit to it, then this library might just be what you're looking for.
 
-> Meteor note: Meteor package version 1.0.0 of angular2-now works with Meteor 1.2 or higher (repo branch `meteor1.2`). The latest Meteor 1.1 package version is 0.3.15.
+> **Meteor note**: Meteor package version 1.0.0 of angular2-now works with Meteor 1.2 or higher (repo branch `meteor1.2`). The latest Meteor 1.1 package version is 0.3.15.
 
 ## Install
 
