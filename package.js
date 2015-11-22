@@ -12,7 +12,7 @@ Package.onUse(function (api) {
     api.imply('angular@1.2.2', 'client');
 
     // Make sure we load after pbastowski:systemjs, if it's used
-    api.use('pbastowski:systemjs', 'client', {weak: true});
+    api.use('pbastowski:systemjs@0.0.1', 'client', {weak: true});
 
     api.addFiles(['angular2-now.js', 'exports.js'], ['client'], {transpile: false});
     api.export(['angular2now']);
