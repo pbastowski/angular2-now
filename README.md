@@ -89,7 +89,7 @@ import {thing1} from "things"
 
 In the above example, when we `import "MyService"` we are actually importing the whole class object, whereas `thing1` is the only object imported from `things`. 
 
-## What Angular 2 annotations can I use in my Angular 1 apps?
+## Which Angular 2 annotations can I use in my Angular 1 apps?
 
 The following annotations have been implemented to support Angular 2.0 component syntax. 
 
