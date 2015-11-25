@@ -444,17 +444,20 @@ var angular2now = function () {
      * a ui-router state to it.
      *
      * @param options   literal object
-     *      name:           name of the state
-     *      url:            url associated with this state
-     *      template:       template
-     *      templateUrl:    templateUrl
-     *      defaultRoute:   truthy = .otherwise(url)
-     *                      string = .otherwise(defaultRoute)
-     *      resolve:        Literal object, see ui-router resolve
-     *      abstract:       true/false
-     *      params:         Literal object, see ui-router doco
-     *      controller:     A controller is automatically assigned, but if you need
-     *                      finer control then you can assign your own controller
+     *      name:              name of the state
+     *      url:               url associated with this state
+     *      template:          template
+     *      templateUrl:       templateUrl
+     *      templateProvider:  templateProvider
+     *      defaultRoute:      truthy = .otherwise(url)
+     *                         string = .otherwise(defaultRoute)
+     *      resolve:           Literal object, see ui-router resolve
+     *      abstract:          true/false
+     *      params:            Literal object, see ui-router doco
+     *      controller:        A controller is automatically assigned, but if you need
+     *                         finer control then you can assign your own controller
+     *      controllerAs:      Specify ControllerAs for cases when there is no
+     *                         @Component used
      *
      * If a class is annotated then it is assumed to be the controller and
      * the state name will be used as the name of the injectable service
@@ -467,7 +470,7 @@ var angular2now = function () {
     function State(options) {
 
         if (!options || !(options instanceof Object) || options.name === undefined)
-            throw new Error('@State: Valid options are: name, url, defaultRoute, template, resolve, abstract, data.');
+            throw new Error('@State: Valid options are: name, url, defaultRoute, template, templateUrl, templateProvider, resolve, abstract, data.');
 
         return function (target) {
 
@@ -538,7 +541,8 @@ var angular2now = function () {
                             templateUrl: options.templateUrl,
 
                             // This is the "inline" template, as opposed to the templateUrl.
-                            // 1) If options.templateUrl is specified then template will be set to undefined.
+                            // 1) If either options.templateUrl or options.templateProvider is specified then
+                            //      template will be set to undefined.
                             // 2) If options.template is provided then it will be used.
                             // 3) Otherwise, if this is a component, but not the bootstrap(**) component,
                             //    then we use it's selector to create the inline template "<selector></selector>".
@@ -546,7 +550,11 @@ var angular2now = function () {
                             //(**) The bootstrap component will be rendered by Angular directly and must not
                             //     be rendered again by ui-router, or you will literally see it twice.
                             // todo: allow the user to specify their own div/span instead of forcing "div(ui-view)"
-                            template: options.templateUrl ? undefined : options.template || ((target.template || target.templateUrl) && !target.bootstrap && target.selector ? target.selector.replace(/^(.*)$/, '<$1></$1>') : '<div ui-view=""></div>'),
+                            template: options.templateUrl || options.templateProvider ? undefined : options.template || ((target.template || target.templateUrl) && !target.bootstrap && target.selector ? target.selector.replace(/^(.*)$/, '<$1></$1>') : '<div ui-view=""></div>'),
+
+                            // The option for dynamically setting a template based on local values
+                            //  or injectable services
+                            templateProvider: options.templateProvider,
 
                             // Do we need to resolve stuff? If so, then we also provide a controller to catch the resolved data.
                             resolve:    resolves,

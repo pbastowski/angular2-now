@@ -150,6 +150,7 @@ Client-side routing with ui-router
     ?controller: controllerFunction, 
     ?template: '<div></div>',
     ?templateUrl: 'client/app/app.html',
+    ?templateProvider: function() { return "<h1>content</h1>"; }
 }))
 ```
 
