@@ -15,11 +15,13 @@ declare module 'angular2now' {
     //export var SetModule: typeof angular2now.SetModule;
 
     export var Inject: typeof angular2now.Inject;
+
+    export var MeteorMethod: typeof angular2now.MeteorMethod;
 }
 
 declare module angular2now {
     // Class decorators.
-    export function Component(config: ComponentConfig): ClassDecorator;
+    export function Component(config: ComponentConfig|string): ClassDecorator;
 
     export function Service(config: ServiceConfig): ClassDecorator;
 
@@ -36,6 +38,8 @@ declare module angular2now {
     export function options(config: options);
 
     export function Inject(dependencies: string[]);
+
+    export function MeteorMethod(config?: options);
 
     interface options {
         controllerAs?: string;
