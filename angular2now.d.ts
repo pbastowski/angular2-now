@@ -23,13 +23,13 @@ declare module angular2now {
     // Class decorators.
     export function Component(config: ComponentConfig|string): ClassDecorator;
 
-    export function Service(config: ServiceConfig): ClassDecorator;
+    export function Service(config: ServiceConfig|string): ClassDecorator;
 
-    export function Filter(config: FilterConfig): ClassDecorator;
+    export function Filter(config: FilterConfig|string): ClassDecorator;
 
     export function State(config: StateConfig): ClassDecorator;
 
-    export function View(config: ViewConfig): ClassDecorator;
+    export function View(config: ViewConfig|string): ClassDecorator;
 
     export function bootstrap(appName: any, dependencies?: string[]);
 
