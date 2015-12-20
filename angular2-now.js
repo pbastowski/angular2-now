@@ -454,6 +454,7 @@ var angular2now = function () {
      *      resolve:           Literal object, see ui-router resolve
      *      abstract:          true/false
      *      params:            Literal object, see ui-router doco
+     *      parent:            Define a custom parent state
      *      controller:        A controller is automatically assigned, but if you need
      *                         finer control then you can assign your own controller
      *      controllerAs:      Specify ControllerAs for cases when there is no
@@ -470,7 +471,7 @@ var angular2now = function () {
     function State(options) {
 
         if (!options || !(options instanceof Object) || options.name === undefined)
-            throw new Error('@State: Valid options are: name, url, defaultRoute, template, templateUrl, templateProvider, resolve, abstract, data.');
+            throw new Error('@State: Valid options are: name, url, defaultRoute, template, templateUrl, templateProvider, resolve, abstract, parent, data.');
 
         return function (target) {
 
@@ -570,6 +571,9 @@ var angular2now = function () {
                             // onEnter and onExit events
                             onEnter: options.onEnter,
                             onExit:  options.onExit,
+
+                            // Custom parent State
+                            parent: options.parent,
 
                             // Custom data
                             data: options.data
