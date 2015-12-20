@@ -1,6 +1,6 @@
 Package.describe({
     name:          'pbastowski:angular2-now',
-    version:       '0.3.16',
+    version:       '0.3.17',
     summary:       'Angular 2 @Component syntax for Angular 1',
     git:           'https://github.com/pbastowski/angular2-now.git',
     documentation: 'README.md'
