@@ -675,5 +675,22 @@ describe("angular2-now", () => {
         expect(getDDO('templateUrl')).toBe(templateUrl);
       });
     });
+
+    describe("options.transclude", () => {
+      it("should set transclude to true", () => {
+        const transclude = true;
+
+        doComponent({transclude});
+
+        expect(getDDO('transclude')).toBe(transclude);
+      });
+      it("should set not set transclude", () => {
+        const transclude = false;
+
+        doComponent({transclude});
+
+        expect(getDDO('transclude')).toBeUndefined();
+      });
+    });
   });
 });
