@@ -254,6 +254,7 @@ describe("angular2-now", () => {
     }
     let spy;
     let spyCtrl;
+
     function Target() {};
 
 
@@ -325,6 +326,7 @@ describe("angular2-now", () => {
     }
     let spy;
     let spyService;
+
     function Target() {};
 
 
@@ -389,6 +391,7 @@ describe("angular2-now", () => {
     let spy;
     let spyFilter;
     const foo = 'bar';
+
     function Target() {
       return arguments;
     };
@@ -547,34 +550,50 @@ describe("angular2-now", () => {
   });
 
   describe("@Component()", () => {
+    const moduleMock = {
+      directive: () => {}
+    };
+    let spyModule;
+    let spyDirective;
+
+    beforeEach(() => {
+      spyModule = spyOn(angular, 'module').and.returnValue(moduleMock);
+      spyDirective = spyOn(moduleMock, 'directive');
+    });
+
     describe("options.selector", () => {
+      let target;
+      const nameCamel = 'testComponent';
+      const nameClass = '.testComponent';
+      const nameDashed = 'test-component';
+
+      beforeEach(() => {
+        target = {};
+      });
+
       it("should set selector if argument is a string", () => {
-        const target = {};
-        const name = 'test-component';
-
-        angular2now.Component(name)(target);
-
-        expect(target.selector).toBe(name);
+        angular2now.Component(nameDashed)(target);
+        expect(target.selector).toBe(nameDashed);
+        expect(spyDirective.calls.mostRecent().args[0]).toBe(nameCamel);
       });
 
       it("should be able to unCamelCase selector", () => {
-        const target = {};
-        const name = 'testComponent';
-        const nameDashed = 'test-component';
-
-        angular2now.Component(name)(target);
-
+        angular2now.Component(nameCamel)(target);
         expect(target.selector).toBe(nameDashed);
+        expect(spyDirective.calls.mostRecent().args[0]).toBe(nameCamel);
       });
 
       it("should handle class name as selector", () => {
-        const target = {};
-        const name = '.testComponent';
-        const nameDashed = 'test-component';
-
-        angular2now.Component(name)(target);
-
+        angular2now.Component(nameClass)(target);
         expect(target.selector).toBe(nameDashed);
+        expect(spyDirective.calls.mostRecent().args[0]).toBe(nameCamel);
+      });
+
+      it("should call angular.directive with proper selector", () => {
+        angular2now.Component(nameClass)(target);
+        expect(target.selector).toBe(nameDashed);
+        expect(spyDirective).toHaveBeenCalled();
+        expect(spyDirective.calls.mostRecent().args[0]).toBe(nameCamel);
       });
     });
   });
