@@ -112,16 +112,6 @@ describe("angular2-now", () => {
           expect(TargetMock.$inject.indexOf(`ns_${inj}`)).not.toBe(-1);
         });
       });
-
-      // TODO wait for pbastowski response
-      /*
-      it("should prevent duplicates", () => {
-        const uniqueConcated = _.uniq(concatedRaw);
-        const uniqueTarget = _.uniq(TargetMock.$inject);
-        const diff = _.difference(uniqueTarget, uniqueConcated);
-
-        expect(diff.length).toBe(0);
-      });*/
     });
   });
 
