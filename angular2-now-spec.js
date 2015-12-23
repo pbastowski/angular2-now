@@ -785,5 +785,39 @@ describe("angular2-now", () => {
         });
       });
     });
+
+    describe("target.require", () => {
+      it("should set require", () => {
+        const require = ['@foo'];
+
+        target.require = require;
+        doComponent();
+
+        expect(getDDO('require')).toBe(require);
+      });
+    });
+
+    describe("options.require", () => {
+      it("should set require", () => {
+        const require = ['@foo'];
+
+        doComponent({
+          require
+        });
+
+        expect(getDDO('require')).toBe(require);
+      });
+
+      it("should overwrite target's require", () => {
+        const require = ['@foo'];
+
+        target.require = ['@bar'];
+        doComponent({
+          require
+        });
+
+        expect(getDDO('require')).toBe(require);
+      });
+    });
   });
 });
