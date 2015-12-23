@@ -704,5 +704,20 @@ describe("angular2-now", () => {
         expect(getDDO('transclude')).toBeUndefined();
       });
     });
+
+    describe("options.restrict", () => {
+
+      it("should set each restriction", () => {
+        const restrictions = ['E', 'A', 'C', 'EA', 'EAC'];
+
+        restrictions.forEach((restrict) => {
+          doComponent({
+            restrict
+          });
+
+          expect(getDDO('restrict')).toBe(restrict);
+        })
+      });
+    });
   });
 });
