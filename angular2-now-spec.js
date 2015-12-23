@@ -560,6 +560,12 @@ describe("angular2-now", () => {
     const nameClass = '.testComponent';
     const nameDashed = 'test-component';
 
+    function getDDO(opt) {
+      const ddo = spyDirective.calls.mostRecent().args[1]();
+
+      return ddo[opt];
+    }
+
     beforeEach(() => {
       target = {};
       spyModule = spyOn(angular, 'module').and.returnValue(moduleMock);
@@ -625,6 +631,18 @@ describe("angular2-now", () => {
 
         expect(target.$inject).toEqual(services);
         expect(target.$injectDefer).toEqual(target.$inject);
+      });
+    });
+
+    describe("options.template", () => {
+      it("should set template", () => {
+        const template = 'foo';
+
+        angular2now.Component({
+          template
+        })(target);
+
+        expect(getDDO('template')).toBe(template);
       });
     });
   });
