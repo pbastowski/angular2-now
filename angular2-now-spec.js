@@ -539,4 +539,10 @@ describe("angular2-now", () => {
       expect(result).toBe(target);
     });
   });
+
+  describe("@Directive", () => {
+    it("should be an alias for @Component()", () => {
+      expect(angular2now.Directive).toBe(angular2now.Component);
+    });
+  });
 });
