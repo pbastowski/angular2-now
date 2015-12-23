@@ -553,23 +553,20 @@ describe("angular2-now", () => {
     const moduleMock = {
       directive: () => {}
     };
+    let target;
     let spyModule;
     let spyDirective;
+    const nameCamel = 'testComponent';
+    const nameClass = '.testComponent';
+    const nameDashed = 'test-component';
 
     beforeEach(() => {
+      target = {};
       spyModule = spyOn(angular, 'module').and.returnValue(moduleMock);
       spyDirective = spyOn(moduleMock, 'directive');
     });
 
     describe("options.selector", () => {
-      let target;
-      const nameCamel = 'testComponent';
-      const nameClass = '.testComponent';
-      const nameDashed = 'test-component';
-
-      beforeEach(() => {
-        target = {};
-      });
 
       it("should set selector if argument is a string", () => {
         angular2now.Component(nameDashed)(target);
@@ -594,6 +591,23 @@ describe("angular2-now", () => {
         expect(target.selector).toBe(nameDashed);
         expect(spyDirective).toHaveBeenCalled();
         expect(spyDirective.calls.mostRecent().args[0]).toBe(nameCamel);
+      });
+    });
+
+    describe("options.injectables", () => {
+      const injectables = ['$http', '$q'];
+
+      beforeEach(() => {
+        target.name = nameCamel;
+      });
+
+      it("should set injectables", () => {
+        angular2now.Component({
+          injectables
+        })(target);
+
+        expect(target.$inject).toEqual(injectables);
+        expect(target.$injectDefer).toEqual(target.$inject);
       });
     });
   });
