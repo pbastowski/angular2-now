@@ -634,7 +634,9 @@ describe("angular2-now", () => {
       });
 
       it("should set injectables", () => {
-        doComponent({injectables});
+        doComponent({
+          injectables
+        });
 
         expect(target.$inject).toEqual(injectables);
         expect(target.$injectDefer).toEqual(target.$inject);
@@ -649,7 +651,9 @@ describe("angular2-now", () => {
       });
 
       it("should set services", () => {
-        doComponent({services});
+        doComponent({
+          services
+        });
 
         expect(target.$inject).toEqual(services);
         expect(target.$injectDefer).toEqual(target.$inject);
@@ -660,7 +664,9 @@ describe("angular2-now", () => {
       it("should set template", () => {
         const template = 'foo';
 
-        doComponent({template});
+        doComponent({
+          template
+        });
 
         expect(getDDO('template')).toBe(template);
       });
@@ -670,7 +676,9 @@ describe("angular2-now", () => {
       it("should set templateUrl", () => {
         const templateUrl = 'foo.html';
 
-        doComponent({templateUrl});
+        doComponent({
+          templateUrl
+        });
 
         expect(getDDO('templateUrl')).toBe(templateUrl);
       });
@@ -680,14 +688,18 @@ describe("angular2-now", () => {
       it("should set transclude to true", () => {
         const transclude = true;
 
-        doComponent({transclude});
+        doComponent({
+          transclude
+        });
 
         expect(getDDO('transclude')).toBe(transclude);
       });
       it("should set not set transclude", () => {
         const transclude = false;
 
-        doComponent({transclude});
+        doComponent({
+          transclude
+        });
 
         expect(getDDO('transclude')).toBeUndefined();
       });
