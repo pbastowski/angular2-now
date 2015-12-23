@@ -820,6 +820,46 @@ describe("angular2-now", () => {
       });
     });
 
+    describe("require", () => {
+      const monkeyInjects = ['@^foo', '@bar'];
+      const injectables = ['$http'].concat(monkeyInjects);
+      const questionInjects = monkeyInjects.map((inj) => '?' + inj.slice(1));
+
+      it("should set require with @ prefixed injectables", () => {
+        doComponent({
+          injectables,
+          selector: nameDashed
+        });
+
+        const requireDDO = getDDO('require');
+
+        questionInjects.forEach((inj) => {
+          expect(requireDDO.indexOf(inj)).not.toBe(-1);
+        });
+      });
+
+      it("should set require with target", () => {
+        doComponent({
+          injectables,
+          selector: nameDashed
+        });
+
+        expect(getDDO('require').indexOf(nameCamel)).not.toBe(-1);
+      });
+
+      it("should remove transformed injectables", () => {
+        doComponent({
+          injectables,
+          selector: nameDashed
+        });
+
+        monkeyInjects.forEach((inj) => {
+          expect(target.$inject.indexOf(inj)).toBe(-1);
+          expect(target.$injectDefer.indexOf(inj)).toBe(-1);
+        });
+      });
+    });
+
     describe("target.link", () => {
       it("should set link", () => {
         const link = function linkTarget() {};
