@@ -563,7 +563,7 @@ var angular2now = function () {
                             onExit:  options.onExit,
 
                             // Custom parent State
-                            parent: options.parent
+                            parent: options.parent,
 
                             // Custom data
                             data: options.data
