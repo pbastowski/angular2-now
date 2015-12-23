@@ -719,5 +719,28 @@ describe("angular2-now", () => {
         })
       });
     });
+
+    describe("options.controllerAs", () => {
+      it("should set controllerAs", () => {
+        const controllerAs = 'foo';
+
+        doComponent({
+          controllerAs
+        });
+
+        expect(getDDO('controllerAs')).toBe(controllerAs);
+      });
+
+      it("should overwrite target's controllerAs", () => {
+        const controllerAs = 'foo';
+
+        target.controllerAs = 'bar';
+        doComponent({
+          controllerAs
+        });
+
+        expect(getDDO('controllerAs')).toBe(controllerAs);
+      });
+    });
   });
 });
