@@ -545,4 +545,37 @@ describe("angular2-now", () => {
       expect(angular2now.Directive).toBe(angular2now.Component);
     });
   });
+
+  describe("@Component()", () => {
+    describe("options.selector", () => {
+      it("should set selector if argument is a string", () => {
+        const target = {};
+        const name = 'test-component';
+
+        angular2now.Component(name)(target);
+
+        expect(target.selector).toBe(name);
+      });
+
+      it("should be able to unCamelCase selector", () => {
+        const target = {};
+        const name = 'testComponent';
+        const nameDashed = 'test-component';
+
+        angular2now.Component(name)(target);
+
+        expect(target.selector).toBe(nameDashed);
+      });
+
+      it("should handle class name as selector", () => {
+        const target = {};
+        const name = '.testComponent';
+        const nameDashed = 'test-component';
+
+        angular2now.Component(name)(target);
+
+        expect(target.selector).toBe(nameDashed);
+      });
+    });
+  });
 });
