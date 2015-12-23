@@ -893,5 +893,35 @@ describe("angular2-now", () => {
         expect(getDDO('link')).toBe(link);
       });
     });
+
+    describe("restrict", () => {
+      it("should be A by default", () => {
+        doComponent(nameCamel);
+        expect(getDDO('restrict')).toBe('A');
+      });
+
+      it("should be EA when templateUrl and non class selector", () => {
+        doComponent({
+          selector: nameCamel,
+          templateUrl: 'foo.html'
+        });
+        expect(getDDO('restrict')).toBe('EA');
+      });
+
+      it("should be EA when template and non class selector", () => {
+        doComponent({
+          selector: nameCamel,
+          template: 'foo'
+        });
+        expect(getDDO('restrict')).toBe('EA');
+      });
+
+      it("should be C when slector is a class name", () => {
+        doComponent({
+          selector: nameClass
+        });
+        expect(getDDO('restrict')).toBe('C');
+      });
+    });
   });
 });
