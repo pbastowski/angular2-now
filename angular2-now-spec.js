@@ -610,5 +610,22 @@ describe("angular2-now", () => {
         expect(target.$injectDefer).toEqual(target.$inject);
       });
     });
+
+    describe("options.services", () => {
+      const services = ['$http', '$q'];
+
+      beforeEach(() => {
+        target.name = nameCamel;
+      });
+
+      it("should set services", () => {
+        angular2now.Component({
+          services
+        })(target);
+
+        expect(target.$inject).toEqual(services);
+        expect(target.$injectDefer).toEqual(target.$inject);
+      });
+    });
   });
 });
