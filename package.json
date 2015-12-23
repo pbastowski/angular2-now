@@ -6,7 +6,8 @@
   "main": "angular2-now.js",
   "scripts": {
     "test": "karma start karma.config.js --set-env-NODE_ENV=ci",
-    "test:local": "karma start karma.config.js"
+    "test:local": "karma start karma.config.js",
+    "coverage:coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
   },
   "repository": {
     "type": "git",
@@ -45,6 +46,7 @@
     "karma-jasmine": "^0.3.6",
     "karma-sourcemap-loader": "^0.3.6",
     "karma-webpack": "^1.7.0",
+    "coveralls": "^2.11.4",
     "underscore": "^1.8.3",
     "webpack": "^1.12.9"
   }
