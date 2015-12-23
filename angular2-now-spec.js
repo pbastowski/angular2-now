@@ -579,8 +579,7 @@ describe("angular2-now", () => {
     }
 
     beforeEach(() => {
-      target = function target() {
-      };
+      target = function target() {};
       spyModule = spyOn(angular, 'module').and.returnValue(moduleMock);
       spyDirective = spyOn(moduleMock, 'directive');
     });
@@ -959,6 +958,40 @@ describe("angular2-now", () => {
         });
 
         expect(getDDO('scope')).toEqual(bind);
+      });
+    });
+
+    describe("transclude", () => {
+      it("should be undefined by default", () => {
+        doComponent({
+          selector: nameDashed
+        });
+
+        expect(getDDO('transclude')).toBeUndefined();
+      });
+
+      it("should set transclude when template contains content element", () => {
+        const template = `
+          <div>
+            <content></content>
+          </div>
+        `;
+
+        doComponent({
+          template
+        });
+
+        expect(getDDO('transclude')).toBe(true);
+      });
+
+      it("should set transclude when template does not contain content", () => {
+        const template = `<div></div>`;
+
+        doComponent({
+          template
+        });
+
+        expect(getDDO('transclude')).toBeUndefined();
       });
     });
   });
