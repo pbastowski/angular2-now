@@ -716,7 +716,7 @@ describe("angular2-now", () => {
           });
 
           expect(getDDO('restrict')).toBe(restrict);
-        })
+        });
       });
     });
 
@@ -740,6 +740,47 @@ describe("angular2-now", () => {
         });
 
         expect(getDDO('controllerAs')).toBe(controllerAs);
+      });
+    });
+
+    describe("options.scope", () => {
+      it("should set scope", () => {
+        const scopes = [true, false, undefined, {
+          foo: 'bar'
+        }];
+
+        scopes.forEach((scope) => {
+          doComponent({
+            scope
+          });
+
+          expect(getDDO('scope')).toBe(scope);
+        });
+      });
+
+      it("should be skipped if target's scope is available", () => {
+        const scopes = [true, false, undefined, {
+          foo: 'bar'
+        }];
+
+        scopes.forEach((scope) => {
+          target.scope = scope;
+          doComponent({
+            scope: {
+              foo: 'baz'
+            }
+          });
+
+          expect(getDDO('scope')).toBe(scope);
+        });
+      });
+
+      it("should be an empty object if neither of bind, scope or target's scope is available", () => {
+        doComponent({
+          selector: nameDashed
+        });
+
+        expect(getDDO('scope')).toEqual({});
       });
     });
   });
