@@ -783,5 +783,18 @@ describe("angular2-now", () => {
         expect(getDDO('scope')).toEqual({});
       });
     });
+
+    describe("target.bindToController", () => {
+      it("shoud set bindToController", () => {
+        const bools = [true, false];
+
+        bools.forEach((val) => {
+          target.bindToController = val;
+          doComponent();
+
+          expect(getDDO('bindToController')).toBe(val);
+        });
+      });
+    });
   });
 });
