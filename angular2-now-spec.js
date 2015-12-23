@@ -819,5 +819,39 @@ describe("angular2-now", () => {
         expect(getDDO('require')).toBe(require);
       });
     });
+
+    describe("target.link", () => {
+      it("should set link", () => {
+        const link = function linkTarget() {};
+
+        target.link = link;
+        doComponent();
+
+        expect(getDDO('link')).toBe(link);
+      });
+    });
+
+    describe("options.link", () => {
+      it("should set link", () => {
+        const link = function linkOptions() {};
+
+        doComponent({
+          link
+        });
+
+        expect(getDDO('link')).toBe(link);
+      });
+
+      it("should overwrite target's link", () => {
+        const link = function linkOptions() {};
+
+        target.link = function linkTarget() {};
+        doComponent({
+          link
+        });
+
+        expect(getDDO('link')).toBe(link);
+      });
+    });
   });
 });
