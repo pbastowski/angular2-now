@@ -7,7 +7,7 @@
   "scripts": {
     "test": "karma start karma.config.js --set-env-NODE_ENV=ci",
     "test:local": "karma start karma.config.js",
-    "coverage:coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+    "coverage:coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },
   "repository": {
     "type": "git",
