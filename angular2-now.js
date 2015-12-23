@@ -181,8 +181,7 @@ var angular2now = function () {
                 restrict:         options.restrict || ((options.template + options.templateUrl) ? 'EA' : isClass ? 'C' : 'A'),
                 controllerAs:     options.controllerAs || controllerAs || target.controllerAs || options.selector,
                 scope:            target.hasOwnProperty('scope') ? target.scope : options.hasOwnProperty('scope') ? options.scope : options['bind'] || {},
-                // TODO Always true
-                bindToController: target.bindToController || true,
+                bindToController: typeof target.bindToController === 'boolean' ? target.bindToController : true,
                 template:         options.template,
                 templateUrl:      options.templateUrl,
                 controller:       target,
