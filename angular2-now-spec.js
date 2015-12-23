@@ -645,5 +645,17 @@ describe("angular2-now", () => {
         expect(getDDO('template')).toBe(template);
       });
     });
+
+    describe("options.templateUrl", () => {
+      it("should set templateUrl", () => {
+        const templateUrl = 'foo.html';
+
+        angular2now.Component({
+          templateUrl
+        })(target);
+
+        expect(getDDO('templateUrl')).toBe(templateUrl);
+      });
+    });
   });
 });
