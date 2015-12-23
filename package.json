@@ -45,6 +45,7 @@
     "karma-jasmine": "^0.3.6",
     "karma-sourcemap-loader": "^0.3.6",
     "karma-webpack": "^1.7.0",
+    "underscore": "^1.8.3",
     "webpack": "^1.12.9"
   }
 }
