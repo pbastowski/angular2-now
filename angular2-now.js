@@ -178,7 +178,7 @@ var angular2now = function () {
 
             // Create the angular directive
             var ddo = {
-                restrict:         options.restrict || (options.template + options.templateUrl) ? 'EA' : isClass ? 'C' : 'A',
+                restrict:         options.restrict || ((options.template + options.templateUrl) ? 'EA' : isClass ? 'C' : 'A'),
                 controllerAs:     options.controllerAs || controllerAs || target.controllerAs || options.selector,
                 scope:            target.hasOwnProperty('scope') ? target.scope : options.hasOwnProperty('scope') ? options.scope : options['bind'] || {},
                 bindToController: target.bindToController || true,
