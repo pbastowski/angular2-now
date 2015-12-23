@@ -923,5 +923,29 @@ describe("angular2-now", () => {
         expect(getDDO('restrict')).toBe('C');
       });
     });
+
+    describe("controllerAs", () => {
+      it("should be the same as selector by default", () => {
+        doComponent({
+          selector: nameDashed
+        });
+        expect(getDDO('controllerAs')).toBe(nameCamel);
+      });
+
+      it("should be owerwritten by options.controllerAs", () => {
+        angular2now.options({
+          controllerAs: 'vm'
+        });
+        doComponent({
+          selector: nameDashed
+        });
+        expect(getDDO('controllerAs')).toBe('vm');
+
+        // reset
+        angular2now.options({
+          controllerAs: null
+        });
+      });
+    });
   });
 });
