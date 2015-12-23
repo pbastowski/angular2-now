@@ -947,5 +947,19 @@ describe("angular2-now", () => {
         });
       });
     });
+
+    describe("options.bind", () => {
+      it("should set scope", () => {
+        const bind = {
+          foo: 'bar'
+        };
+
+        doComponent({
+          bind
+        });
+
+        expect(getDDO('scope')).toEqual(bind);
+      });
+    });
   });
 });
