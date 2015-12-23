@@ -1,7 +1,15 @@
+require('argv-set-env')();
+
+// webpack configuration
 var webpack = require('./webpack/config');
 
+// main file with tests
 var testFile = 'angular2-now-spec.js';
 
+// is it Continuous Integration environment
+var ciEnv = process.env.NODE_ENV === 'ci';
+
+// add preprocessors
 var preprocessors = {};
 preprocessors[testFile] = ['webpack'];
 
@@ -69,17 +77,17 @@ module.exports = function(config) {
 
 
     // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: true,
+    autoWatch: !ciEnv,
 
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
+    browsers: [(ciEnv ? 'Firefox' : 'Chrome')],
 
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false
+    singleRun: ciEnv
   };
   config.set(_config);
 };
