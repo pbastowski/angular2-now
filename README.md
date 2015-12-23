@@ -1,13 +1,13 @@
 Angular2-now */ unit-testing*
 =============================
 
-**Code coverage:** [![Coverage Status](https://coveralls.io/repos/kamilkisiela/angular2-now/badge.svg?branch=feature%2Funit-tests&service=github)](https://coveralls.io/github/kamilkisiela/angular2-now?branch=feature%2Funit-tests)
+**Code coverage:**
 
-https://coveralls.io/github/kamilkisiela/angular2-now
+[![Coverage Status](https://coveralls.io/repos/kamilkisiela/angular2-now/badge.svg?branch=feature%2Funit-tests&service=github)](https://coveralls.io/github/kamilkisiela/angular2-now?branch=feature%2Funit-tests)
 
-**Travis-CI:** [![Build Status](https://travis-ci.org/kamilkisiela/angular2-now.svg?branch=feature%2Funit-tests)](https://travis-ci.org/kamilkisiela/angular2-now)
+**Travis-CI:**
 
-https://travis-ci.org/kamilkisiela/angular2-now
+[![Build Status](https://travis-ci.org/kamilkisiela/angular2-now.svg?branch=feature%2Funit-tests)](https://travis-ci.org/kamilkisiela/angular2-now)
 
 How to use?
 -----------
