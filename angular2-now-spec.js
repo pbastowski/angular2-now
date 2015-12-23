@@ -579,9 +579,16 @@ describe("angular2-now", () => {
     }
 
     beforeEach(() => {
-      target = {};
+      target = function target() {
+      };
       spyModule = spyOn(angular, 'module').and.returnValue(moduleMock);
       spyDirective = spyOn(moduleMock, 'directive');
+    });
+
+    it("should have target at controller", () => {
+      doComponent(nameDashed);
+
+      expect(getDDO('controller')).toBe(target);
     });
 
     describe("options.selector", () => {
@@ -619,10 +626,6 @@ describe("angular2-now", () => {
     describe("options.injectables", () => {
       const injectables = ['$http', '$q'];
 
-      beforeEach(() => {
-        target.name = nameCamel;
-      });
-
       it("should set injectables", () => {
         doComponent({
           injectables
@@ -635,10 +638,6 @@ describe("angular2-now", () => {
 
     describe("options.services", () => {
       const services = ['$http', '$q'];
-
-      beforeEach(() => {
-        target.name = nameCamel;
-      });
 
       it("should set services", () => {
         doComponent({
