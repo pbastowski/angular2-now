@@ -29,6 +29,7 @@
   "devDependencies": {
     "angular": "^1.4.0",
     "angular-mocks": "^1.4.0",
+    "angular-ui-router": "^0.2.15",
     "argv-set-env": "^1.0.0",
     "babel": "^5.8.3",
     "babel-core": "^5.0.0",
@@ -39,8 +40,8 @@
     "karma": "^0.13.15",
     "karma-babel-preprocessor": "^5.2.2",
     "karma-chrome-launcher": "^0.2.1",
-    "karma-firefox-launcher": "^0.1.7",
     "karma-coverage": "^0.5.3",
+    "karma-firefox-launcher": "^0.1.7",
     "karma-jasmine": "^0.3.6",
     "karma-sourcemap-loader": "^0.3.6",
     "karma-webpack": "^1.7.0",
