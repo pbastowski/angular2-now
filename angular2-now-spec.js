@@ -560,10 +560,32 @@ describe("angular2-now", () => {
     const nameClass = '.testComponent';
     const nameDashed = 'test-component';
 
+    /**
+     * Returns directive's object
+     * @param  {Object|String} opt Component(opt)
+     * @return {Object} target reference
+     */
     function getDDO(opt) {
       const ddo = spyDirective.calls.mostRecent().args[1]();
 
       return ddo[opt];
+    }
+
+    /**
+     * Retuns directive's name
+     * @return {[type]} [description]
+     */
+    function getDDName() {
+      return spyDirective.calls.mostRecent().args[0];
+    }
+
+    /**
+     * Shorthand for angular2now.Component(opts)(target)
+     * @param  {Object|String} opts Component(opts)
+     * @return {Object} target reference
+     */
+    function doComponent(opts) {
+      return angular2now.Component(opts)(target);
     }
 
     beforeEach(() => {
@@ -575,28 +597,32 @@ describe("angular2-now", () => {
     describe("options.selector", () => {
 
       it("should set selector if argument is a string", () => {
-        angular2now.Component(nameDashed)(target);
+        doComponent(nameDashed);
+
         expect(target.selector).toBe(nameDashed);
-        expect(spyDirective.calls.mostRecent().args[0]).toBe(nameCamel);
+        expect(getDDName()).toBe(nameCamel);
       });
 
       it("should be able to unCamelCase selector", () => {
-        angular2now.Component(nameCamel)(target);
+        doComponent(nameCamel);
+
         expect(target.selector).toBe(nameDashed);
-        expect(spyDirective.calls.mostRecent().args[0]).toBe(nameCamel);
+        expect(getDDName()).toBe(nameCamel);
       });
 
       it("should handle class name as selector", () => {
-        angular2now.Component(nameClass)(target);
+        doComponent(nameClass);
+
         expect(target.selector).toBe(nameDashed);
-        expect(spyDirective.calls.mostRecent().args[0]).toBe(nameCamel);
+        expect(getDDName()).toBe(nameCamel);
       });
 
       it("should call angular.directive with proper selector", () => {
-        angular2now.Component(nameClass)(target);
+        doComponent(nameClass);
+
         expect(target.selector).toBe(nameDashed);
         expect(spyDirective).toHaveBeenCalled();
-        expect(spyDirective.calls.mostRecent().args[0]).toBe(nameCamel);
+        expect(getDDName()).toBe(nameCamel);
       });
     });
 
@@ -608,9 +634,7 @@ describe("angular2-now", () => {
       });
 
       it("should set injectables", () => {
-        angular2now.Component({
-          injectables
-        })(target);
+        doComponent({injectables});
 
         expect(target.$inject).toEqual(injectables);
         expect(target.$injectDefer).toEqual(target.$inject);
@@ -625,9 +649,7 @@ describe("angular2-now", () => {
       });
 
       it("should set services", () => {
-        angular2now.Component({
-          services
-        })(target);
+        doComponent({services});
 
         expect(target.$inject).toEqual(services);
         expect(target.$injectDefer).toEqual(target.$inject);
@@ -638,9 +660,7 @@ describe("angular2-now", () => {
       it("should set template", () => {
         const template = 'foo';
 
-        angular2now.Component({
-          template
-        })(target);
+        doComponent({template});
 
         expect(getDDO('template')).toBe(template);
       });
@@ -650,9 +670,7 @@ describe("angular2-now", () => {
       it("should set templateUrl", () => {
         const templateUrl = 'foo.html';
 
-        angular2now.Component({
-          templateUrl
-        })(target);
+        doComponent({templateUrl});
 
         expect(getDDO('templateUrl')).toBe(templateUrl);
       });
