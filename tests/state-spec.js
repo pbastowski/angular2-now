@@ -2,13 +2,16 @@ export default (angular2now, ngModuleName) => {
   describe("@State()", () => {
     let target;
     const state = {
-        name: 'test'
-      }
-      // spies
+      name: 'test'
+    };
+    // spies
     let spyLocation = {};
     let spyUrlRouter = {};
     let spyState = {};
 
+    /**
+     * Call State on target and load ng module
+     */
     function doStateRaw(opts) {
       const result = angular2now.State(opts)(target);
 
@@ -18,14 +21,24 @@ export default (angular2now, ngModuleName) => {
       return result;
     }
 
+    /**
+     * Same as doStateRaw but with predefined state options
+     */
     function doState(opts) {
       return doStateRaw(angular.merge(state, opts));
     }
 
+    /**
+     * Get option's value from state definition object
+     */
     function getSDO(opt) {
       return spyState.state.calls.mostRecent().args[1][opt];
     }
 
+    /**
+     * Use it if you want to set state's option
+     * and you expect the same value on state definition object.
+     */
     function expectSDO(name, value) {
       doState({
         [name]: value
@@ -34,12 +47,16 @@ export default (angular2now, ngModuleName) => {
     }
 
     beforeEach(() => {
+      // reset target
       target = {};
-      // spies
+      // set spies
       angular.module('providersConfig', ['ui.router'])
         .config(function($locationProvider, $urlRouterProvider, $stateProvider) {
+          // spy on html5Mode
           spyLocation.html5Mode = spyOn($locationProvider, 'html5Mode');
+          // spy on otherwise
           spyUrlRouter.otherwise = spyOn($urlRouterProvider, 'otherwise');
+          // spy on state
           spyState.state = spyOn($stateProvider, 'state');
         });
       window.module('providersConfig');

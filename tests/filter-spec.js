@@ -1,22 +1,44 @@
 export default (angular2now, ngModuleName) => {
   describe("@Filter()", () => {
+    /**
+     * Filter name
+     * @type {String}
+     */
     const name = 'TestFilter';
+    /**
+     * Mock angular.module
+     * @type {Object}
+     */
     const moduleMock = {
       filter: function() {}
     }
-    let spy;
+    /**
+     * spy on angular.module
+     */
+    let spyModule;
+    /**
+     * spy on angular.module().filter
+     */
     let spyFilter;
     const foo = 'bar';
 
+    /**
+     * Target used in all tests
+     */
     function Target() {
       return arguments;
     };
+    // inject default service
     Target.$inject = ['$http'];
 
+    function doFilter(opts) {
+      return angular2now.Filter(opts)(Target);
+    }
 
     beforeEach(() => {
       // set spies
-      spy = spyOn(angular, 'module').and.returnValue(moduleMock);
+      // and return mock
+      spyModule = spyOn(angular, 'module').and.returnValue(moduleMock);
       spyFilter = spyOn(moduleMock, 'filter');
     });
 
@@ -27,18 +49,18 @@ export default (angular2now, ngModuleName) => {
       });
 
       it("should set filter if argument is a string", () => {
-        angular2now.Filter(name)(Target);
+        doFilter(name);
 
-        expect(spy).toHaveBeenCalledWith(ngModuleName);
+        expect(spyModule).toHaveBeenCalledWith(ngModuleName);
         expect(spyFilter).toHaveBeenCalledWith(`ns_${name}`, jasmine.any(Function));
       });
 
       it("should set filter if argument is an object with name property", () => {
-        angular2now.Filter({
+        doFilter({
           name
-        })(Target);
+        });
 
-        expect(spy).toHaveBeenCalledWith(ngModuleName);
+        expect(spyModule).toHaveBeenCalledWith(ngModuleName);
         expect(spyFilter).toHaveBeenCalledWith(`ns_${name}`, jasmine.any(Function));
       });
     });
@@ -50,27 +72,27 @@ export default (angular2now, ngModuleName) => {
       });
 
       it("should set filter if argument is a string", () => {
-        angular2now.Filter(name)(Target);
+        doFilter(name);
 
-        expect(spy).toHaveBeenCalledWith(ngModuleName);
+        expect(spyModule).toHaveBeenCalledWith(ngModuleName);
         expect(spyFilter).toHaveBeenCalledWith(name, jasmine.any(Function));
       });
 
       it("should set filter if argument is an object with name property", () => {
-        angular2now.Filter({
+        doFilter({
           name
-        })(Target);
+        });
 
-        expect(spy).toHaveBeenCalledWith(ngModuleName);
+        expect(spyModule).toHaveBeenCalledWith(ngModuleName);
         expect(spyFilter).toHaveBeenCalledWith(name, jasmine.any(Function));
       });
     });
 
     it("should pass target's arguments to filter function", () => {
       angular2now.SetModule(`:${ngModuleName}`);
-      angular2now.Filter({
+      doFilter({
         name
-      })(Target);
+      });
 
       // call filter function
       const args = spyFilter.calls.mostRecent().args[1]('foo', 'bar');
@@ -82,9 +104,9 @@ export default (angular2now, ngModuleName) => {
 
     it("should copy injectables to filter function", () => {
       angular2now.SetModule(`:${ngModuleName}`);
-      angular2now.Filter({
+      doFilter({
         name
-      })(Target);
+      });
 
       // call filter function
       const func = spyFilter.calls.mostRecent().args[1];
@@ -93,9 +115,9 @@ export default (angular2now, ngModuleName) => {
     });
 
     it("should return the same target", () => {
-      const result = angular2now.Filter({
+      const result = doFilter({
         name
-      })(Target);
+      });
 
       expect(result).toBe(Target);
     });

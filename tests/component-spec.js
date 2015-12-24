@@ -1,11 +1,27 @@
 export default (angular2now, ngModuleName) => {
   describe("@Component()", () => {
+    /**
+     * Mock angular.module()
+     * @type {Object}
+     */
     const moduleMock = {
       directive: () => {}
     };
+    /**
+     * Target used in all tests
+     */
     let target;
+    /**
+     * Spy on angular.module
+     */
     let spyModule;
+    /**
+     * spy on angular.module().directive
+     */
     let spyDirective;
+    /**
+     * Names
+     */
     const nameCamel = 'testComponent';
     const nameClass = '.testComponent';
     const nameDashed = 'test-component';
@@ -38,6 +54,12 @@ export default (angular2now, ngModuleName) => {
       return angular2now.Component(opts)(target);
     }
 
+    /**
+     * Use it if you want to set component's option
+     * and you expect the same value on directive definition object.
+     * @param  {String} name  option's name
+     * @param  {Any} value option's value
+     */
     function expectDDO(name, value) {
       doComponent({
         [name]: value
@@ -46,8 +68,11 @@ export default (angular2now, ngModuleName) => {
     }
 
     beforeEach(() => {
+      // reset target
       target = function target() {};
+      // add spy on angular.module and return mock
       spyModule = spyOn(angular, 'module').and.returnValue(moduleMock);
+      // add spy on angular.module().directive;
       spyDirective = spyOn(moduleMock, 'directive');
     });
 
@@ -249,9 +274,12 @@ export default (angular2now, ngModuleName) => {
     });
 
     describe("require", () => {
-      const monkeyInjects = ['@^foo', '@bar'];
-      const injectables = ['$http'].concat(monkeyInjects);
-      const questionInjects = monkeyInjects.map((inj) => '?' + inj.slice(1));
+      // injectables prefixed with @
+      const atInjects = ['@^foo', '@bar'];
+      // mix of injetables
+      const injectables = ['$http'].concat(atInjects);
+      // injectables used in controller
+      const questionInjects = atInjects.map((inj) => '?' + inj.slice(1));
 
       it("should set require with @ prefixed injectables", () => {
         doComponent({
@@ -281,7 +309,7 @@ export default (angular2now, ngModuleName) => {
           selector: nameDashed
         });
 
-        monkeyInjects.forEach((inj) => {
+        atInjects.forEach((inj) => {
           expect(target.$inject.indexOf(inj)).toBe(-1);
           expect(target.$injectDefer.indexOf(inj)).toBe(-1);
         });
