@@ -105,4 +105,5 @@ export default (angular2now, ngModuleName) => {
       expect(spyCall).toHaveBeenCalled();
       expect(beforeCall).toHaveBeenCalled();
     });
+  });
 };
