@@ -22,7 +22,7 @@ module.exports = {
             {
                 test: /angular2-now\.js$/,
                 exclude: /node_modules/,
-                loader: 'isparta'
+                loader: 'istanbul-instrumenter'
             }
         ]
     }
