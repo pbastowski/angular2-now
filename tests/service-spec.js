@@ -19,7 +19,7 @@ export default (angular2now, ngModuleName) => {
     describe("with namespace", () => {
       beforeEach(() => {
         // set ngModuleName as currentModule
-        angular2now.SetModule(`ns:${ngModuleName}`);
+        angular2now.SetModule(`ns:${ngModuleName}`, []);
       });
 
       it("should set service if argument is a string", () => {
@@ -42,7 +42,7 @@ export default (angular2now, ngModuleName) => {
     describe("without namespace", () => {
       beforeEach(() => {
         // set ngModuleName as currentModule
-        angular2now.SetModule(`:${ngModuleName}`);
+        angular2now.SetModule(`:${ngModuleName}`, []);
       });
 
       it("should set service if argument is a string", () => {
