@@ -38,6 +38,13 @@ export default (angular2now, ngModuleName) => {
       return angular2now.Component(opts)(target);
     }
 
+    function expectDDO(name, value) {
+      doComponent({
+        [name]: value
+      });
+      expect(getDDO(name)).toEqual(value);
+    }
+
     beforeEach(() => {
       target = function target() {};
       spyModule = spyOn(angular, 'module').and.returnValue(moduleMock);
@@ -110,37 +117,19 @@ export default (angular2now, ngModuleName) => {
 
     describe("options.template", () => {
       it("should set template", () => {
-        const template = 'foo';
-
-        doComponent({
-          template
-        });
-
-        expect(getDDO('template')).toBe(template);
+        expectDDO('template', 'foo');
       });
     });
 
     describe("options.templateUrl", () => {
       it("should set templateUrl", () => {
-        const templateUrl = 'foo.html';
-
-        doComponent({
-          templateUrl
-        });
-
-        expect(getDDO('templateUrl')).toBe(templateUrl);
+        expectDDO('templateUrl', 'foo.html');
       });
     });
 
     describe("options.transclude", () => {
       it("should set transclude to true", () => {
-        const transclude = true;
-
-        doComponent({
-          transclude
-        });
-
-        expect(getDDO('transclude')).toBe(transclude);
+        expectDDO('transclude', true);
       });
       it("should set not set transclude", () => {
         const transclude = false;
@@ -159,24 +148,14 @@ export default (angular2now, ngModuleName) => {
         const restrictions = ['E', 'A', 'C', 'EA', 'EAC'];
 
         restrictions.forEach((restrict) => {
-          doComponent({
-            restrict
-          });
-
-          expect(getDDO('restrict')).toBe(restrict);
+          expectDDO('restrict', restrict);
         });
       });
     });
 
     describe("options.controllerAs", () => {
       it("should set controllerAs", () => {
-        const controllerAs = 'foo';
-
-        doComponent({
-          controllerAs
-        });
-
-        expect(getDDO('controllerAs')).toBe(controllerAs);
+        expectDDO('controllerAs', 'foo');
       });
 
       it("should overwrite target's controllerAs", () => {
@@ -198,11 +177,7 @@ export default (angular2now, ngModuleName) => {
         }];
 
         scopes.forEach((scope) => {
-          doComponent({
-            scope
-          });
-
-          expect(getDDO('scope')).toBe(scope);
+          expectDDO('scope', scope);
         });
       });
 
@@ -258,13 +233,7 @@ export default (angular2now, ngModuleName) => {
 
     describe("options.require", () => {
       it("should set require", () => {
-        const require = ['@foo'];
-
-        doComponent({
-          require
-        });
-
-        expect(getDDO('require')).toBe(require);
+        expectDDO('require', ['@foo']);
       });
 
       it("should overwrite target's require", () => {
@@ -332,13 +301,7 @@ export default (angular2now, ngModuleName) => {
 
     describe("options.link", () => {
       it("should set link", () => {
-        const link = function linkOptions() {};
-
-        doComponent({
-          link
-        });
-
-        expect(getDDO('link')).toBe(link);
+        expectDDO('link', function linkOptions() {});
       });
 
       it("should overwrite target's link", () => {
