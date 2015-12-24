@@ -36,21 +36,30 @@ export default (angular2now, ngModuleName) => {
         _.reject(concatedRaw, (inj) => inj[0] !== '$')
       );
       // target mock
-      const TargetMock = {
-        $inject: Injectables.target
-      };
-      // @Inject mock
-      const InjectMock = angular2now.Inject(Injectables.inject);
+      let target;
 
-      it("should return target", () => {
-        expect(InjectMock(TargetMock)).toBe(TargetMock);
+      function doInject() {
+        return angular2now.Inject(Injectables.inject)(target);
+      }
+
+      // const InjectMock = angular2now.Inject(Injectables.inject);
+
+      beforeEach(() => {
+        angular2now.SetModule(`ns:${ngModuleName}`, []);
+        target = {
+          $inject: Injectables.target
+        };
       });
 
-      // TODO fix bug! There are duplicates if target contains injectables and there is the same injectable provided by @Inject()
+      it("should return target", () => {
+        expect(doInject()).toBe(target);
+      });
+
       it("should concat injectables", () => {
+        doInject();
         // check if all injectables have been added
         concated.forEach((inj) => {
-          expect(TargetMock.$inject.indexOf(inj)).not.toBe(-1);
+          expect(target.$inject.indexOf(inj)).not.toBe(-1);
         });
 
       });
@@ -58,9 +67,11 @@ export default (angular2now, ngModuleName) => {
       it("should add namespace to injectables", () => {
         const namespaced = _.reject(concatedRaw, (inj) => inj[0] === '$');
 
+        doInject();
+
         // check with namespace prefix
         namespaced.forEach((inj) => {
-          expect(TargetMock.$inject.indexOf(`ns_${inj}`)).not.toBe(-1);
+          expect(target.$inject.indexOf(`ns_${inj}`)).not.toBe(-1);
         });
       });
     });
