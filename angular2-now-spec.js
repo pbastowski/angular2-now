@@ -12,6 +12,7 @@ import ScopeShared from './tests/scope-shared-spec';
 import ScopeNew from './tests/scope-new-spec';
 import Directive from './tests/directive-spec';
 import Component from './tests/component-spec';
+import bootstrap from './tests/bootstrap-spec';
 // main test module name
 const ngModuleName = 'test';
 // specs in array
@@ -26,7 +27,8 @@ const specs = [
   ScopeShared,
   ScopeNew,
   Directive,
-  Component
+  Component,
+  bootstrap
 ];
 // call each spec
 specs.forEach((spec) => {
