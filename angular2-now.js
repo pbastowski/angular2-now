@@ -646,7 +646,7 @@ var angular2now = function () {
 
     // The name of the Meteor.method is the same as the name of class method.
     function MeteorMethod(_options) {
-        var options = angular.merge({}, _options, ng2nOptions);
+        var options = angular.merge({}, ng2nOptions, _options);
         var spinner = options.spinner || {show: angular.noop, hide: angular.noop};
         var events = options.events || {beforeCall: angular.noop, afterCall: angular.noop};
 
