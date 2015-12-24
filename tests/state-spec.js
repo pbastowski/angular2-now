@@ -60,6 +60,7 @@ export default (angular2now, ngModuleName) => {
           spyState.state = spyOn($stateProvider, 'state');
         });
       window.module('providersConfig');
+      angular2now.SetModule(`:${ngModuleName}`, []);
     });
 
     describe("before target", () => {
