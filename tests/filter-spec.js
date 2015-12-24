@@ -45,7 +45,7 @@ export default (angular2now, ngModuleName) => {
     describe("with namespace", () => {
       beforeEach(() => {
         // set ngModuleName as currentModule
-        angular2now.SetModule(`ns:${ngModuleName}`);
+        angular2now.SetModule(`ns:${ngModuleName}`, []);
       });
 
       it("should set filter if argument is a string", () => {
@@ -68,7 +68,7 @@ export default (angular2now, ngModuleName) => {
     describe("without namespace", () => {
       beforeEach(() => {
         // set ngModuleName as currentModule
-        angular2now.SetModule(`:${ngModuleName}`);
+        angular2now.SetModule(`:${ngModuleName}`, []);
       });
 
       it("should set filter if argument is a string", () => {
@@ -89,7 +89,7 @@ export default (angular2now, ngModuleName) => {
     });
 
     it("should pass target's arguments to filter function", () => {
-      angular2now.SetModule(`:${ngModuleName}`);
+      angular2now.SetModule(`:${ngModuleName}`, []);
       doFilter({
         name
       });
@@ -103,7 +103,7 @@ export default (angular2now, ngModuleName) => {
     });
 
     it("should copy injectables to filter function", () => {
-      angular2now.SetModule(`:${ngModuleName}`);
+      angular2now.SetModule(`:${ngModuleName}`, []);
       doFilter({
         name
       });
