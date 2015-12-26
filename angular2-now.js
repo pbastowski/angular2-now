@@ -24,7 +24,8 @@ var angular2now = function () {
         Options: Options,
 
         MeteorMethod: MeteorMethod,
-        MeteorReactive: MeteorReactive
+        MeteorReactive: MeteorReactive,
+        LocalInjectables: LocalInjectables
     };
 
     function init() {
@@ -84,6 +85,12 @@ var angular2now = function () {
         }
 
         return nsName;
+    }
+
+    function LocalInjectables(target) {
+        target.localInjectables = true;
+
+        return target;
     }
 
     // Turn on an indication to run $reactive(this).attach($scope) for the component's controller.
@@ -226,24 +233,31 @@ var angular2now = function () {
             // This allows me to add stuff to the controller and it's "this", which is required
             // for some future functionality.
             function controller() {
+                var ctrlInstance = this;
                 var injectedDeps = arguments;
 
                 if (target.meteorReactive) {
                     // Get injected angular-meteor objects
                     var $reactive = arguments[0];
                     var $scope = arguments[1];
-                    $reactive(this).attach($scope);
+                    $reactive(ctrlInstance).attach($scope);
 
                     // Save the user's injected dependencies
                     injectedDeps = Array.prototype.slice.call(arguments, 2);
+
+                    // Clean up $inject
+                    target.$inject = target.$inject.slice(2);
+                }
+
+                if (target.localInjectables) {
+                  target.$inject.forEach(function(value, index) {
+                    ctrlInstance[value] = injectedDeps[index];
+                  });
                 }
 
                 // Call the original constructor, which is now called $$init, injecting all the
                 // dependencies requested.
                 this.$$init.apply(this, injectedDeps);
-
-                // Clean up $inject
-                target.$inject = target.$inject.slice(2);
             }
 
             // This function allows me to replace a component's "real" constructor with my own.
