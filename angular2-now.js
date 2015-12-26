@@ -657,7 +657,7 @@ var angular2now = function () {
     // The name of the Meteor.method is the same as the name of class method.
     function MeteorMethod(_options) {
         var options = angular.merge({}, ng2nOptions, _options);
-        var spinner = options.spinner || {show: angular.noop, hide: angular.noop}; 
+        var spinner = options.spinner || {show: angular.noop, hide: angular.noop};
         var events = options.events || {beforeCall: angular.noop, afterCall: angular.noop};
 
         return function (target, name, descriptor) {
@@ -679,14 +679,22 @@ var angular2now = function () {
                 argv.push(resolver);
 
                 if (spinner) spinner.show();
-                events.beforeCall();  // Call optional events.beforeCall()
+                if(events.beforeCall) {
+                  events.beforeCall();
+                }
+                // Call optional events.beforeCall()
 
                 // todo: should call Meteor after resolution of promise returned by beforeCall()
                 Meteor.call.apply(this, argv);
 
                 deferred.promise.finally(function() {
                     spinner.hide();
-                    options.events.afterCall();  // Call optional events.afterCall()
+                    // TODO @pbastowski, is it correct?
+                    // was: options.events.afterCall();  // Call optional events.afterCall()
+                    if(events.afterCall) {
+                      events.afterCall();
+                    }
+
                 });
 
                 return deferred.promise;
