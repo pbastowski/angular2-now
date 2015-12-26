@@ -669,14 +669,14 @@ var angular2now = function () {
                 argv.push(resolver);
 
                 if (spinner) spinner.show();
-                events.beforeCall();  // Call optional events.beforeCall()
+                if (events.beforeCall) events.beforeCall();  // Call optional events.beforeCall()
 
                 // todo: should call Meteor after resolution of promise returned by beforeCall()
                 Meteor.call.apply(this, argv);
 
                 deferred.promise.finally(function() {
                     spinner.hide();
-                    options.events.afterCall();  // Call optional events.afterCall()
+                    if (events.afterCall) events.afterCall();  // Call optional events.afterCall()
                 });
 
                 return deferred.promise;
