@@ -13,20 +13,38 @@ export default (angular2now, ngModuleName) => {
     // injectables
     let $rootScope;
 
+    /**
+     * Call @MeterMethod() with options on named descriptor
+     * @param  {Any} opts Options
+     * @return {Object} descriptor
+     */
     function doMeteorMethod(opts) {
       return angular2now.MeteorMethod(opts)(undefined, name, descriptor);
     };
 
+    /**
+     * Calls both decorator and the method
+     * @param  {Any} opts Options
+     * @return {Promise}
+     */
     function runMeteorMethod(opts) {
       const desc = doMeteorMethod(opts);
 
       return desc.value();
     }
 
+    /**
+     * Resolve called method
+     * @param  {Any} data Resolve data
+     */
     function resolveMethod(data) {
       spyCall.calls.mostRecent().args[1](undefined, data);
     }
 
+    /**
+     * Reject called method
+     * @param  {Error} error Reject with Error
+     */
     function rejectMethod(error) {
       spyCall.calls.mostRecent().args[1](error);
     }
@@ -104,6 +122,45 @@ export default (angular2now, ngModuleName) => {
 
       expect(spyCall).toHaveBeenCalled();
       expect(beforeCall).toHaveBeenCalled();
+    });
+
+    describe("afterCall", () => {
+      let afterCall;
+      let promise;
+
+      beforeEach(() => {
+        afterCall = jasmine.createSpy('afterCall');
+
+        promise = runMeteorMethod({
+          events: {
+            afterCall
+          }
+        });
+      });
+
+      it("should be called when resolved", (done) => {
+        expect(spyCall).toHaveBeenCalled();
+        expect(afterCall).not.toHaveBeenCalled();
+
+        resolveMethod('test-resolved');
+
+        promise.finally(() => {
+          expect(afterCall).toHaveBeenCalled();
+        });
+        promise.finally(done);
+      });
+
+      it("should be called when rejected", (done) => {
+        expect(spyCall).toHaveBeenCalled();
+        expect(afterCall).not.toHaveBeenCalled();
+
+        rejectMethod('test-rejected');
+
+        promise.finally(() => {
+          expect(afterCall).toHaveBeenCalled();
+        });
+        promise.finally(done);
+      });
     });
   });
 };
