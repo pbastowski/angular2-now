@@ -23,7 +23,8 @@ var angular2now = function () {
         options: options,
         Options: Options,
 
-        MeteorMethod: MeteorMethod
+        MeteorMethod: MeteorMethod,
+        MeteorReactive: MeteorReactive
     };
 
     function init() {
@@ -83,6 +84,14 @@ var angular2now = function () {
         }
 
         return nsName;
+    }
+
+    // Turn on an indication to run $reactive(this).attach($scope) for the component's controller.
+    // Uses with Angular-Meteor: http://angular-meteor.com, v1.3 and up only
+    function MeteorReactive(target) {
+        target.meteorReactive = true;
+
+        return target;
     }
 
     // Cancels out the automatic creation of isolate scope for the directive,
@@ -174,10 +183,11 @@ var angular2now = function () {
             // Remove all the 'delete-me' entries
             target.$inject = target.$inject.filter(function(v) { return v !== 'delete-me'; });
 
-            // Prepend angular-meteor injectables
-            target.$inject.unshift('$scope');
-            target.$inject.unshift('$meteor');
-            //target.$inject.unshift('$reactive');
+            if (target.meteorReactive) {
+                // Prepend angular-meteor injectables
+                target.$inject.unshift('$scope');
+                target.$inject.unshift('$reactive');
+            }
 
             // Remember the original $inject, as it will be needed in the link function.
             // In the link function we will receive any requested component controllers
@@ -216,15 +226,15 @@ var angular2now = function () {
             // This allows me to add stuff to the controller and it's "this", which is required
             // for some future functionality.
             function controller() {
-                // Get injected angular-meteor objects
-                var $scope = arguments[0];
-                var $meteor = arguments[1];
+                if (target.meteorReactive) {
+                    // Get injected angular-meteor objects
+                    var $reactive = arguments[0];
+                    var $scope = arguments[1];
+                    $reactive(this).attach($scope);
+                }
 
                 // Save the user's injected dependencies
                 var injectedDeps = Array.prototype.slice.call(arguments, 2);
-
-                // Add decorations here
-
 
                 // Call the original constructor, which is now called $$init, injecting all the
                 // dependencies requested.
@@ -232,9 +242,6 @@ var angular2now = function () {
 
                 // Clean up $inject
                 target.$inject = target.$inject.slice(2);
-
-                console.log('Target:', target.selector);
-                console.log('    $inject:', target.$inject);
             }
 
             // This function allows me to replace a component's "real" constructor with my own.
