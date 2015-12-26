@@ -15,6 +15,7 @@ import Component from './tests/component-spec';
 import bootstrap from './tests/bootstrap-spec';
 import State from './tests/state-spec';
 import MeteorMethod from './tests/meteor-method-spec';
+import Options from './tests/options-spec';
 // main test module name
 const ngModuleName = 'test';
 // specs in array
@@ -32,7 +33,8 @@ const specs = [
   Component,
   bootstrap,
   State,
-  MeteorMethod
+  MeteorMethod,
+  Options
 ];
 // call each spec
 specs.forEach((spec) => {
