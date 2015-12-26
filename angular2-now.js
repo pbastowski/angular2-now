@@ -239,7 +239,7 @@ var angular2now = function () {
                 if (target.meteorReactive) {
                     // Get injected angular-meteor objects
                     var $reactive = arguments[arguments.length - 1];
-                    var $scope = arguments[arguments.length - 1];
+                    var $scope = arguments[arguments.length - 2];
                     $reactive(ctrlInstance).attach($scope);
                 }
 
