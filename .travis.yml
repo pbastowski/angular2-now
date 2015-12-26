@@ -1,0 +1,18 @@
+language: node_js
+cache:
+  directories:
+    - node_modules
+notifications:
+  email: false
+node_js:
+  - iojs
+before_install:
+  - "npm i"
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+before_script:
+  - "npm prune"
+script:
+  - "npm run test"
+after_success:
+  - "npm run coverage:coveralls"
