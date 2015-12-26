@@ -192,8 +192,8 @@ var angular2now = function () {
 
             if (target.meteorReactive) {
                 // Prepend angular-meteor injectables
-                target.$inject.unshift('$scope');
-                target.$inject.unshift('$reactive');
+                target.$inject.push('$scope');
+                target.$inject.push('$reactive');
             }
 
             // Remember the original $inject, as it will be needed in the link function.
@@ -238,15 +238,9 @@ var angular2now = function () {
 
                 if (target.meteorReactive) {
                     // Get injected angular-meteor objects
-                    var $reactive = arguments[0];
-                    var $scope = arguments[1];
+                    var $reactive = arguments[arguments.length - 1];
+                    var $scope = arguments[arguments.length - 1];
                     $reactive(ctrlInstance).attach($scope);
-
-                    // Save the user's injected dependencies
-                    injectedDeps = Array.prototype.slice.call(arguments, 2);
-
-                    // Clean up $inject
-                    target.$inject = target.$inject.slice(2);
                 }
 
                 if (target.localInjectables) {
