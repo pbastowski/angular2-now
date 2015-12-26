@@ -226,15 +226,17 @@ var angular2now = function () {
             // This allows me to add stuff to the controller and it's "this", which is required
             // for some future functionality.
             function controller() {
+                var injectedDeps = arguments;
+
                 if (target.meteorReactive) {
                     // Get injected angular-meteor objects
                     var $reactive = arguments[0];
                     var $scope = arguments[1];
                     $reactive(this).attach($scope);
-                }
 
-                // Save the user's injected dependencies
-                var injectedDeps = Array.prototype.slice.call(arguments, 2);
+                    // Save the user's injected dependencies
+                    injectedDeps = Array.prototype.slice.call(arguments, 2);
+                }
 
                 // Call the original constructor, which is now called $$init, injecting all the
                 // dependencies requested.
