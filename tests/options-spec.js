@@ -37,5 +37,11 @@ export default (angular2now, ngModuleName) => {
       // expect hide to be kept
       expect(angular2now.options().spinner.hide).toBe(spinner.hide);
     });
+
+    it("should return target", () => {
+      const result = doOptions({});
+      
+      expect(result).toBe(target);
+    });
   });
 };
