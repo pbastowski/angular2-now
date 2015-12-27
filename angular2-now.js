@@ -257,7 +257,7 @@ var angular2now = function () {
                 // dependencies requested.
                 this.$$init.apply(this, injectedDeps);
 
-                if (toInjectAfter) {
+                if (toInjectAfter.length > 0) {
                     target.$inject = ['$reactive', '$scope'].concat(target.$inject);
                     injectedDeps.unshift(toInjectAfter[1]);
                     injectedDeps.unshift(toInjectAfter[0]);
