@@ -85,6 +85,22 @@ export default (angular2now, ngModuleName) => {
         expect(spyBootstrap.calls.mostRecent().args[0]).toBe(selector);
       });
 
+      it("should handle selector provided directly instead of options object", () => {
+        const selector = 'test-selector';
+
+        // bootstrap
+        angular2now.bootstrap(selector);
+        // add mock
+        spyDocumentQuery.and
+          .returnValue(selector);
+
+        callOnReady();
+
+        // expectations
+        expect(spyDocumentQuery).toHaveBeenCalledWith(selector);
+        expect(spyBootstrap.calls.mostRecent().args[0]).toBe(selector);
+      });
+
       it("should use current module if target is function", () => {
         const target = function() {};
 
