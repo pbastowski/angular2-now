@@ -192,8 +192,8 @@ var angular2now = function () {
 
             if (target.meteorReactive) {
                 // Prepend angular-meteor injectables
-                target.$inject.push('$scope');
-                target.$inject.push('$reactive');
+                target.$inject.unshift('$scope');
+                target.$inject.unshift('$reactive');
             }
 
             // Remember the original $inject, as it will be needed in the link function.
@@ -234,13 +234,17 @@ var angular2now = function () {
             // for some future functionality.
             function controller() {
                 var ctrlInstance = this;
-                var injectedDeps = arguments;
+                var injectedDeps = Array.prototype.slice.call(arguments);
+                var toInjectAfter = [];
 
                 if (target.meteorReactive) {
                     // Get injected angular-meteor objects
-                    var $reactive = arguments[arguments.length - 1];
-                    var $scope = arguments[arguments.length - 2];
+                    var $reactive = injectedDeps[0];
+                    var $scope = injectedDeps[1];
                     $reactive(ctrlInstance).attach($scope);
+                    toInjectAfter = injectedDeps.slice(0, 2);
+                    injectedDeps = injectedDeps.slice(2);
+                    target.$inject = target.$inject.slice(2);
                 }
 
                 if (target.localInjectables) {
@@ -252,6 +256,12 @@ var angular2now = function () {
                 // Call the original constructor, which is now called $$init, injecting all the
                 // dependencies requested.
                 this.$$init.apply(this, injectedDeps);
+
+                if (toInjectAfter) {
+                    target.$inject = ['$reactive', '$scope'].concat(target.$inject);
+                    injectedDeps.unshift(toInjectAfter[1]);
+                    injectedDeps.unshift(toInjectAfter[0]);
+                }
             }
 
             // This function allows me to replace a component's "real" constructor with my own.
