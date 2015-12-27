@@ -162,5 +162,95 @@ export default (angular2now, ngModuleName) => {
         promise.finally(done);
       });
     });
+
+    it("should set spinner service", (done) => {
+      const spinner = 'testSpinner';
+      const spyShow = jasmine.createSpy('showSpinner');
+      const spyHide = jasmine.createSpy('hideSpinner');
+
+      // add new service with spinner
+      angular2now.SetModule('test', []).service(spinner, function testSpinner() {
+        this.show = spyShow;
+        this.hide = spyHide;
+      });
+
+      // run meteor method
+      const promise = runMeteorMethod({
+        spinner
+      });
+
+      // resolve it
+      resolveMethod('test-resolved');
+
+      // check if called
+      promise.finally(() => {
+        expect(spyShow).toHaveBeenCalled();
+        expect(spyHide).toHaveBeenCalled();
+      });
+      // end async test
+      promise.finally(done);
+    });
+
+    it("should fail on non existing spinner", () => {
+      expect(() => {
+        runMeteorMethod({
+          spinner: 'foobarspinner'
+        });
+      }).toThrowError(Error, /spinner/i);
+    });
+
+    it("should show spinner", () => {
+      const show = jasmine.createSpy('show');
+
+      runMeteorMethod({
+        spinner: {
+          show,
+          hide() {}
+        }
+      });
+
+      expect(spyCall).toHaveBeenCalled();
+      expect(show).toHaveBeenCalled();
+    });
+
+    describe("hide spinner", () => {
+      let hide;
+      let promise;
+
+      beforeEach(() => {
+        hide = jasmine.createSpy('hide');
+
+        promise = runMeteorMethod({
+          spinner: {
+            hide,
+            show() {}
+          }
+        });
+      });
+
+      it("should hide spinner when resolved", (done) => {
+        expect(spyCall).toHaveBeenCalled();
+        expect(hide).not.toHaveBeenCalled();
+
+        resolveMethod('test-resolved');
+
+        promise.finally(() => {
+          expect(hide).toHaveBeenCalled();
+        });
+        promise.finally(done);
+      });
+
+      it("should hide spinner when rejected", (done) => {
+        expect(spyCall).toHaveBeenCalled();
+        expect(hide).not.toHaveBeenCalled();
+
+        rejectMethod('test-rejected');
+
+        promise.finally(() => {
+          expect(hide).toHaveBeenCalled();
+        });
+        promise.finally(done);
+      });
+    });
   });
 };
