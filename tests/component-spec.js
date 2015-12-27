@@ -465,6 +465,8 @@ export default (angular2now, ngModuleName) => {
 
         // check arguments
         expect(controllers[0].$dependson).toHaveBeenCalledWith(controllers[1], controllers[2]);
+        // check context
+        expect(controllers[0].$dependson.calls.mostRecent().object).toBe(controllers[0]);
       });
     });
   });
