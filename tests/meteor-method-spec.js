@@ -163,6 +163,42 @@ export default (angular2now, ngModuleName) => {
       });
     });
 
+    it("should set spinner service", (done) => {
+      const spinner = 'testSpinner';
+      const spyShow = jasmine.createSpy('showSpinner');
+      const spyHide = jasmine.createSpy('hideSpinner');
+
+      // add new service with spinner
+      angular2now.SetModule('test', []).service(spinner, function testSpinner() {
+        this.show = spyShow;
+        this.hide = spyHide;
+      });
+
+      // run meteor method
+      const promise = runMeteorMethod({
+        spinner
+      });
+
+      // resolve it
+      resolveMethod('test-resolved');
+
+      // check if called
+      promise.finally(() => {
+        expect(spyShow).toHaveBeenCalled();
+        expect(spyHide).toHaveBeenCalled();
+      });
+      // end async test
+      promise.finally(done);
+    });
+
+    it("should fail on non existing spinner", () => {
+      expect(() => {
+        runMeteorMethod({
+          spinner: 'foobarspinner'
+        });
+      }).toThrowError(Error, /spinner/i);
+    });
+
     it("should show spinner", () => {
       const show = jasmine.createSpy('show');
 
