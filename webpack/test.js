@@ -15,7 +15,6 @@ module.exports = {
                 include: [
                     /-spec/
                 ],
-                exclude: /node_modules/,
                 loader: 'babel'
             },
             // transpile and instrument only testing sources with isparta

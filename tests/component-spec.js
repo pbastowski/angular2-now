@@ -423,10 +423,10 @@ export default (angular2now, ngModuleName) => {
 
       it("should set transclude when template contains content element", () => {
         const template = `
-        <div>
-          <content></content>
-        </div>
-      `;
+          <div>
+            <content></content>
+          </div>
+        `;
 
         doComponent({
           template
@@ -443,6 +443,30 @@ export default (angular2now, ngModuleName) => {
         });
 
         expect(getDDO('transclude')).toBeUndefined();
+      });
+    });
+
+    describe("link", () => {
+      it("should apply controllers on $dependson", () => {
+        doComponent();
+        const link = getDDO('link');
+        const controllers = [
+          jasmine.createSpyObj('foo', ['$dependson']), {
+            name: 'bar'
+          }, {
+            name: 'baz'
+          }
+        ];
+
+        expect(link).toEqual(jasmine.any(Function));
+
+        // simulate link execution
+        link(null, null, null, controllers);
+
+        // check arguments
+        expect(controllers[0].$dependson).toHaveBeenCalledWith(controllers[1], controllers[2]);
+        // check context
+        expect(controllers[0].$dependson.calls.mostRecent().object).toBe(controllers[0]);
       });
     });
   });
