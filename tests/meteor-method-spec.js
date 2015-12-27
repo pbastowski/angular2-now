@@ -162,5 +162,59 @@ export default (angular2now, ngModuleName) => {
         promise.finally(done);
       });
     });
+
+    it("should show spinner", () => {
+      const show = jasmine.createSpy('show');
+
+      runMeteorMethod({
+        spinner: {
+          show,
+          hide() {}
+        }
+      });
+
+      expect(spyCall).toHaveBeenCalled();
+      expect(show).toHaveBeenCalled();
+    });
+
+    describe("hide spinner", () => {
+      let hide;
+      let promise;
+
+      beforeEach(() => {
+        hide = jasmine.createSpy('hide');
+
+        promise = runMeteorMethod({
+          spinner: {
+            hide,
+            show() {}
+          }
+        });
+      });
+
+      it("should hide spinner when resolved", (done) => {
+        expect(spyCall).toHaveBeenCalled();
+        expect(hide).not.toHaveBeenCalled();
+
+        resolveMethod('test-resolved');
+
+        promise.finally(() => {
+          expect(hide).toHaveBeenCalled();
+        });
+        promise.finally(done);
+      });
+
+      it("should hide spinner when rejected", (done) => {
+        expect(spyCall).toHaveBeenCalled();
+        expect(hide).not.toHaveBeenCalled();
+
+        rejectMethod('test-rejected');
+
+        promise.finally(() => {
+          expect(hide).toHaveBeenCalled();
+        });
+        promise.finally(done);
+      });
+    });
   });
 };
