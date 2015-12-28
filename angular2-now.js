@@ -234,18 +234,16 @@ var angular2now = function () {
             // for some future functionality.
             function controller() {
                 var ctrlInstance = this;
-                var injectedDeps = arguments;
+                var injectedDeps = Array.prototype.slice.call(arguments);
+                var toInjectAfter = [];
 
                 if (target.meteorReactive) {
                     // Get injected angular-meteor objects
-                    var $reactive = arguments[0];
-                    var $scope = arguments[1];
+                    var $reactive = injectedDeps[0];
+                    var $scope = injectedDeps[1];
                     $reactive(ctrlInstance).attach($scope);
-
-                    // Save the user's injected dependencies
-                    injectedDeps = Array.prototype.slice.call(arguments, 2);
-
-                    // Clean up $inject
+                    toInjectAfter = injectedDeps.slice(0, 2);
+                    injectedDeps = injectedDeps.slice(2);
                     target.$inject = target.$inject.slice(2);
                 }
 
@@ -258,6 +256,12 @@ var angular2now = function () {
                 // Call the original constructor, which is now called $$init, injecting all the
                 // dependencies requested.
                 this.$$init.apply(this, injectedDeps);
+
+                if (toInjectAfter.length > 0) {
+                    target.$inject = ['$reactive', '$scope'].concat(target.$inject);
+                    injectedDeps.unshift(toInjectAfter[1]);
+                    injectedDeps.unshift(toInjectAfter[0]);
+                }
             }
 
             // This function allows me to replace a component's "real" constructor with my own.
