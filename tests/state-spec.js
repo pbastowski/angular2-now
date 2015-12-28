@@ -60,7 +60,7 @@ export default (angular2now, ngModuleName) => {
           spyState.state = spyOn($stateProvider, 'state');
         });
       window.module('providersConfig');
-      angular2now.SetModule(`:${ngModuleName}`, []);
+      angular2now.SetModule(`ns:${ngModuleName}`, ['ui.router']);
     });
 
     describe("before target", () => {
@@ -176,6 +176,32 @@ export default (angular2now, ngModuleName) => {
           expectSDO('parent', 'baz');
         });
       });
+
+      describe("controller", () => {
+        it("should use target if no controller provided", () => {
+          doState();
+          expect(getSDO('controller')).toBe(target);
+        });
+      });
+    });
+
+    describe("resolve", () => {
+      it("should remove namespace from services", () => {
+        const resolve = jasmine.createSpyObj('resolve', ['foo', 'bar']);
+
+        function controller() {
+        }
+
+        controller.$inject = ['ns_bar'];
+
+        doState({
+          resolve,
+          controller
+        });
+
+        expect(getSDO('controller').$inject).toContain('bar');
+      });
     });
   });
+
 };

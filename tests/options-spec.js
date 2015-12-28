@@ -40,8 +40,26 @@ export default (angular2now, ngModuleName) => {
 
     it("should return target", () => {
       const result = doOptions({});
-      
+
       expect(result).toBe(target);
+    });
+
+    it("should be able to monkey-patch angular.module", () => {
+      angular2now.options({
+        noConflict: true
+      });
+
+      expect(angular.module.name).not.toBe(angular2now.SetModule.name);
+      expect(angular.module.name).toBe('module');
+    });
+
+    it("should be able to not monkey-patch angular.module", () => {
+      angular2now.options({
+        noConflict: false
+      });
+
+      expect(angular.module.name).toBe(angular2now.SetModule.name);
+      expect(angular.module.name).not.toBe('module');
     });
   });
 };
