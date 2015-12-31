@@ -178,10 +178,10 @@ var angular2now = function () {
 
             // Create the angular directive
             var ddo = {
-                restrict:         options.restrict || (options.template + options.templateUrl) ? 'EA' : isClass ? 'C' : 'A',
+                restrict:         options.restrict || ((options.template + options.templateUrl) ? 'EA' : isClass ? 'C' : 'A'),
                 controllerAs:     options.controllerAs || controllerAs || target.controllerAs || options.selector,
                 scope:            target.hasOwnProperty('scope') ? target.scope : options.hasOwnProperty('scope') ? options.scope : options['bind'] || {},
-                bindToController: target.bindToController || true,
+                bindToController: typeof target.bindToController === 'boolean' ? target.bindToController : true,
                 template:         options.template,
                 templateUrl:      options.templateUrl,
                 controller:       target,
@@ -656,7 +656,7 @@ var angular2now = function () {
 
     // The name of the Meteor.method is the same as the name of class method.
     function MeteorMethod(_options) {
-        var options = angular.merge({}, _options, ng2nOptions);
+        var options = angular.merge({}, ng2nOptions, _options);
         var spinner = options.spinner || {show: angular.noop, hide: angular.noop};
         var events = options.events || {beforeCall: angular.noop, afterCall: angular.noop};
 
@@ -679,14 +679,22 @@ var angular2now = function () {
                 argv.push(resolver);
 
                 if (spinner) spinner.show();
-                events.beforeCall();  // Call optional events.beforeCall()
+                if(events.beforeCall) {
+                  events.beforeCall();
+                }
+                // Call optional events.beforeCall()
 
                 // todo: should call Meteor after resolution of promise returned by beforeCall()
                 Meteor.call.apply(this, argv);
 
                 deferred.promise.finally(function() {
                     spinner.hide();
-                    options.events.afterCall();  // Call optional events.afterCall()
+                    // TODO @pbastowski, is it correct?
+                    // was: options.events.afterCall();  // Call optional events.afterCall()
+                    if(events.afterCall) {
+                      events.afterCall();
+                    }
+
                 });
 
                 return deferred.promise;
