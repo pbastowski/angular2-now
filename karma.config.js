@@ -1,7 +1,7 @@
 require('argv-set-env')();
 
 // webpack configuration
-var webpack = require('./webpack/config');
+var webpack = require('./webpack/config').test;
 
 // main file with tests
 var testFile = 'angular2-now-spec.js';
@@ -30,7 +30,7 @@ module.exports = function(config) {
       'node_modules/angular/angular.js',
       'node_modules/angular-mocks/angular-mocks.js',
       'node_modules/angular-ui-router/release/angular-ui-router.js',
-      'node_modules/underscore/underscore.js',
+      'node_modules/lodash/index.js',
       testFile
     ],
 

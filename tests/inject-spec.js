@@ -39,7 +39,9 @@ export default (angular2now, ngModuleName) => {
       };
       const concatedRaw = Injectables.inject.concat(Injectables.target);
       const concated = _.uniq(
-        _.reject(concatedRaw, (inj) => inj[0] !== '$')
+        _.filter(concatedRaw, (inj) => {
+          return inj[0] === '$';
+        })
       );
       // mocks
       let target;
