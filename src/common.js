@@ -4,8 +4,8 @@ export const common = {
   currentNameSpace: undefined,
   isCordova: false,
   ng2nOptions: {
-    currentModule: function () {
-        return common.currentModule;
+    currentModule() {
+      return common.currentModule;
     }
   },
   controllerAs: undefined,
