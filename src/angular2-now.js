@@ -32,35 +32,18 @@ const angular2now = {
     options: options,
     Options: Options,
 
-    MeteorMethod: MeteorMethod
+    MeteorMethod: MeteorMethod,
+
+    init: init
 };
 
 function init() {
     common.isCordova = typeof cordova !== 'undefined';
-
     common.angularModule = angular.module;
-
-    // Monkey patch angular.module
-    //angular.module = SetModule;
 }
 
-if (typeof System !== 'undefined' && System.register) {
-
-    System.register("angular2now", [], function (_export) {
-
-        for (let i in angular2now)
-            _export(i, angular2now[i]);
-
-        return {
-            setters: [],
-            execute: function () {
-                init();
-            }
-        };
-
-    })
-} else {
-    init();
+if(typeof Meteor === 'undefined') {
+  init();
 }
 
 export default angular2now;

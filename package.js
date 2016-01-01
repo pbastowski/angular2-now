@@ -14,12 +14,12 @@ Package.onUse(function (api) {
     // Make sure we load after pbastowski:systemjs, if it's used
     api.use('pbastowski:systemjs@0.0.1', 'client', {weak: true});
 
-    api.addFiles(['dist/angular2-now.js', 'exports.js'], ['client'], {transpile: false});
+    api.addFiles(['dist/angular2-now.js', 'src/exports.js'], ['client'], {transpile: false});
     api.export(['angular2now']);
 });
 
 Package.onTest(function (api) {
-    //api.use('tinytest');
-    //api.use('pbastowski:angular2-now');
-    //api.addFiles('angular2-now-tests.js');
+    api.use('tinytest');
+    api.use('pbastowski:angular2-now');
+    api.addFiles('tests/meteor-spec.js', ['client']);
 });
