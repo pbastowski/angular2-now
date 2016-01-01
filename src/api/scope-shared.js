@@ -4,7 +4,7 @@
 // to an existing element, as opposed to components which are stand alone
 // bits of html and behaviour.
 // The other way to do this is to pass "scope: undefined" to @Component.
-export function ScopeShared (target) {
-    target.scope = undefined;
-    return target
+export function ScopeShared(target) {
+  target.scope = undefined;
+  return target
 }
