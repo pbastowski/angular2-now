@@ -38,24 +38,26 @@ from './../utils';
  */
 export function State(options) {
 
-  if (!options || !(options instanceof Object) || options.name === undefined)
+  if (!options || !(options instanceof Object) || options.name === undefined) {
     throw new Error('@State: Valid options are: name, url, defaultRoute, template, templateUrl, templateProvider, resolve, abstract, parent, data.');
+  }
 
   return function(target) {
 
-    var deps;
-    var resolvedServiceName = nameSpace(camelCase(target.selector || (options.name + '').replace('.', '-')));
+    let deps;
+    const resolvedServiceName = nameSpace(camelCase(target.selector || (options.name + '').replace('.', '-')));
 
     // Indicates if there is anything to resolve
-    var doResolve;
+    let doResolve = false;
 
     // Values to resolve can either be supplied in options.resolve or as a static method on the
     // component's class
-    var resolves = options.resolve || target.resolve;
+    const resolves = options.resolve || target.resolve;
 
     // Is there a resolve block?
-    if (resolves && resolves instanceof Object && (deps = Object.keys(resolves)).length)
+    if (resolves && resolves instanceof Object && (deps = Object.keys(resolves)).length) {
       doResolve = true;
+    }
 
     // Create an injectable value service to share the resolved values with the controller
     // The service bears the same name as the component's camelCased selector name.
@@ -69,34 +71,37 @@ export function State(options) {
     angular.module(common.currentModule)
       .config(['$urlRouterProvider', '$stateProvider', '$locationProvider',
         function($urlRouterProvider, $stateProvider, $locationProvider) {
-
           // Activate this state, if options.defaultRoute = true.
           // If you don't want this then don't set options.defaultRoute to true
           // and, instead, use $state.go inside the constructor to active a state.
           // You can also pass a string to defaultRoute, which will become the default route.
-          if (options.defaultRoute)
+          if (options.defaultRoute) {
             $urlRouterProvider.otherwise((typeof options.defaultRoute === 'string') ? options.defaultRoute : options.url);
+          }
 
           // Optionally configure html5Mode
-          if (!(typeof options.html5Mode === 'undefined'))
+          if (!(typeof options.html5Mode === 'undefined')) {
             $locationProvider.html5Mode(options.html5Mode);
+          }
 
           // The user can supply a controller through a parameter in options
           // or the class itself can be used as the controller if no component is annotated.
-          var userController = options.controller || (!target.selector ? target : undefined);
+          const userController = options.controller || (!target.selector ? target : undefined);
 
           // Also, de-namespace the resolve injectables for ui-router to inject correctly
           if (userController && userController.$inject && userController.$inject.length && deps && deps.length) {
             deps.forEach(function(dep) {
-              var i = userController.$inject.indexOf(common.currentNameSpace + '_' + dep);
-              if (i !== -1)
+              const i = userController.$inject.indexOf(common.currentNameSpace + '_' + dep);
+
+              if (i !== -1) {
                 userController.$inject[i] = dep;
+              }
             });
           }
 
 
           // This is the state definition object
-          var sdo = {
+          const sdo = {
             url: options.url,
 
             // Default values for URL parameters can be configured here.
@@ -119,7 +124,7 @@ export function State(options) {
             //(**) The bootstrap component will be rendered by Angular directly and must not
             //     be rendered again by ui-router, or you will literally see it twice.
             // todo: allow the user to specify their own div/span instead of forcing "div(ui-view)"
-            template: options.templateUrl || options.templateProvider ? undefined : options.template || ((target.template || target.templateUrl) && !target.bootstrap && target.selector ? target.selector.replace(/^(.*)$/, '<$1></$1>') : '<div ui-view=""></div>'),
+            template: (target.template || target.templateUrl) && !target.bootstrap && target.selector ? target.selector.replace(/^(.*)$/, '<$1></$1>') : '<div ui-view=""></div>',
 
             // The option for dynamically setting a template based on local values
             //  or injectable services
@@ -130,11 +135,11 @@ export function State(options) {
 
             // A user supplied controller OR
             // An internally created proxy controller, if resolves were requested for a Component.
-            controller: userController || (doResolve ? controller : undefined),
+            controller: doResolve ? controller : undefined,
 
             // Optionally controllerAs can be specifically set for those situations,
             // when we use @State on a class and there is no @Component defined.
-            controllerAs: target.controllerAs || options.controllerAs || (common.ng2nOptions.hasOwnProperty('controllerAs') && !target.hasOwnProperty('selector') ? common.ng2nOptions.controllerAs : undefined),
+            controllerAs: common.ng2nOptions.hasOwnProperty('controllerAs') && !target.hasOwnProperty('selector') ? common.ng2nOptions.controllerAs : undefined,
 
             // onEnter and onExit events
             onEnter: options.onEnter,
@@ -147,6 +152,26 @@ export function State(options) {
             data: options.data
           };
 
+          // sdo's template
+          if (options.templateUrl) {
+            sdo.template = options.templateUrl;
+          } else if (options.templateProvider) {
+            sdo.template = undefined;
+          } else if (options.template) {
+            sdo.template = options.templateUrl;
+          }
+
+          // sdo's controller
+          if (userController) {
+            sdo.controller = userController;
+          }
+
+          // sdo's controllerAs
+          if (target.controllerAs) {
+            sdo.controllerAs = target.controllerAs;
+          } else if (options.controllerAs) {
+            sdo.controllerAs = options.controllerAs;
+          }
 
           // Create the state
           $stateProvider.state(options.name, sdo);
@@ -161,11 +186,9 @@ export function State(options) {
           }
 
           // Populate the published service with the resolved values
-          function controller() {
-            var args = Array.prototype.slice.call(arguments);
-
+          function controller(...args) {
             // This is the service that we "unshifted" earlier
-            var localScope = args[0];
+            localScope = args[0];
 
             args = args.slice(1);
 
