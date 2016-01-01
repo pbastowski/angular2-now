@@ -14,27 +14,28 @@ import { options, Options } from './api/options';
 import { MeteorMethod } from './api/meteor-method';
 
 const angular2now = {
-    SetModule: SetModule,
+    init,
 
-    Component:   Component,
+    SetModule,
+
+    Component,
+    ScopeShared,
+    ScopeNew,
+    View,
+    Inject,
+    Controller,
+    Service,
+    Filter,
+    bootstrap,
+    State,
+
+    options,
+    Options,
+
+    MeteorMethod,
+
     Directive:   Component,
-    ScopeShared: ScopeShared,
-    ScopeNew:    ScopeNew,
-    View:        View,
-    Inject:      Inject,
-    Controller:  Controller,
-    Service:     Service,
-    Filter:      Filter,
-    Injectable:  Service,
-    bootstrap:   bootstrap,
-    State:       State,
-
-    options: options,
-    Options: Options,
-
-    MeteorMethod: MeteorMethod,
-
-    init: init
+    Injectable:  Service
 };
 
 function init() {
