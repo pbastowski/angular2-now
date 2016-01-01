@@ -6,9 +6,10 @@
   "main": "dist/angular2-now.js",
   "scripts": {
     "meteor": "gulp meteor",
-    "test": "karma start karma.config.js --set-env-NODE_ENV=ci & npm run test:meteor",
+    "test": "karma start karma.config.js --set-env-NODE_ENV=ci",
     "test:local": "karma start karma.config.js",
-    "test:meteor": "npm run build:dist & meteor test-packages ./",
+    "test:meteor": "npm run build:dist & meteor test-packages --once --driver-package \"test-in-console\" -p 10015 ./",
+    "test:meteor:local": "npm run build:dist & meteor test-packages ./",
     "build:dist": "webpack --progress --colors --set-env-NODE_ENV=development",
     "build:prod": "webpack --progress --colors --set-env-NODE_ENV=production",
     "build": "npm run build:dist & npm run build:prod & npm run meteor",

@@ -1,3 +1,4 @@
+sudo: required
 language: node_js
 cache:
   directories:
@@ -16,6 +17,7 @@ before_script:
   - "npm prune"
 script:
   - "npm run test"
+  - "npm run test:meteor"
 after_success:
   - "npm run coverage:coveralls"
 #
