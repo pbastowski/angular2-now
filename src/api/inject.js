@@ -10,43 +10,49 @@ import { nameSpace } from './../utils';
 // - Child classes will inherit the parent class's injectables, which will be appended
 //   to the end of the child's dependencies
 export function Inject() {
-    var deps;
-    if (arguments[0] instanceof Array)
-        deps = arguments[0];
-    else
-        deps = Array.prototype.slice.call(arguments);
+  let deps;
 
-    if (deps.length === 0) {
-        throw new Error('@Inject: No dependencies passed in');
+  if (arguments[0] instanceof Array) {
+    deps = arguments[0];
+  } else {
+    deps = Array.prototype.slice.call(arguments);
+  }
+
+  if (deps.length === 0) {
+    throw new Error('@Inject: No dependencies passed in');
+  }
+
+  return function(target, name, descriptor) {
+    let injectable = target;
+
+    if (descriptor) {
+      injectable = descriptor.value;
     }
 
-    return function (target, name, descriptor) {
-        var injectable = target;
-        if (descriptor)
-            injectable = descriptor.value;
+    if (!injectable) {
+      throw new TypeError('@Inject can only be used with classes or class methods.')
+    }
 
-        if (!injectable)
-            throw new TypeError('@Inject can only be used with classes or class methods.')
+    const existingInjects = injectable.$inject;
 
-         var existingInjects = injectable.$inject;
+    injectable.$inject = [];
 
-        injectable.$inject = [];
+    deps.forEach((dep) => {
+      // Namespace any injectables without an existing nameSpace prefix and also
+      // not already prefixed with '$', '@' or '@^'.
+      if (dep[0] !== '$' && dep[0] !== '@' && dep.indexOf('_') === -1) {
+        dep = nameSpace(dep);
+      }
 
-        angular.forEach(deps, function (dep) {
-            // Namespace any injectables without an existing nameSpace prefix and also
-            // not already prefixed with '$', '@' or '@^'.
-            if (dep[0] !== '$' && dep[0] !== '@' && dep.indexOf('_') === -1)
-                dep = nameSpace(dep);
+      if (injectable.$inject.indexOf(dep) === -1) {
+        injectable.$inject.push(dep);
+      }
+    });
 
-            if (injectable.$inject.indexOf(dep) === -1) {
-                injectable.$inject.push(dep);
-            }
-        });
+    if (existingInjects) {
+      injectable.$inject = injectable.$inject.concat(existingInjects);
+    }
 
-        if (existingInjects) {
-            injectable.$inject = injectable.$inject.concat(existingInjects);
-        }
-
-        return descriptor || target;
-    };
+    return descriptor || target;
+  };
 }
