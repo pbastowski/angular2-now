@@ -5,12 +5,14 @@ cache:
 notifications:
   email: false
 node_js:
-  - iojs
+  - "0.12"
 before_install:
   - "npm i"
+  - "curl -L https://raw.githubusercontent.com/arunoda/travis-ci-meteor-packages/master/configure.sh | /bin/sh"
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
 before_script:
+  - "export PATH=$HOME/.meteor:$PATH"
   - "npm prune"
 script:
   - "npm run test"
