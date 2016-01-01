@@ -2,22 +2,32 @@ sudo: required
 language: node_js
 cache:
   directories:
+    # cache node modules
     - node_modules
 notifications:
+  # disable email notification
   email: false
 node_js:
+  # use same node version as meteor does
   - "0.12"
 before_install:
+  # install spacejam
   - "npm i -g spacejam"
+  # install meteor
   - "curl https://install.meteor.com | /bin/sh"
+  # use firefox
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
 before_script:
+  # remove unused node modules from cache
   - "npm prune"
 script:
+  # run karma
   - "npm run test"
+  # run tinytest
   - "npm run test:meteor"
 after_success:
+  # send code-coverage report to coveralls
   - "npm run coverage:coveralls"
 #
 #deploy:
