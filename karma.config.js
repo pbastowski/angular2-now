@@ -4,7 +4,7 @@ require('argv-set-env')();
 var webpack = require('./webpack/config').test;
 
 // main file with tests
-var testFile = 'angular2-now-spec.js';
+var testFile = 'tests/index-spec.js';
 
 // is it Continuous Integration environment
 var ciEnv = process.env.NODE_ENV === 'ci';

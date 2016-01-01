@@ -1,3 +1,6 @@
+/**
+ * @deprecated use tests/index-spec.js
+ */
 // angular2now
 import angular2now from './angular2-now';
 // specs

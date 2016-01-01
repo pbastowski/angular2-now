@@ -3,11 +3,14 @@
   "version": "1.0.1",
   "private": true,
   "description": "Angular 2 component syntax for Angular 1 apps",
-  "main": "angular2-now.js",
+  "main": "dist/angular2-now.js",
   "scripts": {
     "meteor": "gulp meteor",
     "test": "karma start karma.config.js --set-env-NODE_ENV=ci",
     "test:local": "karma start karma.config.js",
+    "build:dist": "webpack -d --progress --colors --set-env-NODE_ENV=development",
+    "build:prod": "webpack -d --progress --colors --set-env-NODE_ENV=production",
+    "build": "npm run build:dist & npm run build:prod & npm run meteor",
     "coverage:coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },
   "repository": {
@@ -39,7 +42,8 @@
     "coveralls": "^2.11.4",
     "gulp": "3.9.0",
     "gulp-replace": "0.5.4",
-    "istanbul-instrumenter-loader": "^0.1.3",
+    "isparta": "^4.0.0",
+    "isparta-loader": "1.0.0",
     "jasmine-core": "^2.3.4",
     "karma": "0.13.15",
     "karma-babel-preprocessor": "^5.2.2",

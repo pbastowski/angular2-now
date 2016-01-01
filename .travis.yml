@@ -16,3 +16,10 @@ script:
   - "npm run test"
 after_success:
   - "npm run coverage:coveralls"
+#
+#deploy:
+#  provider: npm
+#  auth_key: "pbastowski-top-secret-api-key"
+#  on:
+#    tags: true
+#

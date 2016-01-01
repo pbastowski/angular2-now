@@ -1,6 +1,6 @@
 module.exports = function (type) {
     return {
-        entry: './angular2-now.js',
+        entry: './src/angular2-now.js',
         output: output,
         loaders: loaders
     };

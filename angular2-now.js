@@ -1,3 +1,6 @@
+/**
+ * @deprecated use src/angular2-now.js
+ */
 var angular2now = function () {
     'use strict';
 

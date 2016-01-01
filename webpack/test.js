@@ -1,20 +1,23 @@
 module.exports = {
-  entry: './angular2-now-spec.js',
+  entry: './tests/index-spec.js',
   module: {
     loaders: [
       // transpile all files except testing sources with babel as usual
       {
         test: /\.js$/,
         include: [
-          /-spec/
+          /tests/,
+          /src/
         ],
+        exclude: /node_modules/,
         loader: 'babel'
       },
       // transpile and instrument only testing sources with isparta
       {
-        test: /angular2-now\.js$/,
+        test: /\.js$/,
+        include: /src/,
         exclude: /node_modules/,
-        loader: 'istanbul-instrumenter'
+        loader: 'isparta'
       }
     ]
   }
