@@ -12,6 +12,8 @@ import { bootstrap } from './api/bootstrap';
 import { State } from './api/state';
 import { options, Options } from './api/options';
 import { MeteorMethod } from './api/meteor-method';
+import { MeteorReactive } from './api/meteor-reactive';
+import { LocalInjectables } from './api/local-injectables';
 
 const angular2now = {
     init,
@@ -33,6 +35,8 @@ const angular2now = {
     Options,
 
     MeteorMethod,
+    MeteorReactive,
+    LocalInjectables,
 
     Directive:   Component,
     Injectable:  Service

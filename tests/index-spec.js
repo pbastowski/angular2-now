@@ -15,6 +15,8 @@ import Component from './component-spec';
 import bootstrap from './bootstrap-spec';
 import State from './state-spec';
 import MeteorMethod from './meteor-method-spec';
+import MeteorReactive from './meteor-reactive-spec';
+import LocalInjectables from './local-injectables-spec';
 import Options from './options-spec';
 // main test module name
 const ngModuleName = 'test';
@@ -34,6 +36,8 @@ const specs = [
   bootstrap,
   State,
   MeteorMethod,
+  MeteorReactive,
+  LocalInjectables,
   Options
 ];
 // call each spec

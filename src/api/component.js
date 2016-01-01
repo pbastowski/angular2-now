@@ -29,6 +29,11 @@ export function Component(options) {
 
   return function(target) {
     let isClass = false;
+
+    // Create a stub controller and substitute it for the target's constructor,
+    // so that we can call the target's constructor later, within the link function.
+    target = deferController (target, controller);
+
     // service injections, which could also have been specified by using @Inject
     if (options.injectables && options.injectables instanceof Array) {
       target = Inject(options.injectables)(target);
@@ -76,6 +81,12 @@ export function Component(options) {
       return v !== 'delete-me';
     });
 
+    if (target.meteorReactive) {
+      // Prepend angular-meteor injectables
+      target.$inject.unshift('$scope');
+      target.$inject.unshift('$reactive');
+    }
+
     // Remember the original $inject, as it will be needed in the link function.
     // In the link function we will receive any requested component controllers
     // which we will then inject into the arguments that we will pass to the
@@ -119,6 +130,79 @@ export function Component(options) {
     }
 
     return target;
+
+    // The stub controller below saves injected objects, so we can re-inject them
+    // into the "real" controller when the link function executes.
+    // This allows me to add stuff to the controller and it's "this", which is required
+    // for some future functionality.
+    function controller(...args) {
+      const ctrlInstance = this;
+      let toInjectAfter = [];
+      let injectedDeps = args;
+
+      if (target.meteorReactive) {
+        // Get injected angular-meteor objects
+        const $reactive = injectedDeps[0];
+        const $scope = injectedDeps[1];
+
+        $reactive(ctrlInstance).attach($scope);
+
+        toInjectAfter = injectedDeps.slice(0, 2);
+        injectedDeps = injectedDeps.slice(2);
+        target.$inject = target.$inject.slice(2);
+      }
+      if (target.localInjectables) {
+        target.$inject.forEach(function(value, index) {
+          ctrlInstance[value] = injectedDeps[index];
+        });
+      }
+      // Call the original constructor, which is now called $$init, injecting all the
+      // dependencies requested.
+      this.$$init.apply(this, injectedDeps);
+
+      if (toInjectAfter.length > 0) {
+        target.$inject = ['$reactive', '$scope'].concat(target.$inject);
+        injectedDeps.unshift(toInjectAfter[1]);
+        injectedDeps.unshift(toInjectAfter[0]);
+      }
+    }
+    // This function allows me to replace a component's "real" constructor with my own.
+    // I do this, because I want to decorate the $scope and this before instantiating
+    // the class's original controller. Also, this enables me to inject
+    // other component's controllers into the constructor, the same way as you would
+    // inject a service.
+    // The component's original constructor is assigned to the init method of the
+    // component's class, so that when it executes it will run in the original scope and
+    // closures that it was defined in. It is the init method that is called within the
+    // link function.
+    function deferController (target, controller) {
+      // Save the original prototype
+      const oldproto = target.prototype;
+      // Save the original constructor, so we can call it later
+      const construct = target.prototype.constructor;
+      // Save any static properties
+      const staticProps = {};
+
+      for (let i in target) {
+        if (target.hasOwnProperty(i)) {
+          staticProps[i] = target[i];
+        }
+      }
+      // Assign a new constructor, which holds the injected deps.
+      target = controller;
+      // Restore the original prototype
+      target.prototype = oldproto;
+      // Restore saved static properties
+      for (let i in staticProps) {
+        target[i] = staticProps[i];
+      }
+      // Store the original constructor under the name $$init,
+      // which we will call in the link function.
+      target.prototype.$$init = construct;
+      // Hide $$init from the user's casual inspections of the controller
+      //Object.defineProperty(target.prototype, "$$init", {enumerable: false})
+      return target;
+    }
 
     function link(scope, el, attr, controllers) {
       // Create a service with the same name as the selector
