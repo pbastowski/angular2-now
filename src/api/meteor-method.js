@@ -1,6 +1,5 @@
 import { common } from './../common';
 
-
 // The name of the Meteor.method is the same as the name of class method.
 export function MeteorMethod(_options) {
     var options = angular.merge({}, common.ng2nOptions, _options);
@@ -36,8 +35,7 @@ export function MeteorMethod(_options) {
 
             deferred.promise.finally(function() {
                 spinner.hide();
-                // TODO @pbastowski, is it correct?
-                // was: options.events.afterCall();  // Call optional events.afterCall()
+                // Call optional events.afterCall()
                 if(events.afterCall) {
                   events.afterCall();
                 }
