@@ -9,13 +9,13 @@ import { nameSpace } from './../utils';
 // - Methods of a class can now be Injected also
 // - Child classes will inherit the parent class's injectables, which will be appended
 //   to the end of the child's dependencies
-export function Inject() {
+export function Inject(...args) {
   let deps;
 
-  if (arguments[0] instanceof Array) {
-    deps = arguments[0];
+  if (args[0] instanceof Array) {
+    deps = args[0];
   } else {
-    deps = Array.prototype.slice.call(arguments);
+    deps = args;
   }
 
   if (deps.length === 0) {
