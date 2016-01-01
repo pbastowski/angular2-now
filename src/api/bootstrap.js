@@ -39,7 +39,6 @@ export function bootstrap(target, config) {
       strictDi: false
     };
 
-  if (!Meteor) var Meteor = {};
   if (common.isCordova)
     angular.element(document).on("deviceready", onReady);
   else
