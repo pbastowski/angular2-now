@@ -1,19 +1,7 @@
-import {
-  View
-}
-from './view';
-import {
-  Inject
-}
-from './inject';
-import {
-  common
-}
-from './../common';
-import {
-  camelCase, unCamelCase
-}
-from './../utils';
+import { View } from './view';
+import { Inject } from './inject';
+import { common } from './../common';
+import { camelCase, unCamelCase } from './../utils';
 
 //function Directive(options) {
 //
