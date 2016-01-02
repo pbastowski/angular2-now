@@ -49,7 +49,10 @@ function init() {
 
 if (typeof Meteor === 'undefined') {
   init();
-  window.angular2now = angular2now;
+
+  if (typeof window !== 'undefined') {
+    window.angular2now = angular2now;
+  }
 }
 
 export default angular2now;
