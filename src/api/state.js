@@ -1,11 +1,5 @@
-import {
-  common
-}
-from './../common';
-import {
-  serviceExists, nameSpace, camelCase
-}
-from './../utils';
+import { common } from './../common';
+import { serviceExists, nameSpace, camelCase } from './../utils';
 
 /**
  * State can be used to annotate either a Component or a class and assign
@@ -37,13 +31,11 @@ from './../utils';
  * their values.
  */
 export function State(options) {
-
   if (!options || !(options instanceof Object) || options.name === undefined) {
     throw new Error('@State: Valid options are: name, url, defaultRoute, template, templateUrl, templateProvider, resolve, abstract, parent, data.');
   }
 
-  return function(target) {
-
+  return function StateTarget(target) {
     let deps;
     const resolvedServiceName = nameSpace(camelCase(target.selector || (options.name + '').replace('.', '-')));
 
@@ -55,8 +47,12 @@ export function State(options) {
     const resolves = options.resolve || target.resolve;
 
     // Is there a resolve block?
-    if (resolves && resolves instanceof Object && (deps = Object.keys(resolves)).length) {
-      doResolve = true;
+    if (resolves && resolves instanceof Object) {
+      deps = Object.keys(resolves);
+
+      if (deps.length) {
+        doResolve = true;
+      }
     }
 
     // Create an injectable value service to share the resolved values with the controller
@@ -70,7 +66,7 @@ export function State(options) {
     // Configure the state
     angular.module(common.currentModule)
       .config(['$urlRouterProvider', '$stateProvider', '$locationProvider',
-        function($urlRouterProvider, $stateProvider, $locationProvider) {
+        function ($urlRouterProvider, $stateProvider, $locationProvider) {
           // Activate this state, if options.defaultRoute = true.
           // If you don't want this then don't set options.defaultRoute to true
           // and, instead, use $state.go inside the constructor to active a state.
@@ -90,7 +86,7 @@ export function State(options) {
 
           // Also, de-namespace the resolve injectables for ui-router to inject correctly
           if (userController && userController.$inject && userController.$inject.length && deps && deps.length) {
-            deps.forEach(function(dep) {
+            deps.forEach(function (dep) {
               const i = userController.$inject.indexOf(common.currentNameSpace + '_' + dep);
 
               if (i !== -1) {
@@ -121,7 +117,7 @@ export function State(options) {
             // 3) Otherwise, if this is a component, but not the bootstrap(**) component,
             //    then we use it's selector to create the inline template "<selector></selector>".
             // 4) Otherwise, we provide the following default template "<div ui-view></div>".
-            //(**) The bootstrap component will be rendered by Angular directly and must not
+            // (**) The bootstrap component will be rendered by Angular directly and must not
             //     be rendered again by ui-router, or you will literally see it twice.
             // todo: allow the user to specify their own div/span instead of forcing "div(ui-view)"
             template: (target.template || target.templateUrl) && !target.bootstrap && target.selector ? target.selector.replace(/^(.*)$/, '<$1></$1>') : '<div ui-view=""></div>',
@@ -188,22 +184,18 @@ export function State(options) {
           // Populate the published service with the resolved values
           function controller(...args) {
             // This is the service that we "unshifted" earlier
-            let localScope = args[0];
+            const localScope = args[0];
 
             args = args.slice(1);
 
             // Now we copy the resolved values to the service.
             // This service can be injected into a component's constructor, for example.
-            deps.slice(1).forEach(function(v, i) {
+            deps.slice(1).forEach((v, i) => {
               localScope[v] = args[i];
             });
-
           }
-
         }
       ]);
-
     return target;
   };
-
 }
