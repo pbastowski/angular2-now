@@ -188,7 +188,7 @@ export function State(options) {
           // Populate the published service with the resolved values
           function controller(...args) {
             // This is the service that we "unshifted" earlier
-            localScope = args[0];
+            let localScope = args[0];
 
             args = args.slice(1);
 
