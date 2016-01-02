@@ -13,7 +13,7 @@
     "lint": "eslint src/**/*.js",
     "build:dist": "webpack --progress --colors --set-env-NODE_ENV=development",
     "build:prod": "webpack --progress --colors --set-env-NODE_ENV=production",
-    "build": "npm run build:dist & npm run build:prod & npm run meteor",
+    "build": "npm run build:dist && npm run build:prod && npm run meteor",
     "coverage:coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },
   "repository": {
