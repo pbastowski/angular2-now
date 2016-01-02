@@ -47,9 +47,9 @@ function init() {
     common.angularModule = angular.module;
 }
 
-if(typeof Meteor === 'undefined') {
+if (typeof Meteor === 'undefined') {
   init();
-  
+
   if (typeof window !== 'undefined')
     window.angular2now = angular2now;
 }
