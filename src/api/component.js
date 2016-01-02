@@ -22,17 +22,18 @@ import { camelCase, unCamelCase } from './../utils';
 export function Component(options) {
   options = options || {};
   // Allow shorthand notation of just passing the selector name as a string
-  if (typeof options === 'string')
+  if (typeof options === 'string') {
     options = {
       selector: options
     };
+  }
 
   return function(target) {
     let isClass = false;
 
     // Create a stub controller and substitute it for the target's constructor,
     // so that we can call the target's constructor later, within the link function.
-    target = deferController (target, controller);
+    target = deferController(target, controller);
 
     // service injections, which could also have been specified by using @Inject
     if (options.injectables && options.injectables instanceof Array) {
@@ -49,14 +50,14 @@ export function Component(options) {
       isClass = true;
       options.selector = options.selector.slice(1);
     }
-
     // Save the unCamelCased selector name, so that bootstrap() can use it
     target.selector = unCamelCase(options.selector);
 
     // template options can be set with Component or with View
     // so, we run View on the passed in options first.
-    if (options.template || options.templateUrl || options.transclude || options.directives)
+    if (options.template || options.templateUrl || options.transclude || options.directives) {
       View(options)(target);
+    }
 
     // The template(Url) can also be passed in from the @View decorator
     options.template = target.template || undefined;
@@ -67,6 +68,7 @@ export function Component(options) {
     // but with the "@*" injections renamed to "$scope". The link function will pass
     // the "@*" injections directly to the component controller.
     const requiredControllers = [options.selector];
+
     target.$inject = target.$inject || [];
     target.$inject = target.$inject.map(function(dep) {
       if (/^@[^]{0,2}/.test(dep[0])) {
