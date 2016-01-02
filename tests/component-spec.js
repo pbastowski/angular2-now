@@ -1,5 +1,5 @@
 export default (angular2now, ngModuleName) => {
-  describe("@Component()", () => {
+  describe('@Component()', () => {
     /**
      * Mock angular.module()
      * @type {Object}
@@ -76,36 +76,35 @@ export default (angular2now, ngModuleName) => {
       spyDirective = spyOn(moduleMock, 'directive');
     });
 
-    it("should have target at controller", () => {
+    it('should have target at controller', () => {
       const result = doComponent(nameDashed);
 
       expect(getDDO('controller')).toBe(result);
     });
 
-    describe("options.selector", () => {
-
-      it("should set selector if argument is a string", () => {
+    describe('options.selector', () => {
+      it('should set selector if argument is a string', () => {
         const result = doComponent(nameDashed);
 
         expect(result.selector).toBe(nameDashed);
         expect(getDDName()).toBe(nameCamel);
       });
 
-      it("should be able to unCamelCase selector", () => {
+      it('should be able to unCamelCase selector', () => {
         const result = doComponent(nameCamel);
 
         expect(result.selector).toBe(nameDashed);
         expect(getDDName()).toBe(nameCamel);
       });
 
-      it("should handle class name as selector", () => {
+      it('should handle class name as selector', () => {
         const result = doComponent(nameClass);
 
         expect(result.selector).toBe(nameDashed);
         expect(getDDName()).toBe(nameCamel);
       });
 
-      it("should call angular.directive with proper selector", () => {
+      it('should call angular.directive with proper selector', () => {
         const result = doComponent(nameClass);
 
         expect(result.selector).toBe(nameDashed);
@@ -114,10 +113,10 @@ export default (angular2now, ngModuleName) => {
       });
     });
 
-    describe("options.injectables", () => {
+    describe('options.injectables', () => {
       const injectables = ['$http', '$q'];
 
-      it("should set injectables", () => {
+      it('should set injectables', () => {
         const result = doComponent({
           injectables
         });
@@ -127,10 +126,10 @@ export default (angular2now, ngModuleName) => {
       });
     });
 
-    describe("options.services", () => {
+    describe('options.services', () => {
       const services = ['$http', '$q'];
 
-      it("should set services", () => {
+      it('should set services', () => {
         const result = doComponent({
           services
         });
@@ -140,23 +139,23 @@ export default (angular2now, ngModuleName) => {
       });
     });
 
-    describe("options.template", () => {
-      it("should set template", () => {
+    describe('options.template', () => {
+      it('should set template', () => {
         expectDDO('template', 'foo');
       });
     });
 
-    describe("options.templateUrl", () => {
-      it("should set templateUrl", () => {
+    describe('options.templateUrl', () => {
+      it('should set templateUrl', () => {
         expectDDO('templateUrl', 'foo.html');
       });
     });
 
-    describe("options.transclude", () => {
-      it("should set transclude to true", () => {
+    describe('options.transclude', () => {
+      it('should set transclude to true', () => {
         expectDDO('transclude', true);
       });
-      it("should set not set transclude", () => {
+      it('should set not set transclude', () => {
         const transclude = false;
 
         doComponent({
@@ -167,9 +166,8 @@ export default (angular2now, ngModuleName) => {
       });
     });
 
-    describe("options.restrict", () => {
-
-      it("should set each restriction", () => {
+    describe('options.restrict', () => {
+      it('should set each restriction', () => {
         const restrictions = ['E', 'A', 'C', 'EA', 'EAC'];
 
         restrictions.forEach((restrict) => {
@@ -178,12 +176,12 @@ export default (angular2now, ngModuleName) => {
       });
     });
 
-    describe("options.controllerAs", () => {
-      it("should set controllerAs", () => {
+    describe('options.controllerAs', () => {
+      it('should set controllerAs', () => {
         expectDDO('controllerAs', 'foo');
       });
 
-      it("should overwrite target's controllerAs", () => {
+      it('should overwrite target\'s controllerAs', () => {
         const controllerAs = 'foo';
 
         target.controllerAs = 'bar';
@@ -195,8 +193,8 @@ export default (angular2now, ngModuleName) => {
       });
     });
 
-    describe("options.scope", () => {
-      it("should set scope", () => {
+    describe('options.scope', () => {
+      it('should set scope', () => {
         const scopes = [true, false, undefined, {
           foo: 'bar'
         }];
@@ -206,7 +204,7 @@ export default (angular2now, ngModuleName) => {
         });
       });
 
-      it("should be skipped if target's scope is available", () => {
+      it('should be skipped if target\'s scope is available', () => {
         const scopes = [true, false, undefined, {
           foo: 'bar'
         }];
@@ -223,7 +221,7 @@ export default (angular2now, ngModuleName) => {
         });
       });
 
-      it("should be an empty object if neither of bind, scope or target's scope is available", () => {
+      it('should be an empty object if neither of bind, scope or target\'s scope is available', () => {
         doComponent({
           selector: nameDashed
         });
@@ -232,8 +230,8 @@ export default (angular2now, ngModuleName) => {
       });
     });
 
-    describe("target.bindToController", () => {
-      it("shoud set bindToController", () => {
+    describe('target.bindToController', () => {
+      it('shoud set bindToController', () => {
         const bools = [true, false];
 
         bools.forEach((val) => {
@@ -245,8 +243,8 @@ export default (angular2now, ngModuleName) => {
       });
     });
 
-    describe("target.require", () => {
-      it("should set require", () => {
+    describe('target.require', () => {
+      it('should set require', () => {
         const require = ['@foo'];
 
         target.require = require;
@@ -256,12 +254,12 @@ export default (angular2now, ngModuleName) => {
       });
     });
 
-    describe("options.require", () => {
-      it("should set require", () => {
+    describe('options.require', () => {
+      it('should set require', () => {
         expectDDO('require', ['@foo']);
       });
 
-      it("should overwrite target's require", () => {
+      it('should overwrite target\'s require', () => {
         const require = ['@foo'];
 
         target.require = ['@bar'];
@@ -273,7 +271,7 @@ export default (angular2now, ngModuleName) => {
       });
     });
 
-    describe("require", () => {
+    describe('require', () => {
       // injectables prefixed with @
       const atInjects = ['@^foo', '@bar'];
       // mix of injetables
@@ -281,7 +279,7 @@ export default (angular2now, ngModuleName) => {
       // injectables used in controller
       const questionInjects = atInjects.map((inj) => '?' + inj.slice(1));
 
-      it("should set require with @ prefixed injectables", () => {
+      it('should set require with @ prefixed injectables', () => {
         doComponent({
           injectables,
           selector: nameDashed
@@ -294,7 +292,7 @@ export default (angular2now, ngModuleName) => {
         });
       });
 
-      it("should set require with target", () => {
+      it('should set require with target', () => {
         doComponent({
           injectables,
           selector: nameDashed
@@ -303,7 +301,7 @@ export default (angular2now, ngModuleName) => {
         expect(getDDO('require').indexOf(nameCamel)).not.toBe(-1);
       });
 
-      it("should remove transformed injectables", () => {
+      it('should remove transformed injectables', () => {
         const result = doComponent({
           injectables,
           selector: nameDashed
@@ -316,8 +314,8 @@ export default (angular2now, ngModuleName) => {
       });
     });
 
-    describe("target.link", () => {
-      it("should set link", () => {
+    describe('target.link', () => {
+      it('should set link', () => {
         const link = function linkTarget() {};
 
         target.link = link;
@@ -327,12 +325,12 @@ export default (angular2now, ngModuleName) => {
       });
     });
 
-    describe("options.link", () => {
-      it("should set link", () => {
+    describe('options.link', () => {
+      it('should set link', () => {
         expectDDO('link', function linkOptions() {});
       });
 
-      it("should overwrite target's link", () => {
+      it('should overwrite target\'s link', () => {
         const link = function linkOptions() {};
 
         target.link = function linkTarget() {};
@@ -344,13 +342,13 @@ export default (angular2now, ngModuleName) => {
       });
     });
 
-    describe("restrict", () => {
-      it("should be A by default", () => {
+    describe('restrict', () => {
+      it('should be A by default', () => {
         doComponent(nameCamel);
         expect(getDDO('restrict')).toBe('A');
       });
 
-      it("should be EA when templateUrl and non class selector", () => {
+      it('should be EA when templateUrl and non class selector', () => {
         doComponent({
           selector: nameCamel,
           templateUrl: 'foo.html'
@@ -358,7 +356,7 @@ export default (angular2now, ngModuleName) => {
         expect(getDDO('restrict')).toBe('EA');
       });
 
-      it("should be EA when template and non class selector", () => {
+      it('should be EA when template and non class selector', () => {
         doComponent({
           selector: nameCamel,
           template: 'foo'
@@ -366,7 +364,7 @@ export default (angular2now, ngModuleName) => {
         expect(getDDO('restrict')).toBe('EA');
       });
 
-      it("should be C when slector is a class name", () => {
+      it('should be C when slector is a class name', () => {
         doComponent({
           selector: nameClass
         });
@@ -374,15 +372,15 @@ export default (angular2now, ngModuleName) => {
       });
     });
 
-    describe("controllerAs", () => {
-      it("should be the same as selector by default", () => {
+    describe('controllerAs', () => {
+      it('should be the same as selector by default', () => {
         doComponent({
           selector: nameDashed
         });
         expect(getDDO('controllerAs')).toBe(nameCamel);
       });
 
-      it("should be owerwritten by options.controllerAs", () => {
+      it('should be owerwritten by options.controllerAs', () => {
         angular2now.options({
           controllerAs: 'vm'
         });
@@ -398,8 +396,8 @@ export default (angular2now, ngModuleName) => {
       });
     });
 
-    describe("options.bind", () => {
-      it("should set scope", () => {
+    describe('options.bind', () => {
+      it('should set scope', () => {
         const bind = {
           foo: 'bar'
         };
@@ -412,8 +410,8 @@ export default (angular2now, ngModuleName) => {
       });
     });
 
-    describe("transclude", () => {
-      it("should be undefined by default", () => {
+    describe('transclude', () => {
+      it('should be undefined by default', () => {
         doComponent({
           selector: nameDashed
         });
@@ -421,7 +419,7 @@ export default (angular2now, ngModuleName) => {
         expect(getDDO('transclude')).toBeUndefined();
       });
 
-      it("should set transclude when template contains content element", () => {
+      it('should set transclude when template contains content element', () => {
         const template = `
           <div>
             <content></content>
@@ -435,7 +433,7 @@ export default (angular2now, ngModuleName) => {
         expect(getDDO('transclude')).toBe(true);
       });
 
-      it("should set transclude when template does not contain content", () => {
+      it('should set transclude when template does not contain content', () => {
         const template = `<div></div>`;
 
         doComponent({
@@ -446,8 +444,8 @@ export default (angular2now, ngModuleName) => {
       });
     });
 
-    describe("link", () => {
-      it("should apply controllers on $dependson", () => {
+    describe('link', () => {
+      it('should apply controllers on $dependson', () => {
         doComponent();
         const link = getDDO('link');
         const controllers = [

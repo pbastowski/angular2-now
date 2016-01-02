@@ -1,5 +1,5 @@
 export default (angular2now, ngModuleName) => {
-  describe("@Controller()", () => {
+  describe('@Controller()', () => {
     /**
      * controller name
      * @type {String}
@@ -10,8 +10,10 @@ export default (angular2now, ngModuleName) => {
      * @type {Object}
      */
     const moduleMock = {
-      controller: function() {}
-    }
+      controller() {
+
+      }
+    };
     /**
      * spy on angular.module
      */
@@ -24,7 +26,7 @@ export default (angular2now, ngModuleName) => {
     /**
      * Target used in decorator
      */
-    function Target() {};
+    function Target() {}
 
     /**
      * Shorthand for decorator call on target
@@ -43,20 +45,20 @@ export default (angular2now, ngModuleName) => {
       spyCtrl = spyOn(moduleMock, 'controller');
     });
 
-    describe("with namespace", () => {
+    describe('with namespace', () => {
       beforeEach(() => {
         // set ngModuleName as currentModule
         angular2now.SetModule(`ns:${ngModuleName}`, []);
       });
 
-      it("should set name if argument is a string", () => {
+      it('should set name if argument is a string', () => {
         doController(name);
 
         expect(spyModule).toHaveBeenCalledWith(ngModuleName);
         expect(spyCtrl).toHaveBeenCalledWith(`ns_${name}`, Target);
       });
 
-      it("should set name if argument is an object with name property", () => {
+      it('should set name if argument is an object with name property', () => {
         doController({
           name
         });
@@ -66,13 +68,13 @@ export default (angular2now, ngModuleName) => {
       });
     });
 
-    describe("without namespace", () => {
+    describe('without namespace', () => {
       beforeEach(() => {
         // set ngModuleName as currentModule
         angular2now.SetModule(`:${ngModuleName}`, []);
       });
 
-      it("should set name if argument is a string", () => {
+      it('should set name if argument is a string', () => {
         // angular2now.Controller(name)(Target);
         doController(name);
 
@@ -80,7 +82,7 @@ export default (angular2now, ngModuleName) => {
         expect(spyCtrl).toHaveBeenCalledWith(name, Target);
       });
 
-      it("should set name if argument is an object with name property", () => {
+      it('should set name if argument is an object with name property', () => {
         doController({
           name
         });
@@ -90,7 +92,7 @@ export default (angular2now, ngModuleName) => {
       });
     });
 
-    it("should return target", () => {
+    it('should return target', () => {
       const result = doController({
         name
       });

@@ -17,7 +17,8 @@
     "es6": true
   },
   "globals": {
-    "angular": false
+    "angular": false,
+    "inject": false
   },
   "rules": {
     "new-cap": 1,

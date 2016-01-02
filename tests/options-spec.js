@@ -1,5 +1,5 @@
 export default (angular2now, ngModuleName) => {
-  describe("Options()", () => {
+  describe('Options()', () => {
     let target;
 
     function doOptions(opts) {
@@ -10,7 +10,7 @@ export default (angular2now, ngModuleName) => {
       target = {};
     });
 
-    it("should merge options", () => {
+    it('should merge options', () => {
       const spinner = {
         show: function showSpinner() {},
         hide: function hideSpinner() {}
@@ -38,13 +38,13 @@ export default (angular2now, ngModuleName) => {
       expect(angular2now.options().spinner.hide).toBe(spinner.hide);
     });
 
-    it("should return target", () => {
+    it('should return target', () => {
       const result = doOptions({});
 
       expect(result).toBe(target);
     });
 
-    it("should be able to monkey-patch angular.module", () => {
+    it('should be able to monkey-patch angular.module', () => {
       angular2now.options({
         noConflict: true
       });
@@ -53,7 +53,7 @@ export default (angular2now, ngModuleName) => {
       expect(angular.module.name).toBe('module');
     });
 
-    it("should be able to not monkey-patch angular.module", () => {
+    it('should be able to not monkey-patch angular.module', () => {
       angular2now.options({
         noConflict: false
       });

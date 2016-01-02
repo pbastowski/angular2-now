@@ -5,7 +5,7 @@ window.Meteor = {
 };
 
 export default (angular2now, ngModuleName) => {
-  describe("@MeteorMethod()", () => {
+  describe('@MeteorMethod()', () => {
     const name = 'foo';
     let descriptor;
     let spyCall;
@@ -20,7 +20,7 @@ export default (angular2now, ngModuleName) => {
      */
     function doMeteorMethod(opts) {
       return angular2now.MeteorMethod(opts)(undefined, name, descriptor);
-    };
+    }
 
     /**
      * Calls both decorator and the method
@@ -54,7 +54,7 @@ export default (angular2now, ngModuleName) => {
       angular2now.SetModule(`:${ngModuleName}`, []);
       // reset descriptor
       descriptor = {
-        value: function() {}
+        value() {}
       };
 
       // load module
@@ -69,13 +69,13 @@ export default (angular2now, ngModuleName) => {
       spyCall = spyOn(Meteor, 'call');
     });
 
-    it("should call meteor method", () => {
+    it('should call meteor method', () => {
       runMeteorMethod();
 
       expect(spyCall).toHaveBeenCalledWith(name, jasmine.any(Function));
     });
 
-    it("should resolve meteor method", () => {
+    it('should resolve meteor method', () => {
       const data = 'foo';
       const result = runMeteorMethod();
 
@@ -93,7 +93,7 @@ export default (angular2now, ngModuleName) => {
       expect(result.$$state.value).toBe(data);
     });
 
-    it("should reject meteor method", () => {
+    it('should reject meteor method', () => {
       const error = 'bar';
       const result = runMeteorMethod();
 
@@ -111,7 +111,7 @@ export default (angular2now, ngModuleName) => {
       expect(result.$$state.value).toBe(error);
     });
 
-    it("should call beforeCall", () => {
+    it('should call beforeCall', () => {
       const beforeCall = jasmine.createSpy('beforeCall');
 
       runMeteorMethod({
@@ -124,7 +124,7 @@ export default (angular2now, ngModuleName) => {
       expect(beforeCall).toHaveBeenCalled();
     });
 
-    describe("afterCall", () => {
+    describe('afterCall', () => {
       let afterCall;
       let promise;
 
@@ -138,7 +138,7 @@ export default (angular2now, ngModuleName) => {
         });
       });
 
-      it("should be called when resolved", (done) => {
+      it('should be called when resolved', (done) => {
         expect(spyCall).toHaveBeenCalled();
         expect(afterCall).not.toHaveBeenCalled();
 
@@ -150,7 +150,7 @@ export default (angular2now, ngModuleName) => {
         promise.finally(done);
       });
 
-      it("should be called when rejected", (done) => {
+      it('should be called when rejected', (done) => {
         expect(spyCall).toHaveBeenCalled();
         expect(afterCall).not.toHaveBeenCalled();
 
@@ -163,7 +163,7 @@ export default (angular2now, ngModuleName) => {
       });
     });
 
-    it("should set spinner service", (done) => {
+    it('should set spinner service', (done) => {
       const spinner = 'testSpinner';
       const spyShow = jasmine.createSpy('showSpinner');
       const spyHide = jasmine.createSpy('hideSpinner');
@@ -191,7 +191,7 @@ export default (angular2now, ngModuleName) => {
       promise.finally(done);
     });
 
-    it("should fail on non existing spinner", () => {
+    it('should fail on non existing spinner', () => {
       expect(() => {
         runMeteorMethod({
           spinner: 'foobarspinner'
@@ -199,7 +199,7 @@ export default (angular2now, ngModuleName) => {
       }).toThrowError(Error, /spinner/i);
     });
 
-    it("should show spinner", () => {
+    it('should show spinner', () => {
       const show = jasmine.createSpy('show');
 
       runMeteorMethod({
@@ -213,7 +213,7 @@ export default (angular2now, ngModuleName) => {
       expect(show).toHaveBeenCalled();
     });
 
-    describe("hide spinner", () => {
+    describe('hide spinner', () => {
       let hide;
       let promise;
 
@@ -228,7 +228,7 @@ export default (angular2now, ngModuleName) => {
         });
       });
 
-      it("should hide spinner when resolved", (done) => {
+      it('should hide spinner when resolved', (done) => {
         expect(spyCall).toHaveBeenCalled();
         expect(hide).not.toHaveBeenCalled();
 
@@ -240,7 +240,7 @@ export default (angular2now, ngModuleName) => {
         promise.finally(done);
       });
 
-      it("should hide spinner when rejected", (done) => {
+      it('should hide spinner when rejected', (done) => {
         expect(spyCall).toHaveBeenCalled();
         expect(hide).not.toHaveBeenCalled();
 
