@@ -126,7 +126,7 @@ export function Component(options) {
       angular.module(common.currentModule)
         .directive(options.selector, () => ddo);
     } catch (er) {
-      throw new Error('Does module "' + common.currentModule + '" exist? You may need to use angular.module("youModuleName").');
+      throw new Error('Does module "' + common.currentModule + '" exist? You may need to use SetModule("youModuleName").');
     }
 
     return target;

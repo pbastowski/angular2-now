@@ -1,6 +1,6 @@
 Package.describe({
     name:          'pbastowski:angular2-now',
-    version:       '1.0.1',
+    version:       '1.1.0',
     summary:       'Angular 2 @Component syntax for Meteor 1.2 and AngularJS',
     git:           'https://github.com/pbastowski/angular2-now/tree/meteor1.2',
     documentation: 'README.md'
@@ -8,8 +8,8 @@ Package.describe({
 
 Package.onUse(function (api) {
     api.versionsFrom('1.2.0.1');
-    api.use('angular@1.2.3', 'client');
-    api.imply('angular@1.2.3', 'client');
+    api.use('angular@1.3.1', 'client');
+    api.imply('angular@1.3.1', 'client');
 
     // Make sure we load after pbastowski:systemjs, if it's used
     api.use('pbastowski:systemjs@0.0.1', 'client', {weak: true});

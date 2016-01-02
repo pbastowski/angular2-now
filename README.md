@@ -1,4 +1,5 @@
-# angular2-now
+# angular2-now [![Build Status](https://travis-ci.org/pbastowski/angular2-now.svg)](https://travis-ci.org/pbastowski/angular2-now)
+
 ## Angular 2.0 component syntax for Angular 1 apps
 
 Angular2-now gives you the ability to start coding your Angular 1.4+ apps using Angular 2 component syntax. You get to keep your investment in Angular 1 while learning some Angular 2 concepts.
@@ -563,3 +564,26 @@ As it stands now, the above three requirements are satisfied for myself, but if 
 If you think you have a great feature that should be incorporated in the main library, or a fix for a bug, or some doco updates then please send me a PR.
 
 When sending code changes or new code make sure to describe in details what it is that you are trying to achieve and what the code does. I am not going to accept pure code without detailed descriptions of what it does and why.
+
+### Contributors
+
+Over time there were varied contributors to this repo, however, below are those that had the biggest influence:
+
+- Paul Bastowski (pbastowski)
+- Uri Goldshtein (urigo)
+- Kamil Kisiela (kamilkisiela)
+- Aaron Roberson (aaronroberson)
+- Dotan Simha (dotansimha)
+
+# Change Log
+
+### 2 Jan 2016 - v1.1.0
+
+- MeteorReactive support: this version of angular2-now includes the MeteorReactive decorator, which only works with Meteor. See angular-meteor docs for more information on it's usage.  
+- We have a new contributor: Kamil Kisiela.
+- Kamil has added some long overdue features to angular2-now:
+  - tests
+  - coverage reporting (95% currently) and
+  - continuous integration through Travis-ci
+- Kamil also added a build process that generates both Npm and Meteor bundles
+- Meteor 1.1 version is now deprecated and will not be updated any further, other than to possibly fix very annoying errors.
