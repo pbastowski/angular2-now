@@ -1,4 +1,4 @@
-/*! angular2-now v1.0.1 */
+/*! angular2-now v1.1.0 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -127,7 +127,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	if (typeof Meteor === 'undefined') {
 	  init();
-	  window.angular2now = angular2now;
+
+	  if (typeof window !== 'undefined') {
+	    window.angular2now = angular2now;
+	  }
 	}
 
 	exports['default'] = angular2now;
@@ -342,7 +345,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return ddo;
 	      });
 	    } catch (er) {
-	      throw new Error('Does module "' + _common.common.currentModule + '" exist? You may need to use angular.module("youModuleName").');
+	      throw new Error('Does module "' + _common.common.currentModule + '" exist? You may need to use SetModule("youModuleName").');
 	    }
 
 	    return target;
