@@ -58,7 +58,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	Object.defineProperty(exports, '__esModule', {
-	    value: true
+	  value: true
 	});
 
 	var _common = __webpack_require__(1);
@@ -94,41 +94,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _apiLocalInjectables = __webpack_require__(17);
 
 	var angular2now = {
-	    init: init,
+	  init: init,
 
-	    SetModule: _apiSetModule.SetModule,
+	  SetModule: _apiSetModule.SetModule,
 
-	    Component: _apiComponent.Component,
-	    ScopeShared: _apiScopeShared.ScopeShared,
-	    ScopeNew: _apiScopeNew.ScopeNew,
-	    View: _apiView.View,
-	    Inject: _apiInject.Inject,
-	    Controller: _apiController.Controller,
-	    Service: _apiService.Service,
-	    Filter: _apiFilter.Filter,
-	    bootstrap: _apiBootstrap.bootstrap,
-	    State: _apiState.State,
+	  Component: _apiComponent.Component,
+	  ScopeShared: _apiScopeShared.ScopeShared,
+	  ScopeNew: _apiScopeNew.ScopeNew,
+	  View: _apiView.View,
+	  Inject: _apiInject.Inject,
+	  Controller: _apiController.Controller,
+	  Service: _apiService.Service,
+	  Filter: _apiFilter.Filter,
+	  bootstrap: _apiBootstrap.bootstrap,
+	  State: _apiState.State,
 
-	    options: _apiOptions.options,
-	    Options: _apiOptions.Options,
+	  options: _apiOptions.options,
+	  Options: _apiOptions.Options,
 
-	    MeteorMethod: _apiMeteorMethod.MeteorMethod,
-	    MeteorReactive: _apiMeteorReactive.MeteorReactive,
-	    LocalInjectables: _apiLocalInjectables.LocalInjectables,
+	  MeteorMethod: _apiMeteorMethod.MeteorMethod,
+	  MeteorReactive: _apiMeteorReactive.MeteorReactive,
+	  LocalInjectables: _apiLocalInjectables.LocalInjectables,
 
-	    Directive: _apiComponent.Component,
-	    Injectable: _apiService.Service
+	  Directive: _apiComponent.Component,
+	  Injectable: _apiService.Service
 	};
 
 	function init() {
-	    _common.common.isCordova = typeof cordova !== 'undefined';
-	    _common.common.angularModule = angular.module;
+	  _common.common.isCordova = typeof cordova !== 'undefined';
+	  _common.common.angularModule = angular.module;
 	}
 
 	if (typeof Meteor === 'undefined') {
-	    init();
+	  init();
 
-	    if (typeof window !== 'undefined') window.angular2now = angular2now;
+	  if (typeof window !== 'undefined') {
+	    window.angular2now = angular2now;
+	  }
 	}
 
 	exports['default'] = angular2now;
@@ -218,7 +220,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _utils = __webpack_require__(6);
 
-	//function Directive(options) {
+	// function Directive(options) {
 	//
 	//    // A string passed is assumed to be the attribute name of the directive.
 	//    if (typeof options === 'string')
@@ -232,7 +234,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//        angular.merge(options, { scope: undefined });
 	//
 	//    return Component(options);
-	//}
+	// }
 
 	function Component(options) {
 	  options = options || {};
@@ -243,7 +245,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	  }
 
-	  return function (target) {
+	  return function ComponentTarget(target) {
 	    var isClass = false;
 
 	    // Create a stub controller and substitute it for the target's constructor,
@@ -422,14 +424,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // which we will call in the link function.
 	      target.prototype.$$init = construct;
 	      // Hide $$init from the user's casual inspections of the controller
-	      //Object.defineProperty(target.prototype, "$$init", {enumerable: false})
+	      // Object.defineProperty(target.prototype, "$$init", {enumerable: false})
 	      return target;
 	    }
 
 	    function link(scope, el, attr, controllers) {
 	      // Create a service with the same name as the selector
 	      // That holds a reference to our component
-	      //angular.module(currentModule).value(camelCase(target.selector), controllers[0]);
+	      // angular.module(currentModule).value(camelCase(target.selector), controllers[0]);
 
 	      // Alternate syntax for the injection of other component's controllers
 	      if (controllers[0].$dependson) {
@@ -453,13 +455,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	function View(options) {
 	  options = options || {};
 	  // Allow shorthand notation of just passing the templateUrl as a string
-	  if (typeof options === 'string') options = {
-	    templateUrl: options
-	  };
+	  if (typeof options === 'string') {
+	    options = {
+	      templateUrl: options
+	    };
+	  }
 
-	  //if (!options.template) options.template = undefined;
+	  // if (!options.template) options.template = undefined;
 
-	  return function (target) {
+	  return function ViewTarget(target) {
 	    target.template = options.template || target.template;
 	    target.templateUrl = options.templateUrl || target.templateUrl;
 
@@ -470,7 +474,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    target.directives = options.directives || target.directives;
 
 	    // Check for the new <content> tag and add ng-transclude to it, if not there.
-	    if (target.template) target.template = transcludeContent(target.template);
+	    if (target.template) {
+	      target.template = transcludeContent(target.template);
+	    }
 
 	    return target;
 	  };
@@ -528,7 +534,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    throw new Error('@Inject: No dependencies passed in');
 	  }
 
-	  return function (target, name, descriptor) {
+	  return function InjectTarget(target, name, descriptor) {
 	    var injectable = target;
 
 	    if (descriptor) {
@@ -570,11 +576,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	Object.defineProperty(exports, '__esModule', {
-	    value: true
+	  value: true
 	});
 	exports.nameSpace = nameSpace;
-	exports.serviceExists = serviceExists;
 	exports.getService = getService;
+	exports.serviceExists = serviceExists;
 	exports.camelCase = camelCase;
 	exports.unCamelCase = unCamelCase;
 
@@ -584,35 +590,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	// the currentNameSpace and the name argument
 
 	function nameSpace(name) {
-	    return _common.common.currentNameSpace ? _common.common.currentNameSpace + '_' + name : name;
+	  return _common.common.currentNameSpace ? _common.common.currentNameSpace + '_' + name : name;
+	}
+
+	function getService(serviceName, moduleName) {
+	  return angular.module(moduleName || _common.common.currentModule)._invokeQueue.filter(function (v) {
+	    return v[0] === '$provide' && v[2][0] === serviceName;
+	  })[0];
 	}
 
 	// Does a provider with a specific name exist in the current module
 
 	function serviceExists(serviceName) {
-	    return !!getService(serviceName);
-	}
-
-	function getService(serviceName, moduleName) {
-	    return angular.module(moduleName || _common.common.currentModule)._invokeQueue.filter(function (v, i) {
-	        return v[0] === '$provide' && v[2][0] === serviceName;
-	    })[0];
+	  return !!getService(serviceName);
 	}
 
 	function camelCase(s) {
-	    return s.replace(/-(.)/g, function (a, b) {
-	        return b.toUpperCase();
-	    });
+	  return s.replace(/-(.)/g, function (a, b) {
+	    return b.toUpperCase();
+	  });
 	}
 
 	function unCamelCase(c) {
-	    var s = c.replace(/([A-Z])/g, '-$1').replace(/--/g, '-').toLowerCase();
+	  var s = c.replace(/([A-Z])/g, '-$1').replace(/--/g, '-').toLowerCase();
 
-	    if (s[0] === '-') {
-	        return s.slice(1);
-	    }
+	  if (s[0] === '-') {
+	    return s.slice(1);
+	  }
 
-	    return s;
+	  return s;
 	}
 
 /***/ },
@@ -662,7 +668,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	Object.defineProperty(exports, '__esModule', {
-	    value: true
+	  value: true
 	});
 	exports.Controller = Controller;
 
@@ -671,15 +677,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _utils = __webpack_require__(6);
 
 	function Controller(options) {
-	    options = options || {};
-	    // Allow shorthand notation of just passing the name as a string
-	    if (typeof options === 'string') options = { name: options };
+	  options = options || {};
+	  // Allow shorthand notation of just passing the name as a string
+	  if (typeof options === 'string') {
+	    options = { name: options };
+	  }
 
-	    return function (target) {
-	        angular.module(_common.common.currentModule).controller((0, _utils.nameSpace)(options.name), target);
-
-	        return target;
-	    };
+	  return function ControllerTarget(target) {
+	    angular.module(_common.common.currentModule).controller((0, _utils.nameSpace)(options.name), target);
+	    return target;
+	  };
 	}
 
 /***/ },
@@ -700,13 +707,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	function Service(options) {
 	  options = options || {};
 	  // Allow shorthand notation of just passing the name as a string
-	  if (typeof options === 'string') options = {
-	    name: options
-	  };
+	  if (typeof options === 'string') {
+	    options = {
+	      name: options
+	    };
+	  }
 
-	  return function (target) {
+	  return function ServiceTarget(target) {
 	    angular.module(_common.common.currentModule).service((0, _utils.nameSpace)(options.name), target);
-	    //.factory(options.name, function () { return new target })
+	    // .factory(options.name, function () { return new target })
 
 	    return target;
 	  };
@@ -730,11 +739,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	function Filter(options) {
 	  options = options || {};
 	  // Allow shorthand notation of just passing the name as a string
-	  if (typeof options === 'string') options = {
-	    name: options
-	  };
+	  if (typeof options === 'string') {
+	    options = {
+	      name: options
+	    };
+	  }
 
-	  return function (target) {
+	  return function FilterTarget(target) {
 	    filterFunc.$inject = target.$inject;
 
 	    angular.module(_common.common.currentModule).filter((0, _utils.nameSpace)(options.name), filterFunc);
@@ -797,25 +808,32 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  var bootModule = target.selector || _common.common.currentModule;
 
-	  if (bootModule !== _common.common.currentModule) angular.module(bootModule);
+	  if (bootModule !== _common.common.currentModule) {
+	    angular.module(bootModule);
+	  }
 
-	  if (!config) config = {
-	    strictDi: false
-	  };
+	  if (!config) {
+	    config = {
+	      strictDi: false
+	    };
+	  }
 
-	  if (_common.common.isCordova) angular.element(document).on("deviceready", onReady);else angular.element(document).ready(onReady);
+	  if (_common.common.isCordova) {
+	    angular.element(document).on('deviceready', onReady);
+	  } else {
+	    angular.element(document).ready(onReady);
+	  }
 
 	  function onReady() {
 	    var el = undefined;
 
-	    // Find the component's element
 	    if (!bootOnDocument) {
+	      // Find the component's element
 	      el = document.querySelector(target.selector);
+	    } else {
+	      // Or use document, if user passed no arguments
+	      el = document.body;
 	    }
-	    // Or use document, if user passed no arguments
-	    else {
-	        el = document.body;
-	      }
 
 	    angular.bootstrap(el, [bootModule], config);
 	  }
@@ -867,13 +885,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 
 	function State(options) {
-
 	  if (!options || !(options instanceof Object) || options.name === undefined) {
 	    throw new Error('@State: Valid options are: name, url, defaultRoute, template, templateUrl, templateProvider, resolve, abstract, parent, data.');
 	  }
 
-	  return function (target) {
-
+	  return function StateTarget(target) {
 	    var deps = undefined;
 	    var resolvedServiceName = (0, _utils.nameSpace)((0, _utils.camelCase)(target.selector || (options.name + '').replace('.', '-')));
 
@@ -885,8 +901,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var resolves = options.resolve || target.resolve;
 
 	    // Is there a resolve block?
-	    if (resolves && resolves instanceof Object && (deps = Object.keys(resolves)).length) {
-	      doResolve = true;
+	    if (resolves && resolves instanceof Object) {
+	      deps = Object.keys(resolves);
+
+	      if (deps.length) {
+	        doResolve = true;
+	      }
 	    }
 
 	    // Create an injectable value service to share the resolved values with the controller
@@ -948,7 +968,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // 3) Otherwise, if this is a component, but not the bootstrap(**) component,
 	        //    then we use it's selector to create the inline template "<selector></selector>".
 	        // 4) Otherwise, we provide the following default template "<div ui-view></div>".
-	        //(**) The bootstrap component will be rendered by Angular directly and must not
+	        // (**) The bootstrap component will be rendered by Angular directly and must not
 	        //     be rendered again by ui-router, or you will literally see it twice.
 	        // todo: allow the user to specify their own div/span instead of forcing "div(ui-view)"
 	        template: (target.template || target.templateUrl) && !target.bootstrap && target.selector ? target.selector.replace(/^(.*)$/, '<$1></$1>') : '<div ui-view=""></div>',
@@ -1030,7 +1050,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	      }
 	    }]);
-
 	    return target;
 	  };
 	}
@@ -1089,7 +1108,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function Options(options) {
-	  return function (target) {
+	  return function OptionsTarget(target) {
 	    angular.merge(_common.common.ng2nOptions, options);
 	    return target;
 	  };
@@ -1121,8 +1140,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    afterCall: angular.noop
 	  };
 
-	  return function (target, name, descriptor) {
-
+	  return function MeteorMethodTarget(target, name, descriptor) {
 	    // Create a method that calls the back-end
 	    descriptor.value = function () {
 	      var argv = Array.prototype.slice.call(arguments);
@@ -1132,7 +1150,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (angular.injector(['ng', _common.common.currentModule]).has(options.spinner)) {
 	          spinner = angular.injector(['ng', _common.common.currentModule]).get(options.spinner);
 	          options.spinner = spinner;
-	        } else throw new Error('Spinner "' + spinner + '" does not exist.');
+	        } else {
+	          throw new Error('Spinner "' + spinner + '" does not exist.');
+	        }
 	      }
 
 	      argv.unshift(name);
