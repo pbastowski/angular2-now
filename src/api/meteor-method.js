@@ -12,10 +12,9 @@ export function MeteorMethod(_options) {
     afterCall: angular.noop
   };
 
-  return function(target, name, descriptor) {
-
+  return function MeteorMethodTarget(target, name, descriptor) {
     // Create a method that calls the back-end
-    descriptor.value = function() {
+    descriptor.value = function () {
       const argv = Array.prototype.slice.call(arguments);
       const deferred = common.$q.defer();
 
@@ -23,8 +22,9 @@ export function MeteorMethod(_options) {
         if (angular.injector(['ng', common.currentModule]).has(options.spinner)) {
           spinner = angular.injector(['ng', common.currentModule]).get(options.spinner);
           options.spinner = spinner;
-        } else
+        } else {
           throw new Error('Spinner "' + spinner + '" does not exist.');
+        }
       }
 
       argv.unshift(name);
@@ -42,13 +42,12 @@ export function MeteorMethod(_options) {
       // todo: should call Meteor after resolution of promise returned by beforeCall()
       Meteor.call.apply(this, argv);
 
-      deferred.promise.finally(function() {
+      deferred.promise.finally(function () {
         spinner.hide();
         // Call optional events.afterCall()
         if (events.afterCall) {
           events.afterCall();
         }
-
       });
 
       return deferred.promise;
@@ -63,5 +62,5 @@ export function MeteorMethod(_options) {
     };
 
     return descriptor;
-  }
+  };
 }

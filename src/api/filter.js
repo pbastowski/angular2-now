@@ -4,12 +4,13 @@ import { nameSpace } from './../utils';
 export function Filter(options) {
   options = options || {};
   // Allow shorthand notation of just passing the name as a string
-  if (typeof options === 'string')
+  if (typeof options === 'string') {
     options = {
       name: options
     };
+  }
 
-  return function(target) {
+  return function FilterTarget(target) {
     filterFunc.$inject = target.$inject;
 
     angular.module(common.currentModule)

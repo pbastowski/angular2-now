@@ -1,0 +1,34 @@
+{
+  "extends": [
+    "./node_modules/eslint-config-airbnb/rules/best-practices.js",
+    "./node_modules/eslint-config-airbnb/rules/errors.js",
+    "./node_modules/eslint-config-airbnb/rules/legacy.js",
+    "./node_modules/eslint-config-airbnb/rules/node.js",
+    "./node_modules/eslint-config-airbnb/rules/strict.js",
+    "./node_modules/eslint-config-airbnb/rules/style.js",
+    "./node_modules/eslint-config-airbnb/rules/variables.js",
+    "./node_modules/eslint-config-airbnb/rules/es6.js"
+  ],
+  "parser": "babel-eslint",
+  "env": {
+    "browser": true,
+    "meteor": true,
+    "jasmine": true,
+    "es6": true
+  },
+  "globals": {
+    "angular": false,
+    "inject": false
+  },
+  "rules": {
+    "new-cap": 1,
+    "no-unused-vars": 1,
+    "comma-dangle": 0,
+    "no-use-before-define": 1,
+    "no-param-reassign": 1,
+    "no-nested-ternary": 1,
+    "dot-notation": 0,
+    "guard-for-in": 1,
+    "no-shadow": 1
+  }
+}

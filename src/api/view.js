@@ -1,14 +1,15 @@
 export function View(options) {
   options = options || {};
   // Allow shorthand notation of just passing the templateUrl as a string
-  if (typeof options === 'string')
+  if (typeof options === 'string') {
     options = {
       templateUrl: options
     };
+  }
 
-  //if (!options.template) options.template = undefined;
+  // if (!options.template) options.template = undefined;
 
-  return function(target) {
+  return function ViewTarget(target) {
     target.template = options.template || target.template;
     target.templateUrl = options.templateUrl || target.templateUrl;
 
@@ -19,8 +20,9 @@ export function View(options) {
     target.directives = options.directives || target.directives;
 
     // Check for the new <content> tag and add ng-transclude to it, if not there.
-    if (target.template)
+    if (target.template) {
       target.template = transcludeContent(target.template);
+    }
 
     return target;
   };
@@ -33,7 +35,7 @@ export function View(options) {
     if (s && s[1].toLowerCase().indexOf('ng-transclude') === -1) {
       template = template.replace(/\<content/i, '<content ng-transclude');
     }
-    
+
     return template;
   }
 }

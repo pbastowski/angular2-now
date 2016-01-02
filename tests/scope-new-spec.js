@@ -1,6 +1,6 @@
 export default (angular2now, ngModuleName) => {
-  describe("@ScopeNew()", () => {
-    it("should set scope as true", () => {
+  describe('@ScopeNew()', () => {
+    it('should set scope as true', () => {
       const target = {};
 
       angular2now.ScopeNew(target);
@@ -8,7 +8,7 @@ export default (angular2now, ngModuleName) => {
       expect(target.scope).toBe(true);
     });
 
-    it("should overwrite scope to true", () => {
+    it('should overwrite scope to true', () => {
       const target = {
         scope: undefined
       };
@@ -18,7 +18,7 @@ export default (angular2now, ngModuleName) => {
       expect(target.scope).toBe(true);
     });
 
-    it("should return target", () => {
+    it('should return target', () => {
       const target = {};
 
       const result = angular2now.ScopeShared(target);

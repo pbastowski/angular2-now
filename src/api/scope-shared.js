@@ -6,5 +6,5 @@
 // The other way to do this is to pass "scope: undefined" to @Component.
 export function ScopeShared(target) {
   target.scope = undefined;
-  return target
+  return target;
 }

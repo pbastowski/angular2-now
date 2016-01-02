@@ -2,5 +2,5 @@
 // The other way to do this is to pass "scope: true" to @Component.
 export function ScopeNew(target) {
   target.scope = true;
-  return target
+  return target;
 }

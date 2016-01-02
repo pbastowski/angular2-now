@@ -1,12 +1,12 @@
 export default (angular2now, ngModuleName) => {
-  describe("bootstrap()", () => {
+  describe('bootstrap()', () => {
     /**
      * angular.element mock
      * @type {Object}
      */
     const elementMock = {
       ready() {},
-        on() {}
+      on() {}
     };
     /**
      * spy on angular.module
@@ -34,7 +34,7 @@ export default (angular2now, ngModuleName) => {
     let spyElementOn;
 
     /**
-     * Call element's "on" or "ready". Depends on Cordova
+     * Call element's 'on' or 'ready'. Depends on Cordova
      * @return {[type]} [description]
      */
     function callOnReady() {
@@ -53,15 +53,15 @@ export default (angular2now, ngModuleName) => {
       spyElementOn = spyOn(elementMock, 'on');
     });
 
-    describe("not cordova", () => {
-      it("should use ready on document if target is not defined", () => {
+    describe('not cordova', () => {
+      it('should use ready on document if target is not defined', () => {
         angular2now.bootstrap();
 
         expect(spyElement).toHaveBeenCalledWith(document);
         expect(spyElementReady).toHaveBeenCalledWith(jasmine.any(Function));
       });
 
-      it("should use document's body if target is not defined", () => {
+      it('should use document\'s body if target is not defined', () => {
         angular2now.bootstrap();
         callOnReady();
 
@@ -69,7 +69,7 @@ export default (angular2now, ngModuleName) => {
         expect(spyBootstrap.calls.mostRecent().args[0]).toBe(document.body);
       });
 
-      it("should use target's selector", () => {
+      it('should use target\'s selector', () => {
         const selector = 'test-selector';
 
         angular2now.bootstrap({
@@ -85,7 +85,7 @@ export default (angular2now, ngModuleName) => {
         expect(spyBootstrap.calls.mostRecent().args[0]).toBe(selector);
       });
 
-      it("should handle selector provided directly instead of options object", () => {
+      it('should handle selector provided directly instead of options object', () => {
         const selector = 'test-selector';
 
         // bootstrap
@@ -101,8 +101,8 @@ export default (angular2now, ngModuleName) => {
         expect(spyBootstrap.calls.mostRecent().args[0]).toBe(selector);
       });
 
-      it("should use current module if target is function", () => {
-        const target = function() {};
+      it('should use current module if target is function', () => {
+        const target = function () {};
 
         angular2now.bootstrap(target);
 
@@ -111,6 +111,5 @@ export default (angular2now, ngModuleName) => {
         expect(spyBootstrap.calls.mostRecent().args[0]).toBe(document.body);
       });
     });
-
   });
 };

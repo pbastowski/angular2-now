@@ -33,28 +33,30 @@ export function bootstrap(target, config) {
 
   const bootModule = target.selector || common.currentModule;
 
-  if (bootModule !== common.currentModule)
+  if (bootModule !== common.currentModule) {
     angular.module(bootModule);
+  }
 
-  if (!config)
+  if (!config) {
     config = {
       strictDi: false
     };
+  }
 
-  if (common.isCordova)
-    angular.element(document).on("deviceready", onReady);
-  else
+  if (common.isCordova) {
+    angular.element(document).on('deviceready', onReady);
+  } else {
     angular.element(document).ready(onReady);
+  }
 
   function onReady() {
     let el;
 
-    // Find the component's element
     if (!bootOnDocument) {
+      // Find the component's element
       el = document.querySelector(target.selector);
-    }
-    // Or use document, if user passed no arguments
-    else {
+    } else {
+      // Or use document, if user passed no arguments
       el = document.body;
     }
 

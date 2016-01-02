@@ -22,7 +22,7 @@ export function Inject(...args) {
     throw new Error('@Inject: No dependencies passed in');
   }
 
-  return function(target, name, descriptor) {
+  return function InjectTarget(target, name, descriptor) {
     let injectable = target;
 
     if (descriptor) {
@@ -30,7 +30,7 @@ export function Inject(...args) {
     }
 
     if (!injectable) {
-      throw new TypeError('@Inject can only be used with classes or class methods.')
+      throw new TypeError('@Inject can only be used with classes or class methods.');
     }
 
     const existingInjects = injectable.$inject;

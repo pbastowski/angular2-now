@@ -16,42 +16,43 @@ import { MeteorReactive } from './api/meteor-reactive';
 import { LocalInjectables } from './api/local-injectables';
 
 const angular2now = {
-    init,
+  init,
 
-    SetModule,
+  SetModule,
 
-    Component,
-    ScopeShared,
-    ScopeNew,
-    View,
-    Inject,
-    Controller,
-    Service,
-    Filter,
-    bootstrap,
-    State,
+  Component,
+  ScopeShared,
+  ScopeNew,
+  View,
+  Inject,
+  Controller,
+  Service,
+  Filter,
+  bootstrap,
+  State,
 
-    options,
-    Options,
+  options,
+  Options,
 
-    MeteorMethod,
-    MeteorReactive,
-    LocalInjectables,
+  MeteorMethod,
+  MeteorReactive,
+  LocalInjectables,
 
-    Directive:   Component,
-    Injectable:  Service
+  Directive: Component,
+  Injectable: Service
 };
 
 function init() {
-    common.isCordova = typeof cordova !== 'undefined';
-    common.angularModule = angular.module;
+  common.isCordova = typeof cordova !== 'undefined';
+  common.angularModule = angular.module;
 }
 
 if (typeof Meteor === 'undefined') {
   init();
 
-  if (typeof window !== 'undefined')
+  if (typeof window !== 'undefined') {
     window.angular2now = angular2now;
+  }
 }
 
 export default angular2now;

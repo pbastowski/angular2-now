@@ -1,14 +1,13 @@
 export default (angular2now, ngModuleName) => {
-  describe("@Service()", () => {
+  describe('@Service()', () => {
     const name = 'TestService';
     const moduleMock = {
-      service: function() {}
-    }
+      service() {}
+    };
     let spy;
     let spyService;
 
-    function Target() {};
-
+    function Target() {}
 
     beforeEach(() => {
       // set spies
@@ -16,20 +15,20 @@ export default (angular2now, ngModuleName) => {
       spyService = spyOn(moduleMock, 'service');
     });
 
-    describe("with namespace", () => {
+    describe('with namespace', () => {
       beforeEach(() => {
         // set ngModuleName as currentModule
         angular2now.SetModule(`ns:${ngModuleName}`, []);
       });
 
-      it("should set service if argument is a string", () => {
+      it('should set service if argument is a string', () => {
         angular2now.Service(name)(Target);
 
         expect(spy).toHaveBeenCalledWith(ngModuleName);
         expect(spyService).toHaveBeenCalledWith(`ns_${name}`, Target);
       });
 
-      it("should set service if argument is an object with name property", () => {
+      it('should set service if argument is an object with name property', () => {
         angular2now.Service({
           name
         })(Target);
@@ -39,20 +38,20 @@ export default (angular2now, ngModuleName) => {
       });
     });
 
-    describe("without namespace", () => {
+    describe('without namespace', () => {
       beforeEach(() => {
         // set ngModuleName as currentModule
         angular2now.SetModule(`:${ngModuleName}`, []);
       });
 
-      it("should set service if argument is a string", () => {
+      it('should set service if argument is a string', () => {
         angular2now.Service(name)(Target);
 
         expect(spy).toHaveBeenCalledWith(ngModuleName);
         expect(spyService).toHaveBeenCalledWith(name, Target);
       });
 
-      it("should set service if argument is an object with name property", () => {
+      it('should set service if argument is an object with name property', () => {
         angular2now.Service({
           name
         })(Target);
