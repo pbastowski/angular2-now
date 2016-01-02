@@ -38,8 +38,8 @@ export function options(options) {
 }
 
 export function Options(options) {
-  return function(target) {
+  return function OptionsTarget(target) {
     angular.merge(common.ng2nOptions, options);
     return target;
-  }
+  };
 }
