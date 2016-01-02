@@ -1,4 +1,4 @@
-/*! angular2-now v1.0.1 */
+/*! angular2-now v1.1.0 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -89,6 +89,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _apiMeteorMethod = __webpack_require__(15);
 
+	var _apiMeteorReactive = __webpack_require__(16);
+
+	var _apiLocalInjectables = __webpack_require__(17);
+
 	var angular2now = {
 	    init: init,
 
@@ -109,6 +113,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Options: _apiOptions.Options,
 
 	    MeteorMethod: _apiMeteorMethod.MeteorMethod,
+	    MeteorReactive: _apiMeteorReactive.MeteorReactive,
+	    LocalInjectables: _apiLocalInjectables.LocalInjectables,
 
 	    Directive: _apiComponent.Component,
 	    Injectable: _apiService.Service
@@ -229,12 +235,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	function Component(options) {
 	  options = options || {};
 	  // Allow shorthand notation of just passing the selector name as a string
-	  if (typeof options === 'string') options = {
-	    selector: options
-	  };
+	  if (typeof options === 'string') {
+	    options = {
+	      selector: options
+	    };
+	  }
 
 	  return function (target) {
 	    var isClass = false;
+
+	    // Create a stub controller and substitute it for the target's constructor,
+	    // so that we can call the target's constructor later, within the link function.
+	    target = deferController(target, controller);
+
 	    // service injections, which could also have been specified by using @Inject
 	    if (options.injectables && options.injectables instanceof Array) {
 	      target = (0, _inject.Inject)(options.injectables)(target);
@@ -250,13 +263,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      isClass = true;
 	      options.selector = options.selector.slice(1);
 	    }
-
 	    // Save the unCamelCased selector name, so that bootstrap() can use it
 	    target.selector = (0, _utils.unCamelCase)(options.selector);
 
 	    // template options can be set with Component or with View
 	    // so, we run View on the passed in options first.
-	    if (options.template || options.templateUrl || options.transclude || options.directives) (0, _view.View)(options)(target);
+	    if (options.template || options.templateUrl || options.transclude || options.directives) {
+	      (0, _view.View)(options)(target);
+	    }
 
 	    // The template(Url) can also be passed in from the @View decorator
 	    options.template = target.template || undefined;
@@ -267,6 +281,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // but with the "@*" injections renamed to "$scope". The link function will pass
 	    // the "@*" injections directly to the component controller.
 	    var requiredControllers = [options.selector];
+
 	    target.$inject = target.$inject || [];
 	    target.$inject = target.$inject.map(function (dep) {
 	      if (/^@[^]{0,2}/.test(dep[0])) {
@@ -280,6 +295,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    target.$inject = target.$inject.filter(function (v) {
 	      return v !== 'delete-me';
 	    });
+
+	    if (target.meteorReactive) {
+	      // Prepend angular-meteor injectables
+	      target.$inject.unshift('$scope');
+	      target.$inject.unshift('$reactive');
+	    }
 
 	    // Remember the original $inject, as it will be needed in the link function.
 	    // In the link function we will receive any requested component controllers
@@ -324,6 +345,84 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    return target;
+
+	    // The stub controller below saves injected objects, so we can re-inject them
+	    // into the "real" controller when the link function executes.
+	    // This allows me to add stuff to the controller and it's "this", which is required
+	    // for some future functionality.
+	    function controller() {
+	      var ctrlInstance = this;
+	      var toInjectAfter = [];
+
+	      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	        args[_key] = arguments[_key];
+	      }
+
+	      var injectedDeps = args;
+
+	      if (target.meteorReactive) {
+	        // Get injected angular-meteor objects
+	        var $reactive = injectedDeps[0];
+	        var $scope = injectedDeps[1];
+
+	        $reactive(ctrlInstance).attach($scope);
+
+	        toInjectAfter = injectedDeps.slice(0, 2);
+	        injectedDeps = injectedDeps.slice(2);
+	        target.$inject = target.$inject.slice(2);
+	      }
+	      if (target.localInjectables) {
+	        target.$inject.forEach(function (value, index) {
+	          ctrlInstance[value] = injectedDeps[index];
+	        });
+	      }
+	      // Call the original constructor, which is now called $$init, injecting all the
+	      // dependencies requested.
+	      this.$$init.apply(this, injectedDeps);
+
+	      if (toInjectAfter.length > 0) {
+	        target.$inject = ['$reactive', '$scope'].concat(target.$inject);
+	        injectedDeps.unshift(toInjectAfter[1]);
+	        injectedDeps.unshift(toInjectAfter[0]);
+	      }
+	    }
+	    // This function allows me to replace a component's "real" constructor with my own.
+	    // I do this, because I want to decorate the $scope and this before instantiating
+	    // the class's original controller. Also, this enables me to inject
+	    // other component's controllers into the constructor, the same way as you would
+	    // inject a service.
+	    // The component's original constructor is assigned to the init method of the
+	    // component's class, so that when it executes it will run in the original scope and
+	    // closures that it was defined in. It is the init method that is called within the
+	    // link function.
+	    function deferController(target, controller) {
+	      // Save the original prototype
+	      var oldproto = target.prototype;
+	      // Save the original constructor, so we can call it later
+	      var construct = target.prototype.constructor;
+	      // Save any static properties
+	      var staticProps = {};
+
+	      for (var i in target) {
+	        if (target.hasOwnProperty(i)) {
+	          staticProps[i] = target[i];
+	        }
+	      }
+	      // Assign a new constructor, which holds the injected deps.
+	      target = controller;
+	      // Restore the original prototype
+	      target.prototype = oldproto;
+	      // Restore saved static properties
+	      for (var i in staticProps) {
+	        target[i] = staticProps[i];
+	      }
+	      // Store the original constructor under the name $$init,
+	      // which we will call in the link function.
+	      target.prototype.$$init = construct;
+	      // Hide $$init from the user's casual inspections of the controller
+	      //Object.defineProperty(target.prototype, "$$init", {enumerable: false})
+	      return target;
+	    }
 
 	    function link(scope, el, attr, controllers) {
 	      // Create a service with the same name as the selector
@@ -918,7 +1017,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        // This is the service that we "unshifted" earlier
-	        localScope = args[0];
+	        var localScope = args[0];
 
 	        args = args.slice(1);
 
@@ -1070,6 +1169,40 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    return descriptor;
 	  };
+	}
+
+/***/ },
+/* 16 */
+/***/ function(module, exports) {
+
+	// Turn on an indication to run $reactive(this).attach($scope) for the component's controller.
+	// Uses with Angular-Meteor: http://angular-meteor.com, v1.3 and up only
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.MeteorReactive = MeteorReactive;
+
+	function MeteorReactive(target) {
+	  target.meteorReactive = true;
+	  return target;
+	}
+
+/***/ },
+/* 17 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.LocalInjectables = LocalInjectables;
+
+	function LocalInjectables(target) {
+	  target.localInjectables = true;
+	  return target;
 	}
 
 /***/ }
