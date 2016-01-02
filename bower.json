@@ -1,10 +1,10 @@
 {
   "name": "angular2-now",
-  "version": "0.3.18",
+  "version": "1.1.0",
   "authors": [
     "pbastowski@gmail.com"
   ],
-  "description": "Use Angular2 @Component syntax with Angular 1.x and Babel",
+  "description": "Angular2 @Component syntax for Angular 1 apps",
   "main": "angular2-now.js",
   "keywords": [
     "AngularJS",

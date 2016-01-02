@@ -1,21 +1,25 @@
 Package.describe({
     name:          'pbastowski:angular2-now',
-    version:       '0.3.18',
-    summary:       'Angular 2 @Component syntax for Angular 1',
-    git:           'https://github.com/pbastowski/angular2-now.git',
+    version:       '1.1.0',
+    summary:       'Angular 2 @Component syntax for Meteor 1.2 and AngularJS',
+    git:           'https://github.com/pbastowski/angular2-now/tree/meteor1.2',
     documentation: 'README.md'
 });
 
 Package.onUse(function (api) {
-    api.versionsFrom('1.1.0.2');
-    api.use('angular@1.0.1', 'client');
-    api.imply('angular@1.0.1', 'client');
-    api.addFiles(['angular2-now.js', 'exports.js'], ['client']);
+    api.versionsFrom('1.2.0.1');
+    api.use('angular@1.3.1', 'client');
+    api.imply('angular@1.3.1', 'client');
+
+    // Make sure we load after pbastowski:systemjs, if it's used
+    api.use('pbastowski:systemjs@0.0.1', 'client', {weak: true});
+
+    api.addFiles(['dist/angular2-now.js', 'src/exports.js'], ['client'], {transpile: false});
     api.export(['angular2now']);
 });
 
 Package.onTest(function (api) {
-    //api.use('tinytest');
-    //api.use('pbastowski:angular2-now');
-    //api.addFiles('angular2-now-tests.js');
+    api.use('tinytest');
+    api.use('pbastowski:angular2-now');
+    api.addFiles('tests/meteor-spec.js', ['client']);
 });
