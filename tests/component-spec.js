@@ -77,38 +77,38 @@ export default (angular2now, ngModuleName) => {
     });
 
     it("should have target at controller", () => {
-      doComponent(nameDashed);
+      const result = doComponent(nameDashed);
 
-      expect(getDDO('controller')).toBe(target);
+      expect(getDDO('controller')).toBe(result);
     });
 
     describe("options.selector", () => {
 
       it("should set selector if argument is a string", () => {
-        doComponent(nameDashed);
+        const result = doComponent(nameDashed);
 
-        expect(target.selector).toBe(nameDashed);
+        expect(result.selector).toBe(nameDashed);
         expect(getDDName()).toBe(nameCamel);
       });
 
       it("should be able to unCamelCase selector", () => {
-        doComponent(nameCamel);
+        const result = doComponent(nameCamel);
 
-        expect(target.selector).toBe(nameDashed);
+        expect(result.selector).toBe(nameDashed);
         expect(getDDName()).toBe(nameCamel);
       });
 
       it("should handle class name as selector", () => {
-        doComponent(nameClass);
+        const result = doComponent(nameClass);
 
-        expect(target.selector).toBe(nameDashed);
+        expect(result.selector).toBe(nameDashed);
         expect(getDDName()).toBe(nameCamel);
       });
 
       it("should call angular.directive with proper selector", () => {
-        doComponent(nameClass);
+        const result = doComponent(nameClass);
 
-        expect(target.selector).toBe(nameDashed);
+        expect(result.selector).toBe(nameDashed);
         expect(spyDirective).toHaveBeenCalled();
         expect(getDDName()).toBe(nameCamel);
       });
@@ -118,12 +118,12 @@ export default (angular2now, ngModuleName) => {
       const injectables = ['$http', '$q'];
 
       it("should set injectables", () => {
-        doComponent({
+        const result = doComponent({
           injectables
         });
 
-        expect(target.$inject).toEqual(injectables);
-        expect(target.$injectDefer).toEqual(target.$inject);
+        expect(result.$inject).toEqual(injectables);
+        expect(result.$injectDefer).toEqual(result.$inject);
       });
     });
 
@@ -131,12 +131,12 @@ export default (angular2now, ngModuleName) => {
       const services = ['$http', '$q'];
 
       it("should set services", () => {
-        doComponent({
+        const result = doComponent({
           services
         });
 
-        expect(target.$inject).toEqual(services);
-        expect(target.$injectDefer).toEqual(target.$inject);
+        expect(result.$inject).toEqual(services);
+        expect(result.$injectDefer).toEqual(result.$inject);
       });
     });
 
@@ -304,14 +304,14 @@ export default (angular2now, ngModuleName) => {
       });
 
       it("should remove transformed injectables", () => {
-        doComponent({
+        const result = doComponent({
           injectables,
           selector: nameDashed
         });
 
         atInjects.forEach((inj) => {
-          expect(target.$inject.indexOf(inj)).toBe(-1);
-          expect(target.$injectDefer.indexOf(inj)).toBe(-1);
+          expect(result.$inject.indexOf(inj)).toBe(-1);
+          expect(result.$injectDefer.indexOf(inj)).toBe(-1);
         });
       });
     });
