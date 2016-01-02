@@ -3,7 +3,7 @@ import { Inject } from './inject';
 import { common } from './../common';
 import { camelCase, unCamelCase } from './../utils';
 
-//function Directive(options) {
+// function Directive(options) {
 //
 //    // A string passed is assumed to be the attribute name of the directive.
 //    if (typeof options === 'string')
@@ -17,7 +17,7 @@ import { camelCase, unCamelCase } from './../utils';
 //        angular.merge(options, { scope: undefined });
 //
 //    return Component(options);
-//}
+// }
 
 export function Component(options) {
   options = options || {};
@@ -28,7 +28,7 @@ export function Component(options) {
     };
   }
 
-  return function(target) {
+  return function ComponentTarget(target) {
     let isClass = false;
 
     // Create a stub controller and substitute it for the target's constructor,
@@ -70,18 +70,16 @@ export function Component(options) {
     const requiredControllers = [options.selector];
 
     target.$inject = target.$inject || [];
-    target.$inject = target.$inject.map(function(dep) {
+    target.$inject = target.$inject.map((dep) => {
       if (/^@[^]{0,2}/.test(dep[0])) {
         requiredControllers.push('?' + dep.slice(1));
-        dep = 'delete-me'
+        dep = 'delete-me';
       }
       return dep;
     });
 
     // Remove all the 'delete-me' entries
-    target.$inject = target.$inject.filter(function(v) {
-      return v !== 'delete-me';
-    });
+    target.$inject = target.$inject.filter((v) => v !== 'delete-me');
 
     if (target.meteorReactive) {
       // Prepend angular-meteor injectables
@@ -154,7 +152,7 @@ export function Component(options) {
         target.$inject = target.$inject.slice(2);
       }
       if (target.localInjectables) {
-        target.$inject.forEach(function(value, index) {
+        target.$inject.forEach((value, index) => {
           ctrlInstance[value] = injectedDeps[index];
         });
       }
@@ -177,7 +175,7 @@ export function Component(options) {
     // component's class, so that when it executes it will run in the original scope and
     // closures that it was defined in. It is the init method that is called within the
     // link function.
-    function deferController (target, controller) {
+    function deferController(target, controller) {
       // Save the original prototype
       const oldproto = target.prototype;
       // Save the original constructor, so we can call it later
@@ -185,7 +183,7 @@ export function Component(options) {
       // Save any static properties
       const staticProps = {};
 
-      for (let i in target) {
+      for (const i in target) {
         if (target.hasOwnProperty(i)) {
           staticProps[i] = target[i];
         }
@@ -195,21 +193,21 @@ export function Component(options) {
       // Restore the original prototype
       target.prototype = oldproto;
       // Restore saved static properties
-      for (let i in staticProps) {
+      for (const i in staticProps) {
         target[i] = staticProps[i];
       }
       // Store the original constructor under the name $$init,
       // which we will call in the link function.
       target.prototype.$$init = construct;
       // Hide $$init from the user's casual inspections of the controller
-      //Object.defineProperty(target.prototype, "$$init", {enumerable: false})
+      // Object.defineProperty(target.prototype, "$$init", {enumerable: false})
       return target;
     }
 
     function link(scope, el, attr, controllers) {
       // Create a service with the same name as the selector
       // That holds a reference to our component
-      //angular.module(currentModule).value(camelCase(target.selector), controllers[0]);
+      // angular.module(currentModule).value(camelCase(target.selector), controllers[0]);
 
       // Alternate syntax for the injection of other component's controllers
       if (controllers[0].$dependson) {
@@ -217,5 +215,4 @@ export function Component(options) {
       }
     }
   };
-
 }
