@@ -43,6 +43,11 @@ export function Component(options) {
     if (options.services && options.services instanceof Array) {
       target = Inject(options.services)(target);
     }
+    // injectables has been renamed to providers, actually, but also keeping
+    // services in case anyone has used it already.
+    if (options.providers && options.providers instanceof Array) {
+      target = Inject(options.providers)(target);
+    }
 
     // Selector name may be prefixed with a '.', in which case "restrict: 'C'" will be used
     options.selector = camelCase(options.selector || '') + '';

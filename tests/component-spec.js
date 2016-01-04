@@ -139,6 +139,19 @@ export default (angular2now, ngModuleName) => {
       });
     });
 
+    describe('options.providers', () => {
+      const providers = ['$http', '$q'];
+
+      it('should set providers', () => {
+        const result = doComponent({
+          providers
+        });
+
+        expect(result.$inject).toEqual(providers);
+        expect(result.$injectDefer).toEqual(result.$inject);
+      });
+    });
+
     describe('options.template', () => {
       it('should set template', () => {
         expectDDO('template', 'foo');

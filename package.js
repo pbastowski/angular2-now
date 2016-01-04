@@ -1,13 +1,13 @@
 Package.describe({
   name: 'pbastowski:angular2-now',
-  version: '1.1.1',
+  version: '1.1.2',
   summary: 'Angular 2 @Component syntax for Meteor 1.2 and AngularJS',
   git: 'https://github.com/pbastowski/angular2-now/tree/meteor1.2',
   documentation: 'README.md'
 });
 
 Npm.depends({
-  'angular2-now': '1.1.0'
+  'angular2-now': '1.1.2'
 });
 
 Package.onUse(function(api) {

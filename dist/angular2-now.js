@@ -1,4 +1,4 @@
-/*! angular2-now v1.1.0 */
+/*! angular2-now v1.1.2 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -127,10 +127,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	if (typeof Meteor === 'undefined') {
 	  init();
+	}
 
-	  if (typeof window !== 'undefined') {
-	    window.angular2now = angular2now;
-	  }
+	if (typeof window !== 'undefined') {
+	  window.angular2now = angular2now;
 	}
 
 	exports['default'] = angular2now;
@@ -259,6 +259,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // injectables has been renamed to services
 	    if (options.services && options.services instanceof Array) {
 	      target = (0, _inject.Inject)(options.services)(target);
+	    }
+	    // injectables has been renamed to providers, actually, but also keeping
+	    // services in case anyone has used it already.
+	    if (options.providers && options.providers instanceof Array) {
+	      target = (0, _inject.Inject)(options.providers)(target);
 	    }
 
 	    // Selector name may be prefixed with a '.', in which case "restrict: 'C'" will be used

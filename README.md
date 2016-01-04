@@ -96,23 +96,31 @@ In the above example, when we `import "MyService"` we are actually importing the
 The following annotations have been implemented to support Angular 2.0 component syntax. Any parameters preceeded with `?` are optional.
 
 ```javascript
-SetModule('my-app', ['angular-meteor']);  // Use SetModule in place of angular.module
+// SetModule is not actually in Angular2, but is required in Angular1
+// in place of angular.module().
+SetModule('my-app', ['angular-meteor']);
 
 @Component({ 
     selector: 'my-app', 
+    ?template: '<div>Inline template</div>',   // inline template 
+    ?templateUrl: 'path/to/the_template.html', // importing a template
+    ?transclude: true or false,
     ?bind: { twoWay: '=', value: '@', function: '&' },
-    ?services: ['$http', '$q', 'myService'],
+    ?providers: ['$http', '$q', 'myService'],  // alias for @Inject
     ?replace: true or false,
     ?transclude: true or false,
     ?scope: undefined or true or same as bind
 })
 
+// View is optional, as all it's properties are also available in @Component
 @View({ 
     template: '<div>Inline template</div>',    // inline template 
     templateUrl: 'path/to/the_template.html',  // importing a template
     ?transclude: true or false
 })
 
+// Inject is optional, as injected objects can be specified in the 
+// providers property of @Component
 @Inject('$http', '$q'); // Passing injectables directly
                         // Also valid: @Inject(['$http', '$q'])
 
