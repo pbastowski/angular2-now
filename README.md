@@ -585,6 +585,12 @@ Over time there were varied contributors to this repo, however, below are those 
 
 # Change Log
 
+### 5 Jan 2016 - v1.1.3
+
+- Added `providers` property to @Component as an alias for @Inject. An angular2-now component can now be fully defined with the @Component decorator, just like in Angular2.
+- For Meteor users, updated Meteor package angular dependency to 1.3.4.
+- Added coveralls code coverage badge to readme. 
+
 ### 2 Jan 2016 - v1.1.0
 
 - MeteorReactive support: this version of angular2-now includes the MeteorReactive decorator, which only works with Meteor. See angular-meteor docs for more information on it's usage.  

@@ -1,4 +1,4 @@
-/*! angular2-now v1.1.2 */
+/*! angular2-now v1.1.3 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
