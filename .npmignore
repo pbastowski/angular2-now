@@ -1,0 +1,13 @@
+webpack
+tests
+src
+.npm
+.editorconfig
+.eslintignore
+.eslintrc
+.travis.yml
+bower.json
+gulpfile.js
+karma.config.js
+package.js
+webpack.config.js
