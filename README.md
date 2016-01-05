@@ -1,4 +1,4 @@
-# angular2-now [![Build Status](https://travis-ci.org/pbastowski/angular2-now.svg?branch=master)](https://travis-ci.org/pbastowski/angular2-now)
+# angular2-now  [![Build Status](https://travis-ci.org/pbastowski/angular2-now.svg?branch=master)](https://travis-ci.org/pbastowski/angular2-now)  [![Coverage Status](https://coveralls.io/repos/pbastowski/angular2-now/badge.svg?branch=master&service=github)](https://coveralls.io/github/pbastowski/angular2-now?branch=master)
 
 ## Angular 2.0 component syntax for Angular 1 apps
 
