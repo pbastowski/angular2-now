@@ -1,19 +1,60 @@
 var gulp = require('gulp');
 var replace = require('gulp-replace');
+var bump = require('gulp-bump');
 
-// bump npm package version into package.js
+//
+// Bump new patch version
+// npm run bump:patch
+//
+gulp.task('bump:patch', function() {
+  gulp.src('package.json')
+    .pipe(bump({
+      type: 'patch'
+    }))
+    .pipe(gulp.dest('./'));
+});
+
+//
+// Bump new patch version
+// $ npm run bump:minor
+//
+gulp.task('bump:minor', function() {
+  gulp.src('package.json')
+    .pipe(bump({
+      type: 'minor'
+    }))
+    .pipe(gulp.dest('./'));
+});
+
+//
+// Bump new major version
+// $ npm run bump:major
+//
+gulp.task('bump:major', function() {
+  gulp.src('package.json')
+    .pipe(bump({
+      type: 'major'
+    }))
+    .pipe(gulp.dest('./'));
+});
+
+//
+// Update meteor version
+// $ npm run meteor
+//
 gulp.task('meteor', function() {
-  // get version of npm package
+  // current version
   var version = require('./package.json').version;
-  // find: version: '...'
-  var versionRegex = /(version\:\s*\')([^\']+)\'/gi;
-  // find: 'angular2-now': '...'
-  var npmVersionRegex = /(\'angular2-now\'\:\s*')([^\']+)\'/gi;
+  // regex for package version and npm dependency version
+  var regex = {
+    version: /(version: ')([^\']+)'/gi,
+    npm: /('angular2-now': ')([^\']+)'/gi
+  };
 
   return gulp.src('package.js')
     // update version of meteor package
-    .pipe(replace(versionRegex, '$1' + version + "'"))
+    .pipe(replace(regex.version, '$1' + version + "'"))
     // update version of npm dependency
-    .pipe(replace(npmVersionRegex, '$1' + version + "'"))
+    .pipe(replace(regex.npm, '$1' + version + "'"))
     .pipe(gulp.dest('./'));
 });

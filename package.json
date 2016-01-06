@@ -12,7 +12,14 @@
     "lint": "eslint src/**/*.js",
     "build:dist": "webpack --progress --colors --set-env-NODE_ENV=development",
     "build:prod": "webpack --progress --colors --set-env-NODE_ENV=production",
-    "build": "npm run build:dist && npm run build:prod && npm run meteor",
+    "build": "npm run build:dist && npm run build:prod",
+    "bump:patch": "gulp bump:patch && npm run after-bump",
+    "bump:minor": "gulp bump:minor && npm run after-bump",
+    "bump:major": "gulp bump:major && npm run after-bump",
+    "after-bump": "npm run meteor",
+    "release:patch": "npm run bump:patch && npm run build",
+    "release:minor": "npm run bump:minor && npm run build",
+    "release:major": "npm run bump:major && npm run build",
     "coverage:coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },
   "repository": {
@@ -56,6 +63,7 @@
     "eslint": "^1.10.3",
     "eslint-config-airbnb": "^2.1.1",
     "gulp": "3.9.0",
+    "gulp-bump": "^1.0.0",
     "gulp-replace": "0.5.4",
     "isparta": "^4.0.0",
     "isparta-loader": "1.0.0",
