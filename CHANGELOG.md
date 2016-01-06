@@ -31,5 +31,5 @@ We have a new contributor: Kamil Kisiela.
 
 - BREAKING CHANGE: Meteor 1.1 version is now deprecated and will not be updated any further, other than to possibly fix very annoying errors.
 
-[1.1.3]: https://github.com/pbastowski/angular2-now/compare/v1.1.0...v1.1.3
-[1.1.0]: https://github.com/pbastowski/angular2-now/compare/45b6220...v1.1.0
+[1.1.3]: https://github.com/pbastowski/angular2-now/compare/v1.1.0...a8e7c2a
+[1.1.0]: https://github.com/pbastowski/angular2-now/compare/689efb3...v1.1.0
