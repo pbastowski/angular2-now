@@ -6,6 +6,7 @@ src
 .eslintignore
 .eslintrc
 .travis.yml
+.bower.json
 bower.json
 gulpfile.js
 karma.config.js
