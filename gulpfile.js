@@ -48,8 +48,14 @@ gulp.task('meteor', function() {
   // regex for package version and npm dependency version
   var regex = {
     version: /(version: ')([^\']+)'/gi,
-    npm: /('angular2-now': ')([^\']+)'/gi
+    npm: /('angular2-now': ')([^\']+)'/gi,
+    shrinkwrap: /("version": ")([^\"]+)"/gi,
   };
+
+  gulp.src('.npm/package/npm-shrinkwrap.json')
+    // update version of angular2-now in npm-shrinkwrap
+    .pipe(replace(regex.shrinkwrap, '$1' + version + '"'))
+    .pipe(gulp.dest('.npm/package'));
 
   return gulp.src('package.js')
     // update version of meteor package
