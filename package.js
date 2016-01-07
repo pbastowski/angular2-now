@@ -29,9 +29,3 @@ Package.onUse(function(api) {
 
   api.export(['angular2now']);
 });
-
-Package.onTest(function(api) {
-  api.use('tinytest');
-  api.use('pbastowski:angular2-now');
-  api.addFiles('tests/meteor-spec.js', 'client');
-});
