@@ -25,7 +25,7 @@ export default (angular2now, ngModuleName) => {
      * Same as doStateRaw but with predefined state options
      */
     function doState(opts) {
-      return doStateRaw(angular.merge(state, opts));
+      return doStateRaw(angular.merge(angular.copy(state), opts));
     }
 
     /**
@@ -139,15 +139,38 @@ export default (angular2now, ngModuleName) => {
         });
       });
 
+      describe('template', () => {
+        it('should be the same as in options', () => {
+          expectSDO('template', '<foo></foo>');
+          //
+          expect(getSDO('templateUrl')).toBeUndefined();
+          expect(getSDO('templateProvider')).toBeUndefined();
+        });
+
+        it('should contain div with ui-view directive', () => {
+          doState({});
+          expect(getSDO('template')).toContain('div');
+          expect(getSDO('template')).toContain('ui-view');
+          expect(getSDO('templateUrl')).toBeUndefined();
+          expect(getSDO('templateProvider')).toBeUndefined();
+        });
+      });
+
       describe('templateUrl', () => {
         it('should be the same as in options', () => {
           expectSDO('templateUrl', 'foo.html');
+          //
+          expect(getSDO('template')).toBeUndefined();
+          expect(getSDO('templateProvider')).toBeUndefined();
         });
       });
 
       describe('templateProvider', () => {
         it('should be the same as in options', () => {
           expectSDO('templateProvider', function templateProvider() {});
+          //
+          expect(getSDO('template')).toBeUndefined();
+          expect(getSDO('templateUrl')).toBeUndefined();
         });
       });
 
