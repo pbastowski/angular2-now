@@ -149,12 +149,10 @@ export function State(options) {
           };
 
           // sdo's template
-          if (options.templateUrl) {
-            sdo.template = options.templateUrl;
-          } else if (options.templateProvider) {
+          if (options.templateUrl || options.templateProvider) {
             sdo.template = undefined;
           } else if (options.template) {
-            sdo.template = options.templateUrl;
+            sdo.template = options.template;
           }
 
           // sdo's controller
