@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [1.1.5]
 
 ### Fixed
 
@@ -36,6 +36,6 @@ We have a new contributor: Kamil Kisiela.
 
 - BREAKING CHANGE: Meteor 1.1 version is now deprecated and will not be updated any further, other than to possibly fix very annoying errors.
 
-[Unreleased]: https://github.com/pbastowski/angular2-now/compare/a8e7c2a...HEAD
+[1.1.5]: https://github.com/pbastowski/angular2-now/compare/a8e7c2a...v1.1.5
 [1.1.3]: https://github.com/pbastowski/angular2-now/compare/v1.1.0...a8e7c2a
 [1.1.0]: https://github.com/pbastowski/angular2-now/compare/689efb3...v1.1.0
