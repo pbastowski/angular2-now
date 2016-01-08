@@ -1,4 +1,4 @@
-/*! angular2-now v1.1.4 */
+/*! angular2-now v1.1.5 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -1005,12 +1005,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      };
 
 	      // sdo's template
-	      if (options.templateUrl) {
-	        sdo.template = options.templateUrl;
-	      } else if (options.templateProvider) {
+	      if (options.templateUrl || options.templateProvider) {
 	        sdo.template = undefined;
 	      } else if (options.template) {
-	        sdo.template = options.templateUrl;
+	        sdo.template = options.template;
 	      }
 
 	      // sdo's controller
