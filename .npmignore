@@ -13,3 +13,4 @@ gulpfile.js
 karma.config.js
 package.js
 webpack.config.js
+.idea
