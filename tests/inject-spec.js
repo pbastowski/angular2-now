@@ -103,21 +103,47 @@ export default (angular2now, ngModuleName) => {
         expect(childClass.$inject).toContain('$http');
       });
 
-      it('should keep injectables while extending component', () => {
+      it('should keep injectables while extending component without injectables', () => {
+        const injectables = ['$http', '$foo', '$bar'];
         // parent class
         class parentClass {}
         // inject $http
-        angular2now.Inject(['$http'])(parentClass);
+        angular2now.Inject(injectables)(parentClass);
 
         // child class
         class childClass extends parentClass {}
-
         // component extended by parentClass
         const result = angular2now.Component({
           selector: 'child-class'
         })(childClass);
 
-        expect(result.$inject).toContain('$http');
+        injectables.forEach((inj) => {
+          expect(result.$inject).toContain(inj);
+        });
+      });
+
+      it('should keep injectables while extending component with injectables', () => {
+        const injectables = {
+          parent: ['$http', '$foo', '$bar'],
+          child: ['$baz']
+        };
+        // parent class
+        class parentClass {}
+        // inject $http
+        angular2now.Inject(injectables.parent)(parentClass);
+
+        // child class
+        class childClass extends parentClass {}
+
+        angular2now.Inject(injectables.child)(childClass);
+        // component extended by parentClass
+        const result = angular2now.Component({
+          selector: 'child-class'
+        })(childClass);
+
+        injectables.parent.concat(injectables.child).forEach((inj) => {
+          expect(result.$inject).toContain(inj);
+        });
       });
     });
   });
