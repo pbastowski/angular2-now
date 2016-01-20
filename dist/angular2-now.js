@@ -1,4 +1,4 @@
-/*! angular2-now v1.1.5 */
+/*! angular2-now v1.1.6 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -413,9 +413,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var staticProps = {};
 
 	      for (var i in target) {
-	        if (target.hasOwnProperty(i)) {
-	          staticProps[i] = target[i];
-	        }
+	        staticProps[i] = target[i];
 	      }
 	      // Assign a new constructor, which holds the injected deps.
 	      target = controller;
