@@ -102,6 +102,23 @@ export default (angular2now, ngModuleName) => {
 
         expect(childClass.$inject).toContain('$http');
       });
+
+      it('should keep injectables while extending component', () => {
+        // parent class
+        class parentClass {}
+        // inject $http
+        angular2now.Inject(['$http'])(parentClass);
+
+        // child class
+        class childClass extends parentClass {}
+
+        // component extended by parentClass
+        const result = angular2now.Component({
+          selector: 'child-class'
+        })(childClass);
+
+        expect(result.$inject).toContain('$http');
+      });
     });
   });
 };
