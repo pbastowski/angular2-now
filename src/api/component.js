@@ -189,9 +189,7 @@ export function Component(options) {
       const staticProps = {};
 
       for (const i in target) {
-        if (target.hasOwnProperty(i)) {
-          staticProps[i] = target[i];
-        }
+        staticProps[i] = target[i];
       }
       // Assign a new constructor, which holds the injected deps.
       target = controller;
