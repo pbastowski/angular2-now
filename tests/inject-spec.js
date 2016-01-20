@@ -44,7 +44,7 @@ export default (angular2now, ngModuleName) => {
         })
       );
       // mocks
-      let target;
+      function target() {}
       let descriptor;
 
       function doInject(useDescriptor) {
@@ -56,9 +56,7 @@ export default (angular2now, ngModuleName) => {
 
       beforeEach(() => {
         angular2now.SetModule(`ns:${ngModuleName}`, []);
-        target = {
-          $inject: Injectables.target
-        };
+        target.$inject = Injectables.target;
         descriptor = {
           value() {}
         };
@@ -95,6 +93,14 @@ export default (angular2now, ngModuleName) => {
         expect(descriptor.value.$inject).toBeUndefined();
         doInject(true);
         expect(descriptor.value.$inject).toBeDefined();
+      });
+
+      it('should keep injectables while extending class', () => {
+        class parentClass {}
+        angular2now.Inject(['$http'])(parentClass);
+        class childClass extends parentClass {}
+
+        expect(childClass.$inject).toContain('$http');
       });
     });
   });
