@@ -104,7 +104,6 @@ SetModule('my-app', ['angular-meteor']);
     selector: 'my-app', 
     ?template: '<div>Inline template</div>',   // inline template 
     ?templateUrl: 'path/to/the_template.html', // importing a template
-    ?transclude: true or false,
     ?bind: { twoWay: '=', value: '@', function: '&' },
     ?providers: ['$http', '$q', 'myService'],  // alias for @Inject
     ?replace: true or false,
