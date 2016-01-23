@@ -5,13 +5,13 @@ var prod = require('./prod');
 var common = require('./common');
 
 module.exports = {
-    test: extend(test),
-    dist: extend(dist),
-    prod: extend(prod)
+  test: extend(test),
+  dist: extend(dist),
+  prod: extend(prod)
 };
 
 function extend(cfg) {
-    var config = _.merge({}, common, cfg);
-    
-    return config;
+  var config = _.merge({}, common, cfg);
+
+  return config;
 }
