@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 export default (angular2now, ngModuleName) => {
   describe('@Inject()', () => {
     // TODO add tests of null, undefined and empty array as Inject() argument
