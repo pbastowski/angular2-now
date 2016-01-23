@@ -6,6 +6,9 @@ module.exports = {
   resolve: {
     extensions: ['', '.js']
   },
+  babel: {
+    presets: ['es2015']
+  },
   externals: {
     angular: 'angular'
   }
