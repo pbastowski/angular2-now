@@ -30,7 +30,6 @@ module.exports = function(config) {
       'node_modules/angular/angular.js',
       'node_modules/angular-mocks/angular-mocks.js',
       'node_modules/angular-ui-router/release/angular-ui-router.js',
-      'node_modules/lodash/index.js',
       testFile
     ],
 
@@ -62,7 +61,7 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress', 'coverage', 'html'],
+    reporters: ['progress', 'coverage', 'kjhtml'],
 
 
     // web server port

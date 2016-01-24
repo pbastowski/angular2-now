@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 export default (angular2now, ngModuleName) => {
   describe('@View()', () => {
     it('should set templateUrl if argument is a string', () => {
