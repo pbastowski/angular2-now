@@ -23,10 +23,3 @@ script:
 after_success:
   # send code-coverage report to coveralls
   - "npm run coverage:coveralls"
-#
-#deploy:
-#  provider: npm
-#  auth_key: "pbastowski-top-secret-api-key"
-#  on:
-#    tags: true
-#
