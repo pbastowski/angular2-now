@@ -1,7 +1,7 @@
 require('argv-set-env')();
 
 // webpack configuration
-var webpack = require('./webpack/config').test;
+var webpack = require('./webpack')('test');
 
 // main file with tests
 var testFile = 'tests/index-spec.js';

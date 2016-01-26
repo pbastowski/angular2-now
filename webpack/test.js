@@ -1,17 +1,8 @@
-module.exports = {
+module.exports = require('./common')({
   entry: './tests/index-spec.js',
+  output: undefined,
   module: {
     loaders: [
-      // transpile all files except testing sources with babel as usual
-      {
-        test: /\.js$/,
-        include: [
-          /tests/,
-          /src/
-        ],
-        exclude: /node_modules/,
-        loader: 'babel'
-      },
       // transpile and instrument only testing sources with isparta
       {
         test: /\.js$/,
@@ -21,4 +12,4 @@ module.exports = {
       }
     ]
   }
-};
+});
