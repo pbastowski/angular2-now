@@ -8,9 +8,27 @@ So, if you like the clean syntax of Angular 2, but are not yet ready or able to 
 
 > **Meteor note**: Meteor package version 1.1.0 of angular2-now works with Meteor 1.2 or higher (repo branch `master`). The latest Meteor 1.1 package version is 0.3.18 (repo branch `meteor1.1`).
 
+## If you are going to use Meteor 1.3...
+... then you can install angular2-now with NPM, like this: 
+
+    npm install angular2-now
+
+You will need to import from `angular2-now` instead of `angular2now`. See the extra "-"? Here is an example:
+
+````js
+import { Component } from "angular2-now"
+````
+
+Also, with Meteor 1.3, for the moment you need to do this, before you call `SetModule()`.
+
+```js
+import { init } from "angular2-now";
+init();
+```
+
 ## Install
 
-**NPM**
+**NPM and Meteor 1.3**
 
     npm install angular2-now
     
