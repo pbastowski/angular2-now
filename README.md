@@ -19,7 +19,7 @@ You will need to import from `angular2-now` instead of `angular2now`. See the ex
 import { Component } from "angular2-now"
 ````
 
-Also, with Meteor 1.3, for the moment you need to do this, before you call `SetModule()`.
+> Temporarily, with Meteor 1.3 you need to do what's shown below, before you call `SetModule()`. This will be fixed in an upcoming release.
 
 ```js
 import { init } from "angular2-now";
