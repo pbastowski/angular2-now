@@ -1,0 +1,5 @@
+{
+  "globalDependencies": {
+    "angular2-now": "github:onderceylan/angular2-now/angular2-now.d.ts#e22d64ef073c7a460ca75225090b42371fde002c"
+  }
+}
