@@ -1,0 +1,8 @@
+{
+  "resolution": "main",
+  "tree": {
+    "src": "https://raw.githubusercontent.com/onderceylan/angular2-now/e22d64ef073c7a460ca75225090b42371fde002c/angular2-now.d.ts",
+    "raw": "github:onderceylan/angular2-now/angular2-now.d.ts#e22d64ef073c7a460ca75225090b42371fde002c",
+    "typings": "https://raw.githubusercontent.com/onderceylan/angular2-now/e22d64ef073c7a460ca75225090b42371fde002c/angular2-now.d.ts"
+  }
+}
