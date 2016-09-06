@@ -44,10 +44,10 @@ init();
 
 ```html
 <!-- Meteor 1.2 -->
-<script src="https://npmcdn.com/angular2-now@1.1.5/dist/angular2-now.js"></script>
+<script src="https://unpkg.com/angular2-now@1.1.5/dist/angular2-now.js"></script>
  
 <!-- Meteor 1.1 -->
-<script src="https://npmcdn.com/angular2-now@0.3.15/angular2-now.js"></script>
+<script src="https://unpkg.com/angular2-now@0.3.15/angular2-now.js"></script>
 ```
     
 ## Usage with ES6
